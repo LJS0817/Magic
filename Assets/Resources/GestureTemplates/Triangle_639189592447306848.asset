@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Triangle_639189592447306848
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Triangle
+  points:
+  - X: -0.30864292
+    Y: 0.37224194
+    StrokeID: 1
+  - X: -0.30224591
+    Y: 0.2762837
+    StrokeID: 1
+  - X: -0.30026776
+    Y: 0.18017831
+    StrokeID: 1
+  - X: -0.30026776
+    Y: 0.084007055
+    StrokeID: 1
+  - X: -0.30026776
+    Y: -0.012164146
+    StrokeID: 1
+  - X: -0.30026776
+    Y: -0.108335346
+    StrokeID: 1
+  - X: -0.30026776
+    Y: -0.20450659
+    StrokeID: 1
+  - X: -0.30691254
+    Y: -0.30042264
+    StrokeID: 1
+  - X: -0.3170184
+    Y: -0.39593223
+    StrokeID: 1
+  - X: -0.26775408
+    Y: -0.4237527
+    StrokeID: 1
+  - X: -0.17759755
+    Y: -0.39045754
+    StrokeID: 1
+  - X: -0.09043884
+    Y: -0.35018447
+    StrokeID: 1
+  - X: -0.0013313591
+    Y: -0.31600785
+    StrokeID: 1
+  - X: 0.089318454
+    Y: -0.28433993
+    StrokeID: 1
+  - X: 0.17883337
+    Y: -0.24920481
+    StrokeID: 1
+  - X: 0.26947552
+    Y: -0.21711157
+    StrokeID: 1
+  - X: 0.36126906
+    Y: -0.18842623
+    StrokeID: 1
+  - X: 0.45265847
+    Y: -0.15848914
+    StrokeID: 1
+  - X: 0.5453766
+    Y: -0.13316667
+    StrokeID: 1
+  - X: 0.5908521
+    Y: -0.08220509
+    StrokeID: 1
+  - X: 0.5266841
+    Y: -0.014096707
+    StrokeID: 1
+  - X: 0.4437158
+    Y: 0.033751845
+    StrokeID: 1
+  - X: 0.36276543
+    Y: 0.0855715
+    StrokeID: 1
+  - X: 0.27911532
+    Y: 0.132803
+    StrokeID: 1
+  - X: 0.19724041
+    Y: 0.18295184
+    StrokeID: 1
+  - X: 0.11272967
+    Y: 0.22855845
+    StrokeID: 1
+  - X: 0.028772831
+    Y: 0.27532253
+    StrokeID: 1
+  - X: -0.057341725
+    Y: 0.3175393
+    StrokeID: 1
+  - X: -0.14626923
+    Y: 0.3541564
+    StrokeID: 1
+  - X: -0.23239338
+    Y: 0.39693257
+    StrokeID: 1
+  - X: -0.32037464
+    Y: 0.43575785
+    StrokeID: 1
+  - X: -0.40914792
+    Y: 0.47274658
+    StrokeID: 1
