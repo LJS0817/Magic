@@ -7,12 +7,14 @@ namespace Magic.Drawing
         public string Name;
         public Rect Bounds;
         public Vector2 Center;
+        public float Accuracy;
 
-        public DrawnShape(string name, Rect bounds, Vector2 center)
+        public DrawnShape(string name, Rect bounds, Vector2 center, float accuracy)
         {
             Name = name;
             Bounds = bounds;
             Center = center;
+            Accuracy = accuracy;
         }
     }
 }
