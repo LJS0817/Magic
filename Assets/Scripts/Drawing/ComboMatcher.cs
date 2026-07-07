@@ -5,14 +5,22 @@ namespace Magic.Drawing
 {
     public static class ComboMatcher
     {
-        public static string Match(List<DrawnShape> drawnShapes, SpellRecipeAsset[] recipes)
+        public static System.Tuple<string, float> Match(List<DrawnShape> drawnShapes, SpellRecipeAsset[] recipes)
         {
-            if (drawnShapes == null || drawnShapes.Count == 0) return "아무것도 그리지 않음";
+            if (drawnShapes == null || drawnShapes.Count == 0) return new System.Tuple<string, float>("아무것도 그리지 않음", 0f);
+
+            // 평균 정확도(Score) 계산
+            float averageScore = 0f;
+            foreach (var shape in drawnShapes)
+            {
+                averageScore += shape.Accuracy;
+            }
+            averageScore /= drawnShapes.Count;
 
             // 1. 글로벌 규칙 검사 (상호 배타성 검사: 꼼수 방지)
             if (CheckGlobalOverlap(drawnShapes))
             {
-                return "조합 실패 (같은 도형이 너무 겹쳐 있습니다)";
+                return new System.Tuple<string, float>("조합 실패 (같은 도형이 너무 겹쳐 있습니다)", averageScore);
             }
 
             // 2. 레시피 매칭
@@ -27,11 +35,11 @@ namespace Magic.Drawing
                 // 재귀적 순열(Permutation) 탐색을 통해 유효한 짝을 찾고 규칙을 검사함
                 if (TryMatchRecursive(0, mapping, used, drawnShapes, recipe))
                 {
-                    return recipe.SpellName;
+                    return new System.Tuple<string, float>(recipe.SpellName, averageScore);
                 }
             }
 
-            return "조합 실패 (일치하는 레시피가 없습니다)";
+            return new System.Tuple<string, float>("조합 실패 (일치하는 레시피가 없습니다)", averageScore);
         }
 
         private static bool CheckGlobalOverlap(List<DrawnShape> shapes)

@@ -91,9 +91,27 @@ namespace Magic.EditorTools
                 manager = managerObj.AddComponent<DrawingManager>();
             }
             
-            manager.linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
             manager.drawingArea = drawingArea;
             manager.mainCamera = cam;
+
+            // 6. DrawingDatabase 씬에 배치
+            DrawingDatabase db = Object.FindObjectOfType<DrawingDatabase>();
+            if (db == null)
+            {
+                GameObject dbObj = new GameObject("DrawingDatabase");
+                db = dbObj.AddComponent<DrawingDatabase>();
+            }
+            
+            // 프리팹은 이제 데이터베이스에서 관리
+            db.linePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+            // 7. InventoryManager 씬에 배치
+            Magic.Inventory.InventoryManager inv = Object.FindObjectOfType<Magic.Inventory.InventoryManager>();
+            if (inv == null)
+            {
+                GameObject invObj = new GameObject("InventoryManager");
+                invObj.AddComponent<Magic.Inventory.InventoryManager>();
+            }
 
             Debug.Log("✅ [마법진 그리기 시스템] 셋업이 성공적으로 완료되었습니다! 플레이(Play) 버튼을 눌러 스크롤 영역 위에서 마우스로 그림을 그려보세요.");
         }

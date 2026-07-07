@@ -5,7 +5,7 @@ namespace Magic.Drawing
     [RequireComponent(typeof(LineRenderer))]
     public class DrawingLine : MonoBehaviour
     {
-        private LineRenderer lineRenderer;
+        public LineRenderer lineRenderer { get; private set; }
         public float minDistanceToUpdate = 0.1f;
         
         public Stroke currentStroke { get; private set; }

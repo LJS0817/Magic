@@ -115,13 +115,13 @@ namespace Magic.Drawing
             AssetDatabase.CreateAsset(newAsset, assetPath);
             AssetDatabase.SaveAssets();
 
-            // 씬에 있는 DrawingManager 찾아서 자동으로 배열에 넣어주기
-            DrawingManager manager = Object.FindObjectOfType<DrawingManager>();
-            if (manager != null)
+            // 씬에 있는 DrawingDatabase 찾아서 자동으로 배열에 넣어주기
+            DrawingDatabase db = Object.FindObjectOfType<DrawingDatabase>();
+            if (db != null)
             {
                 SpellRecipeAsset[] allRecipes = Resources.LoadAll<SpellRecipeAsset>("SpellRecipes");
-                manager.recipes = allRecipes;
-                EditorUtility.SetDirty(manager);
+                db.recipes = allRecipes;
+                EditorUtility.SetDirty(db);
             }
 
             Debug.Log($"<color=lime>🎉 [자동 생성 완료] 새로운 마법 레시피 '{recipeName}'이(가) 저장되었습니다!</color>\n경로: {assetPath}");

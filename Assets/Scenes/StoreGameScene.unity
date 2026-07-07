@@ -538,6 +538,64 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &653578145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 653578147}
+  - component: {fileID: 653578146}
+  - component: {fileID: 653578148}
+  m_Layer: 0
+  m_Name: InventoryManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &653578146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653578145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b479edb22c9d044a0ca44a6ef147aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.InventoryManager
+  items: []
+--- !u!4 &653578147
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653578145}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.94445, y: -0.10571, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &653578148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653578145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f2ea770a42f2414596ba409beaf165f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.InventoryDebugUI
 --- !u!1 &1666065029
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,7 +684,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2038397799}
-  - component: {fileID: 2038397798}
+  - component: {fileID: 2038397800}
   m_Layer: 0
   m_Name: DrawingManager
   m_TagString: Untagged
@@ -634,47 +692,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2038397798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2038397797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea2d7d936486954449337939861c856f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.DrawingManager
-  linePrefab: {fileID: 7985386607996301196, guid: 5002eba7847db55438491506c667b0c1, type: 3}
-  drawingArea: {fileID: 582534681}
-  mainCamera: {fileID: 519420031}
-  autoSaveTemplateOnRelease: 1
-  shapeNameToSave: Square
-  recipes:
-  - {fileID: 11400000, guid: 49f83324036711d4883fcea93c4de86b, type: 2}
-  - {fileID: 11400000, guid: 1c9b9d7e3d281e341adc3e85cd3a6946, type: 2}
-  - {fileID: 11400000, guid: f4d7ba2a4e5e19c42bb54fefb5a49c31, type: 2}
-  - {fileID: 11400000, guid: b91e5b8567d6439479f2d14fe9ba71c6, type: 2}
-  - {fileID: 11400000, guid: e59dc45cd55aec245936d6bf80f8fc46, type: 2}
-  - {fileID: 11400000, guid: 4249462a6f7a1ee47b29708a130e8a15, type: 2}
-  - {fileID: 11400000, guid: d74c5226f51a74e40bf467596e0c890c, type: 2}
-  - {fileID: 11400000, guid: dbbf4a24ad0689944b8e53e3def36a22, type: 2}
-  - {fileID: 11400000, guid: 8f17b74ea9b1bbe45a7afae38e213a69, type: 2}
-  - {fileID: 11400000, guid: 60b642df4f422b54fa1f0da01642f919, type: 2}
-  - {fileID: 11400000, guid: 37186abf92e5ce249b6510e273b12edf, type: 2}
-  - {fileID: 11400000, guid: 46d564d3635bd1946a00ba43d421ab93, type: 2}
-  - {fileID: 11400000, guid: cfd0cee441baac34bb0bce2fec7dff73, type: 2}
-  - {fileID: 11400000, guid: 2bae5d5eba956be43bc93a79463b147f, type: 2}
-  - {fileID: 11400000, guid: 71e6fdf59e437df4fb669197031e5be4, type: 2}
-  - {fileID: 11400000, guid: eb1125b72a3761d40b9054c499b998ba, type: 2}
-  - {fileID: 11400000, guid: c59e5c1a240d55149b1f42ee38d378fc, type: 2}
-  - {fileID: 11400000, guid: eb33db9a4adb3ef41919352e17ebca45, type: 2}
-  - {fileID: 11400000, guid: 318500fe221af0742ab40dde08e5fc8b, type: 2}
-  - {fileID: 11400000, guid: e5429cbf5951df2468b77b533f1a2ace, type: 2}
-  - {fileID: 11400000, guid: f4ee9fceaec72c54481310bbfc0f8a92, type: 2}
-  recordRecipeMode: 0
-  newRecipeName: MyAwesomeSpell
 --- !u!4 &2038397799
 Transform:
   m_ObjectHideFlags: 0
@@ -690,6 +707,84 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2038397800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038397797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bcbd8b03790a1b47b3ea18bfe48f787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.RecipeDeveloper
+  drawingArea: {fileID: 582534681}
+  mainCamera: {fileID: 519420031}
+  selectedScrollIndex: -1
+  selectedInkIndex: -1
+  inkDrainRate: 10
+  autoSaveTemplateOnRelease: 0
+  shapeNameToSave: MyNewShape
+  recordRecipeMode: 0
+  newRecipeName: MyAwesomeSpell
+--- !u!1001 &7849889936305553701
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 327.17654
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 582.34436
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2320611372832795573, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5792698008502127892, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
+      propertyPath: m_Name
+      value: DrawingDB
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: cf011373d2ea7b4409787376dea6dea6, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -699,3 +794,5 @@ SceneRoots:
   - {fileID: 1666065032}
   - {fileID: 2345830}
   - {fileID: 2038397799}
+  - {fileID: 7849889936305553701}
+  - {fileID: 653578147}

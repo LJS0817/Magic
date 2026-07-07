@@ -141,7 +141,7 @@ namespace Magic.Editor
             Debug.Log($"<color=lime>🎉 총 {count}개의 샘플 레시피가 성공적으로 생성되었습니다!</color>");
 
             // 씬에 있는 DrawingManager 찾아서 자동으로 배열에 넣어주기
-            DrawingManager manager = Object.FindObjectOfType<DrawingManager>();
+            DrawingDatabase manager = Object.FindObjectOfType<DrawingDatabase>();
             if (manager != null)
             {
                 SpellRecipeAsset[] allRecipes = Resources.LoadAll<SpellRecipeAsset>("SpellRecipes");

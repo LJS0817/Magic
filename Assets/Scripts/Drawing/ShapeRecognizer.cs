@@ -8,9 +8,9 @@ namespace Magic.Drawing
         private static List<GestureTemplate> templates = new List<GestureTemplate>();
         private static bool initialized = false;
 
-        public static string Recognize(DrawingData data)
+        public static RecognizerResult Recognize(DrawingData data)
         {
-            if (data == null || data.strokes.Count == 0) return "Unknown";
+            if (data == null || data.strokes.Count == 0) return new RecognizerResult { Name = "Unknown", Score = 0f };
 
             if (!initialized)
             {
@@ -32,8 +32,14 @@ namespace Magic.Drawing
             // Run $P Recognizer
             RecognizerResult result = PointCloudRecognizer.Classify(pointsList.ToArray(), templates);
 
+            if (result.Score < 0.5f)
+            {
+                Debug.Log($"<color=orange>[ShapeRecognizer] 인식 실패: {result.Name} (Score: {result.Score:F3} < 0.5)</color>");
+                return new RecognizerResult { Name = "Unknown", Score = result.Score };
+            }
+
             Debug.Log($"<color=green>[ShapeRecognizer] 획 인식 완료: {result.Name} (Score: {result.Score:F3})</color>");
-            return result.Name;
+            return result;
         }
 
         // 개발자 도구: 방금 그린 그림을 ScriptableObject 에셋 파일로 저장합니다.

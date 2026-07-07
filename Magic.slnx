@@ -25,9 +25,10 @@
   <Project Path="Unity.2D.Tooling.Editor.csproj" />
   <Project Path="Unity.VisualScripting.State.csproj" />
   <Project Path="Unity.InternalAPIEditorBridge.001.csproj" />
-  <Project Path="Unity.2D.Animation.Profiler.Editor.csproj" />
-  <Project Path="Unity.InputSystem.ForUI.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Unity.2D.Animation.Profiler.Editor.csproj" />
+  <Project Path="DOTween.Modules.csproj" />
+  <Project Path="Unity.InputSystem.ForUI.csproj" />
   <Project Path="Unity.2D.Tilemap.Extras.csproj" />
   <Project Path="Unity.2D.Animation.Runtime.csproj" />
   <Project Path="Unity.VisualScripting.SettingsProvider.Editor.csproj" />
@@ -37,7 +38,9 @@
   <Project Path="Unity.Profiling.Core.csproj" />
   <Project Path="Unity.2D.Aseprite.Common.csproj" />
   <Project Path="Unity.2D.Animation.Profiler.csproj" />
+  <Project Path="DOTweenPro.EditorScripts.csproj" />
   <Project Path="Unity.CollabProxy.Editor.csproj" />
+  <Project Path="DOTweenPro.Scripts.csproj" />
   <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Unity.VisualScripting.DocCodeExamples.csproj" />
