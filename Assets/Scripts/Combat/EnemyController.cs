@@ -13,10 +13,21 @@ namespace Magic.Combat
             health = maxHealth;
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, SpellElement element = SpellElement.None)
         {
             health -= damage;
-            Debug.Log($"<color=orange>[Enemy] Took {damage} damage! Remaining Health: {health}</color>");
+
+            string elementColor = "orange";
+            string elementName = "";
+            switch (element)
+            {
+                case SpellElement.Fire: elementColor = "red"; elementName = " Fire"; break;
+                case SpellElement.Ice: elementColor = "aqua"; elementName = " Ice"; break;
+                case SpellElement.Lightning: elementColor = "yellow"; elementName = " Lightning"; break;
+                case SpellElement.Earth: elementColor = "#8B4513"; elementName = " Earth"; break;
+            }
+
+            Debug.Log($"<color={elementColor}>[Enemy] Took {damage}{elementName} damage! Remaining Health: {health}</color>");
             
             if (health <= 0)
             {

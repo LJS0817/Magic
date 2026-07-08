@@ -35,19 +35,19 @@ namespace Magic.Inventory
             {
                 var scroll1 = new Item_Scroll(true, "", 5);
                 var scroll2 = new Item_Scroll(true, "", 5);
-                var meteorScroll = new Item_Scroll(false, "Meteor", 5);
+                var impactScroll = new Item_Scroll(false, "Impact", 5);
                 var normalInk = new Item_Ink(100f, "일반");
                 var highInk = new Item_Ink(100f, "고급");
 
                 items.Add(scroll1);      // 빈 스크롤
                 items.Add(scroll2);      // 빈 스크롤
-                items.Add(meteorScroll); // 메테오 스크롤
+                items.Add(impactScroll); // 임팩트 스크롤
                 items.Add(normalInk);        // 잉크 1병
                 items.Add(highInk);        // 잉크 2병
 
                 // 기본 전투 장비로 세팅 (테스트용)
                 combatLoadout.Add(scroll1);
-                combatLoadout.Add(meteorScroll);
+                combatLoadout.Add(impactScroll);
                 combatLoadout.Add(normalInk);
 
                 Debug.Log("[InventoryManager] 기본 테스트 아이템 및 로드아웃 지급 완료.");

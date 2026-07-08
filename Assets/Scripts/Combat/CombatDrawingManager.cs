@@ -5,6 +5,13 @@ using Magic.Inventory;
 
 namespace Magic.Combat
 {
+    [System.Serializable]
+    public struct ChantRecipe
+    {
+        public SpellElement element;
+        public List<KeyCode> combo;
+    }
+
     public class CombatDrawingManager : DrawingManager
     {
         [Header("Combat References")]
@@ -14,6 +21,12 @@ namespace Magic.Combat
         public float maxMana = 100f;
         public float currentMana = 100f;
         public float manaCostPerSpell = 30f;
+
+        [Header("Chanting System")]
+        public List<ChantRecipe> chantRecipes = new List<ChantRecipe>();
+        public List<KeyCode> currentChantInput = new List<KeyCode>();
+        public SpellElement currentElement = SpellElement.None;
+        private KeyCode[] chantKeys = { KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F };
 
         // 오버라이드: CombatDrawingManager는 combatLoadout만 사용
         public override List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemData>();
@@ -25,6 +38,15 @@ namespace Magic.Combat
         {
             base.Start();
             if (player == null) player = FindObjectOfType<PlayerController>();
+
+            if (chantRecipes.Count == 0)
+            {
+                // 기본 레시피 등록 (4원소 4키 조합)
+                chantRecipes.Add(new ChantRecipe { element = SpellElement.Fire, combo = new List<KeyCode> { KeyCode.W, KeyCode.R, KeyCode.A, KeyCode.Q } });
+                chantRecipes.Add(new ChantRecipe { element = SpellElement.Ice, combo = new List<KeyCode> { KeyCode.Q, KeyCode.E, KeyCode.W, KeyCode.S } });
+                chantRecipes.Add(new ChantRecipe { element = SpellElement.Lightning, combo = new List<KeyCode> { KeyCode.E, KeyCode.D, KeyCode.R, KeyCode.F } });
+                chantRecipes.Add(new ChantRecipe { element = SpellElement.Earth, combo = new List<KeyCode> { KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.W } });
+            }
 
             FindNextScroll(1);
             FindNextInk(1);
@@ -57,6 +79,8 @@ namespace Magic.Combat
 
             if (canAct && selectedScrollIndex != -1)
             {
+                HandleChantInput();
+
                 Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
 
                 if (currentScroll != null && currentScroll.isEmpty)
@@ -111,7 +135,8 @@ namespace Magic.Combat
             if (currentScroll != null && currentScroll.isEmpty)
             {
                 string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
-                Debug.Log($"<color=cyan>[전투] 마법 발동! {rank} [{matchedSpell}] (Score: {averageScore:F2})</color>");
+                string elementText = currentElement == SpellElement.None ? "" : $" [{currentElement}]";
+                Debug.Log($"<color=cyan>[전투] 마법 발동! {rank}{elementText} [{matchedSpell}] (Score: {averageScore:F2})</color>");
                 
                 // 마나 체크 (실제로는 마나 소모가 필요)
                 if (currentMana >= manaCostPerSpell)
@@ -126,8 +151,8 @@ namespace Magic.Combat
                     }
                     else if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
                     {
-                        // 플레이어 턴에 공격
-                        CombatManager.Instance.enemy.TakeDamage(25f); // 임시 데미지
+                        // 플레이어 턴에 공격 (속성 정보 전달)
+                        CombatManager.Instance.enemy.TakeDamage(25f, currentElement); // 임시 데미지와 속성
                         CombatManager.Instance.EndPlayerTurn();
                     }
 
@@ -140,7 +165,61 @@ namespace Magic.Combat
                 }
             }
 
+            // 속성 영창 초기화
+            currentElement = SpellElement.None;
+            currentChantInput.Clear();
+
             ClearDrawing();
+        }
+
+        private void HandleChantInput()
+        {
+            if (Input.anyKeyDown)
+            {
+                foreach (KeyCode key in chantKeys)
+                {
+                    if (Input.GetKeyDown(key))
+                    {
+                        currentChantInput.Add(key);
+                        CheckChantRecipe();
+                        
+                        // 영창 길이가 너무 길어지면 초기화 (예: 4개 키 초과)
+                        if (currentChantInput.Count > 4)
+                        {
+                            currentChantInput.Clear();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void CheckChantRecipe()
+        {
+            foreach (var recipe in chantRecipes)
+            {
+                if (recipe.combo.Count == currentChantInput.Count)
+                {
+                    bool isMatch = true;
+                    for (int i = 0; i < recipe.combo.Count; i++)
+                    {
+                        if (recipe.combo[i] != currentChantInput[i])
+                        {
+                            isMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (isMatch)
+                    {
+                        currentElement = recipe.element;
+                        Debug.Log($"<color=orange>[영창 완성] {currentElement} 속성이 부여되었습니다!</color>");
+                        // 영창 완성 시 입력 초기화할지 유지할지는 선택이나, 여기선 유지/초기화 중 초기화 선택 (완성되었으므로)
+                        currentChantInput.Clear();
+                        return;
+                    }
+                }
+            }
         }
 
         private void ConsumeScrollDurability(Item_Scroll item)
@@ -208,20 +287,26 @@ namespace Magic.Combat
                 }
             }
 
-            // 4. 하단 중앙: 활성화된 스크롤
+            // 4. 하단 중앙: 활성화된 스크롤 및 영창 상태
             if (selectedScrollIndex != -1 && inventory[selectedScrollIndex] is Item_Scroll activeScroll)
             {
                 GUIStyle centerStyle = new GUIStyle(GUI.skin.label);
                 centerStyle.fontSize = 24;
                 centerStyle.alignment = TextAnchor.MiddleCenter;
                 
-                Rect bottomCenter = new Rect(0, Screen.height - 60, Screen.width, 50);
-                GUI.color = new Color(0, 0, 0, 0.5f);
+                Rect bottomCenter = new Rect(0, Screen.height - 80, Screen.width, 70);
+                GUI.color = new Color(0, 0, 0, 0.6f);
                 GUI.DrawTexture(bottomCenter, Texture2D.whiteTexture);
                 GUI.color = Color.white;
                 
                 string scrollName = activeScroll.isEmpty ? "빈 스크롤" : activeScroll.spellName;
-                GUI.Label(bottomCenter, $"[Active Scroll] {scrollName} (내구도: {activeScroll.currentDurability})", centerStyle);
+                string chantStr = "";
+                foreach (var k in currentChantInput) chantStr += $"[{k}] ";
+                
+                string elementStr = currentElement == SpellElement.None ? "" : $"<color=orange> (속성: {currentElement})</color>";
+
+                GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"영창: {chantStr}{elementStr}", centerStyle);
+                GUI.Label(new Rect(0, Screen.height - 40, Screen.width, 30), $"[Active Scroll] {scrollName} (내구도: {activeScroll.currentDurability})", centerStyle);
             }
 
             // 5. 우측: 스크롤 인벤토리 (그리드 형태)
