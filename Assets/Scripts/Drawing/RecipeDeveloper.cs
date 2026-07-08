@@ -40,6 +40,11 @@ namespace Magic.Drawing
             }
         }
 
+        protected override bool ShouldConsumeInk()
+        {
+            return !autoSaveTemplateOnRelease;
+        }
+
         private void SaveTemplate()
         {
             if (currentDrawingData == null || currentDrawingData.strokes.Count == 0) return;

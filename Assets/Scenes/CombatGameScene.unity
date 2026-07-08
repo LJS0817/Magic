@@ -360,6 +360,108 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &670511618
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 670511620}
+  - component: {fileID: 670511619}
+  m_Layer: 0
+  m_Name: CombatManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &670511619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670511618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0130d9f316428a24b9dc530e19dec71d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.CombatManager
+  maxATB: 100
+  playerATBFillRate: 20
+  enemyATBFillRate: 15
+  currentPlayerATB: 0
+  currentEnemyATB: 0
+  playerTurnTimeLimit: 1000
+  currentPlayerTurnTimer: 0
+  parryWindowDuration: 1.5
+  currentParryTimer: 0
+  player: {fileID: 1512672473}
+  enemy: {fileID: 1068636474}
+--- !u!4 &670511620
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670511618}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.13373, y: 0.43824, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1068636473
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1068636475}
+  - component: {fileID: 1068636474}
+  m_Layer: 0
+  m_Name: EnemyController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1068636474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068636473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac4daf7c865d13f46be825c45bb8ac2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.EnemyController
+  maxHealth: 100
+  health: 100
+  attackDamage: 15
+--- !u!4 &1068636475
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068636473}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.13373, y: 0.43824, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1126723974
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -447,9 +549,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eae2c9288000668408212330f857a5f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.PlayerController
-  moveSpeed: 5
-  armedSpellName: 
-  isArmed: 0
+  maxHealth: 100
+  health: 100
 --- !u!212 &1512672474
 SpriteRenderer:
   serializedVersion: 3
@@ -650,14 +751,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.CombatDrawingManager
   drawingArea: {fileID: 0}
   mainCamera: {fileID: 519420031}
+  selectedScrollIndex: -1
+  selectedInkIndex: -1
+  inkDrainRate: 10
   player: {fileID: 1512672473}
   maxMana: 100
   currentMana: 100
   manaCostPerSpell: 30
-  inkDrainRate: 10
-  inventory: []
-  selectedScrollIndex: -1
-  selectedInkIndex: -1
   scrollCanvasRect:
     serializedVersion: 2
     x: 0
@@ -674,3 +774,5 @@ SceneRoots:
   - {fileID: 2038397799}
   - {fileID: 1512672475}
   - {fileID: 1126723974}
+  - {fileID: 670511620}
+  - {fileID: 1068636475}

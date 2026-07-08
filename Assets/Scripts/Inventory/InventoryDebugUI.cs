@@ -32,10 +32,11 @@ namespace Magic.Inventory
                 return;
             }
 
-            var items = InventoryManager.Instance.items;
             Magic.Drawing.DrawingManager dm = Object.FindObjectOfType<Magic.Drawing.DrawingManager>();
+            var items = dm != null ? dm.inventory : InventoryManager.Instance.items;
             
-            GUILayout.Label($"총 아이템 개수: {items.Count}");
+            GUILayout.Label(dm != null && dm is Magic.Combat.CombatDrawingManager ? "현재 로드아웃 아이템" : "전체 아이템");
+            GUILayout.Label($"총 개수: {items.Count}");
             GUILayout.Space(10);
 
             // 스크롤 목록 출력

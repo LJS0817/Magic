@@ -14,17 +14,12 @@ namespace Magic.Combat
         public float maxMana = 100f;
         public float currentMana = 100f;
         public float manaCostPerSpell = 30f;
-        public float inkDrainRate = 10f; // 잉크 소모 속도 (초당)
 
-        // 글로벌 인벤토리 시스템 참조 (부모 클래스 사용)
+        // 오버라이드: CombatDrawingManager는 combatLoadout만 사용
+        public override List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemData>();
         
-        // 상태 관리
-        private bool isScrollUIVisible = false;
-        
-        // 화면 우측 하단의 스크롤 캔버스 영역
-        public Rect scrollCanvasRect; // OnGUI용 현재 스크롤 영역
-
-        private Item_Scroll currentlyArmedScroll = null;
+        // 화면 중앙 그리기 캔버스 영역
+        public Rect scrollCanvasRect; 
 
         protected override void Start()
         {
@@ -37,108 +32,33 @@ namespace Magic.Combat
 
         protected override void Update()
         {
-            // 1. 발사 처리 (스크롤 모드가 아니고, 장전 상태일 때 좌클릭)
-            if (!isScrollUIVisible && player.isArmed && Input.GetMouseButtonDown(0))
-            {
-                if (currentMana >= manaCostPerSpell)
-                {
-                    currentMana -= manaCostPerSpell;
-                    Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-                    mouseWorldPos.z = 0;
-                    player.CastArmedSpell(mouseWorldPos);
+            if (CombatManager.Instance == null) return;
 
-                    // 마법 발사 성공 시 스크롤 순환(사이클) 처리
-                    if (currentlyArmedScroll != null)
-                    {
-                        currentlyArmedScroll.currentDurability--;
-                        if (currentlyArmedScroll.currentDurability <= 0)
-                        {
-                            Debug.LogWarning("[전투] 스크롤이 수명을 다해 바스라졌습니다!");
-                            int idx = inventory.IndexOf(currentlyArmedScroll);
-                            inventory.Remove(currentlyArmedScroll);
-                            
-                            if (selectedInkIndex > idx) selectedInkIndex--;
-                            if (selectedScrollIndex == idx)
-                            {
-                                selectedScrollIndex = -1;
-                                FindNextScroll(1);
-                            }
-                            else if (selectedScrollIndex > idx) selectedScrollIndex--;
-                        }
-                        else
-                        {
-                            currentlyArmedScroll.isEmpty = true;
-                            currentlyArmedScroll.spellName = "";
-                            currentlyArmedScroll.itemName = "빈 스크롤";
-                            Debug.Log($"[전투] 마법 사용 완료! 종이가 하얗게 표백되어 빈 스크롤이 되었습니다. (남은 횟수: {currentlyArmedScroll.currentDurability})");
-                        }
-                        currentlyArmedScroll = null;
-                    }
-                }
-                else
-                {
-                    Debug.Log("<color=red>[전투] 마나가 부족하여 발사할 수 없습니다!</color>");
-                }
-                return;
+            bool canAct = CombatManager.Instance.CurrentState == CombatState.PlayerTurn || CombatManager.Instance.IsParryWindowOpen;
+
+            // 잉크/스크롤 전환 (숫자키 등 단축키를 쓰거나 UI 클릭)
+            // 임시로 마우스 휠로 스크롤 전환
+            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+            if (scrollWheel != 0f)
+            {
+                FindNextScroll(scrollWheel > 0f ? -1 : 1);
+                ClearDrawing();
             }
 
-            // 2. 잉크 순차적 전환 (Shift 키)
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
             {
                 FindNextInk(1);
             }
 
-            // 3. 스크롤 모드 토글 (Space)
-            if (Input.GetKeyDown(KeyCode.Space))
+            // 캔버스 영역 계산 (가로 전체, 세로 절반, 중앙 배치)
+            float canvasWidth = Screen.width;
+            float canvasHeight = Screen.height * 0.5f;
+            scrollCanvasRect = new Rect(0, (Screen.height - canvasHeight) / 2f, canvasWidth, canvasHeight);
+
+            if (canAct && selectedScrollIndex != -1)
             {
-                if (player.isArmed)
-                {
-                    Debug.Log("[전투] 장전된 마법을 취소합니다. (스크롤 유지)");
-                    player.isArmed = false;
-                    player.armedSpellName = "";
-                    currentlyArmedScroll = null;
-                }
-
-                isScrollUIVisible = !isScrollUIVisible;
-                if (isScrollUIVisible)
-                {
-                    FindNextScroll(1); // 스크롤을 펼칠 때 유효한 스크롤이 있는지 재검사
-                    
-                    if (selectedScrollIndex == -1)
-                    {
-                        Debug.LogWarning("[전투] 인벤토리에 스크롤이 하나도 없습니다!");
-                        isScrollUIVisible = false;
-                    }
-                    else
-                    {
-                        Debug.Log($"[전투] 스크롤 펼침!");
-                    }
-                }
-                else
-                {
-                    ClearDrawing();
-                }
-            }
-
-            // 4. 스크롤 모드가 켜져 있을 때의 로직
-            if (isScrollUIVisible && selectedScrollIndex != -1)
-            {
-                // 마우스 휠로 스크롤 전환 (스크롤 아이템만 순회)
-                float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-                if (scrollWheel != 0f)
-                {
-                    FindNextScroll(scrollWheel > 0f ? -1 : 1);
-                    ClearDrawing();
-                }
-
-                // 스크롤 캔버스 영역 계산
-                float canvasWidth = Screen.width * 0.4f;
-                float canvasHeight = Screen.height * 0.6f;
-                scrollCanvasRect = new Rect(Screen.width - canvasWidth - 20, Screen.height - canvasHeight - 20, canvasWidth, canvasHeight);
-                
                 Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
 
-                // 빈 스크롤일 때만 그리기 허용
                 if (currentScroll != null && currentScroll.isEmpty)
                 {
                     Vector2 mousePosGUI = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
@@ -154,41 +74,27 @@ namespace Magic.Combat
                     }
                 }
 
-                // 5. 장전 처리 (우클릭)
-                if (Input.GetMouseButtonDown(1))
+                // 마법 조합 (빈 스크롤) 또는 완성된 스크롤 즉시 발동
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    ArmAndCloseScroll();
+                    if (currentScroll != null && currentScroll.isEmpty)
+                    {
+                        MatchCombo();
+                    }
+                    else if (currentScroll != null && !currentScroll.isEmpty)
+                    {
+                        // 완성된 스크롤 즉시 발사
+                        OnSpellMatched(currentScroll.spellName, currentScroll.accuracyScore);
+                        // 완성된 스크롤 발사 후 다시 빈 스크롤로 되돌림
+                        currentScroll.isEmpty = true;
+                        currentScroll.spellName = "";
+                        currentScroll.itemName = "빈 스크롤";
+                    }
                 }
-            }
-        }
-
-        // ConsumeInkBottle, UpdateStroke, StartStroke are now handled by base DrawingManager
-
-        private void ArmAndCloseScroll()
-        {
-            if (selectedScrollIndex == -1) return;
-            Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
-
-            if (currentScroll.isEmpty)
-            {
-                if (drawnShapes.Count == 0)
-                {
-                    isScrollUIVisible = false;
-                    return;
-                }
-
-                // 부모 클래스의 매칭 로직 호출 -> OnSpellMatched() 로 연결됨
-                MatchCombo();
             }
             else
             {
-                player.ArmSpell(currentScroll.spellName);
-                
-                currentlyArmedScroll = currentScroll;
-                Debug.Log($"[전투] 완성된 스크롤 '{currentScroll.spellName}'을(를) 장전했습니다. (발사 시 빈 스크롤로 변환됩니다)");
-                
-                isScrollUIVisible = false;
-                ClearDrawing();
+                if (isDrawing) EndStroke();
             }
         }
 
@@ -201,25 +107,39 @@ namespace Magic.Combat
                 return;
             }
 
-            // 성공 시 현재 선택된 스크롤을 마법 스크롤로 변환
             Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
             if (currentScroll != null && currentScroll.isEmpty)
             {
-                // 빈 스크롤 종이 자체를 마법이 새겨진 스크롤로 변환 (아직 종이를 쓴 건 아니므로 내구도는 유지)
-                currentScroll.isEmpty = false;
-                currentScroll.spellName = matchedSpell;
-                currentScroll.accuracyScore = averageScore;
-                
                 string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
-                currentScroll.itemName = $"스크롤 {rank} [{matchedSpell}]";
-
-                Debug.Log($"<color=cyan>[전투] 마법 장전 완료! 우클릭하여 발사하세요. {rank} (Score: {averageScore:F2})</color>");
+                Debug.Log($"<color=cyan>[전투] 마법 발동! {rank} [{matchedSpell}] (Score: {averageScore:F2})</color>");
                 
-                player.ArmSpell(matchedSpell);
-                currentlyArmedScroll = currentScroll;
+                // 마나 체크 (실제로는 마나 소모가 필요)
+                if (currentMana >= manaCostPerSpell)
+                {
+                    currentMana -= manaCostPerSpell;
+
+                    // 상태에 따른 처리
+                    if (CombatManager.Instance.IsParryWindowOpen)
+                    {
+                        // 패링 타이밍에 성공적으로 그렸을 때 (방어 마법인지 추가 체크 가능)
+                        CombatManager.Instance.SuccessfulParry();
+                    }
+                    else if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
+                    {
+                        // 플레이어 턴에 공격
+                        CombatManager.Instance.enemy.TakeDamage(25f); // 임시 데미지
+                        CombatManager.Instance.EndPlayerTurn();
+                    }
+
+                    // 스크롤 내구도 소모
+                    ConsumeScrollDurability(currentScroll);
+                }
+                else
+                {
+                    Debug.Log("<color=red>[전투] 마나가 부족합니다!</color>");
+                }
             }
 
-            isScrollUIVisible = false;
             ClearDrawing();
         }
 
@@ -228,11 +148,10 @@ namespace Magic.Combat
             item.currentDurability--;
             if (item.currentDurability <= 0)
             {
-                Debug.LogWarning("[전투] 빈 스크롤이 파괴되었습니다!");
+                Debug.LogWarning("[전투] 스크롤이 파괴되었습니다!");
                 int idxToRemove = inventory.IndexOf(item);
-                inventory.Remove(item);
+                InventoryManager.Instance.RemoveFromLoadout(item); // Loadout에서 제거
                 
-                // 인덱스 재조정
                 if (selectedInkIndex > idxToRemove) selectedInkIndex--;
                 
                 selectedScrollIndex = -1;
@@ -240,74 +159,83 @@ namespace Magic.Combat
             }
         }
 
-        void OnGUI()
+        protected override void OnGUI()
         {
+            if (CombatManager.Instance == null) return;
+
+            // 부모의 판별 표시 시스템(OnGUI) 상속 호출
+            base.OnGUI();
+
             GUI.color = Color.white;
             GUIStyle style = new GUIStyle(GUI.skin.label);
             style.fontSize = 20;
+            style.alignment = TextAnchor.MiddleLeft;
+
+            // 1. 상단 정보 (턴, 게이지, 시간)
+            string turnInfo = CombatManager.Instance.CurrentState.ToString();
+            float pATB = CombatManager.Instance.currentPlayerATB;
+            float eATB = CombatManager.Instance.currentEnemyATB;
+            float pTime = CombatManager.Instance.currentPlayerTurnTimer;
+            float eTime = CombatManager.Instance.currentParryTimer;
+
+            GUI.Label(new Rect(20, 20, 400, 30), $"State: {turnInfo}", style);
+            GUI.Label(new Rect(20, 50, 400, 30), $"Player ATB: {pATB:F0} | Enemy ATB: {eATB:F0}", style);
             
-            // 상단 자원 바
-            GUI.Label(new Rect(20, 20, 300, 30), $"Mana: {currentMana:F0} / {maxMana}", style);
+            if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
+                GUI.Label(new Rect(20, 80, 400, 30), $"<color=green>Time Left: {pTime:F1}s</color>", style);
+            if (CombatManager.Instance.IsParryWindowOpen)
+                GUI.Label(new Rect(20, 80, 400, 30), $"<color=yellow>Parry Window: {eTime:F1}s!</color>", style);
 
-            // 조작법 힌트
-            GUI.Label(new Rect(20, 60, 400, 100), 
-                "[Space] 스크롤 열기/닫기\n" +
-                "[Shift] 다음 잉크 장착\n" +
-                "[스크롤 모드] 마우스 휠: 인벤토리의 스크롤만 전환\n" +
-                "[일반 모드] 좌클릭: 장전된 마법 발사 (마나소모)");
+            // 2. 중앙 그리기 캔버스 (화면 세로의 1/2)
+            GUI.color = new Color(0.8f, 0.9f, 1f, 0.3f);
+            GUI.DrawTexture(scrollCanvasRect, Texture2D.whiteTexture);
+            GUI.color = Color.black;
+            GUI.Label(new Rect(scrollCanvasRect.x + 10, scrollCanvasRect.y + 10, 300, 30), "[그리기 영역] 스페이스바로 마법 발동");
+            GUI.color = Color.white;
 
-            // 인벤토리 전체 리스트 출력 (우측 상단)
-            GUI.Label(new Rect(Screen.width - 300, 20, 200, 30), $"--- Backpack ---", style);
+            // 3. 좌측: 잉크 (세로 리스트)
+            float leftX = 20f;
+            float bottomYStart = Screen.height - 200f;
+            GUI.Label(new Rect(leftX, bottomYStart, 200, 30), "--- Ink ---", style);
+            int inkCount = 0;
             for (int i = 0; i < inventory.Count; i++)
             {
-                ItemData item = inventory[i];
-                string prefix = "  ";
-                string colorTag = "<color=white>";
-                string details = "";
-
-                if (item is Item_Scroll scroll)
+                if (inventory[i] is Item_Ink ink)
                 {
-                    if (i == selectedScrollIndex && isScrollUIVisible) 
-                    {
-                        prefix = "▶ ";
-                        colorTag = "<color=yellow>";
-                    }
-                    details = scroll.isEmpty ? $"(내구도:{scroll.currentDurability})" : "";
+                    string prefix = i == selectedInkIndex ? "<color=cyan>▶ </color>" : "  ";
+                    GUI.Label(new Rect(leftX, bottomYStart + 30 + (inkCount * 30), 200, 30), $"{prefix}{ink.itemName}", style);
+                    inkCount++;
                 }
-                else if (item is Item_Ink ink)
-                {
-                    if (i == selectedInkIndex)
-                    {
-                        prefix = "▶ ";
-                        colorTag = "<color=cyan>";
-                    }
-                    details = $"({ink.currentAmount:F0}/{ink.maxAmount:F0}ml)";
-                }
-
-                GUI.Label(new Rect(Screen.width - 300, 50 + (i * 30), 300, 30), $"{colorTag}{prefix}[Slot {i+1}] {item.itemName} {details}</color>", style);
             }
 
-            // 스크롤 캔버스 그리기
-            if (isScrollUIVisible && selectedScrollIndex != -1)
+            // 4. 하단 중앙: 활성화된 스크롤
+            if (selectedScrollIndex != -1 && inventory[selectedScrollIndex] is Item_Scroll activeScroll)
             {
-                Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
-
-                // 캔버스 배경
-                GUI.color = currentScroll.isEmpty ? new Color(1f, 0.9f, 0.7f, 0.8f) : new Color(0.7f, 0.9f, 1f, 0.8f);
-                GUI.DrawTexture(scrollCanvasRect, Texture2D.whiteTexture);
+                GUIStyle centerStyle = new GUIStyle(GUI.skin.label);
+                centerStyle.fontSize = 24;
+                centerStyle.alignment = TextAnchor.MiddleCenter;
                 
-                GUI.color = Color.black;
-                if (currentScroll.isEmpty)
+                Rect bottomCenter = new Rect(0, Screen.height - 60, Screen.width, 50);
+                GUI.color = new Color(0, 0, 0, 0.5f);
+                GUI.DrawTexture(bottomCenter, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+                
+                string scrollName = activeScroll.isEmpty ? "빈 스크롤" : activeScroll.spellName;
+                GUI.Label(bottomCenter, $"[Active Scroll] {scrollName} (내구도: {activeScroll.currentDurability})", centerStyle);
+            }
+
+            // 5. 우측: 스크롤 인벤토리 (그리드 형태)
+            float rightX = Screen.width - 250f;
+            GUI.Label(new Rect(rightX, bottomYStart, 200, 30), "--- Scrolls ---", style);
+            int scrollCount = 0;
+            for (int i = 0; i < inventory.Count; i++)
+            {
+                if (inventory[i] is Item_Scroll scroll)
                 {
-                    GUI.Label(new Rect(scrollCanvasRect.x + 10, scrollCanvasRect.y + 10, 300, 30), $"[빈 스크롤] 좌클릭: 그리기, 우클릭: 장전");
-                }
-                else
-                {
-                    GUIStyle hugeStyle = new GUIStyle(GUI.skin.label);
-                    hugeStyle.fontSize = 40;
-                    hugeStyle.alignment = TextAnchor.MiddleCenter;
-                    GUI.Label(new Rect(scrollCanvasRect.x, scrollCanvasRect.y, scrollCanvasRect.width, scrollCanvasRect.height), 
-                        $"{currentScroll.spellName}\n<size=20>우클릭으로 즉시 장전!</size>", hugeStyle);
+                    string prefix = i == selectedScrollIndex ? "<color=yellow>▶ </color>" : "  ";
+                    string scrollName = scroll.isEmpty ? "빈 스크롤" : scroll.spellName;
+                    GUI.Label(new Rect(rightX, bottomYStart + 30 + (scrollCount * 30), 200, 30), $"{prefix}{scrollName}", style);
+                    scrollCount++;
                 }
             }
         }

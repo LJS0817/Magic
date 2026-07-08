@@ -23,7 +23,7 @@ namespace Magic.Drawing
         protected DrawingDatabase drawingDatabase;
 
         // 글로벌 인벤토리 시스템 참조
-        public List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.items : new List<ItemData>();
+        public virtual List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.items : new List<ItemData>();
         
         public int selectedScrollIndex = -1;
         public int selectedInkIndex = -1;
@@ -131,19 +131,28 @@ namespace Magic.Drawing
 
             Vector2 newPoint = new Vector2(worldPos.x, worldPos.y);
 
-            // 잉크 소모 처리 (마우스를 움직인 거리에 비례 또는 시간에 비례)
-            // 여기서는 시간에 비례하여 간단히 잉크 소모
-            Item_Ink currentInk = selectedInkIndex != -1 && selectedInkIndex < inventory.Count ? inventory[selectedInkIndex] as Item_Ink : null;
-            if (currentInk == null || currentInk.currentAmount <= 0)
+            if (ShouldConsumeInk())
             {
-                EndStroke();
-                Debug.LogWarning("[그리기] 잉크가 바닥났습니다! 병이 버려집니다.");
-                ConsumeInkBottle();
-                return;
+                // 잉크 소모 처리 (마우스를 움직인 거리에 비례 또는 시간에 비례)
+                // 여기서는 시간에 비례하여 간단히 잉크 소모
+                Item_Ink currentInk = selectedInkIndex != -1 && selectedInkIndex < inventory.Count ? inventory[selectedInkIndex] as Item_Ink : null;
+                if (currentInk == null || currentInk.currentAmount <= 0)
+                {
+                    EndStroke();
+                    Debug.LogWarning("[그리기] 잉크가 바닥났습니다! 병이 버려집니다.");
+                    ConsumeInkBottle();
+                    return;
+                }
+
+                currentInk.currentAmount -= inkDrainRate * Time.deltaTime;
             }
 
-            currentInk.currentAmount -= inkDrainRate * Time.deltaTime;
             currentLine.AddPoint(newPoint);
+        }
+
+        protected virtual bool ShouldConsumeInk()
+        {
+            return true;
         }
 
         protected virtual void EndStroke()
@@ -256,7 +265,11 @@ namespace Magic.Drawing
             Item_Ink ink = inventory[selectedInkIndex] as Item_Ink;
             if (ink != null && ink.currentAmount <= 0)
             {
+                int idxToRemove = selectedInkIndex;
                 InventoryManager.Instance.RemoveItem(ink);
+                
+                if (selectedScrollIndex > idxToRemove) selectedScrollIndex--;
+                
                 selectedInkIndex = -1;
             }
         }
@@ -307,31 +320,46 @@ namespace Magic.Drawing
 
         protected virtual void OnGUI()
         {
-            if (drawnShapes.Count == 0 || mainCamera == null) return;
+            if (drawnShapes.Count == 0) return;
 
-            GUIStyle style = new GUIStyle();
+            GUIStyle style = new GUIStyle(GUI.skin.label);
             style.fontSize = 20;
-            style.alignment = TextAnchor.MiddleCenter;
+            style.alignment = TextAnchor.MiddleLeft;
 
+            float startX = 20f;
+            float startY = Screen.height * 0.4f;
+
+            GUI.Label(new Rect(startX, startY, 200, 30), "--- Drawn Shapes ---", style);
+            
+            int displayIndex = 0;
             foreach (var shape in drawnShapes)
             {
-                if (shape.Name == "Unknown" || shape.Name == "None") continue;
+                string displayName = shape.Name;
+                string scoreText = $" : {shape.Accuracy:F2}";
+                string colorTag = "<color=red>";
 
-                // 월드 좌표인 center를 스크린 좌표로 변환
-                Vector3 screenPos = mainCamera.WorldToScreenPoint(new Vector3(shape.Center.x, shape.Center.y, 0));
-                // GUI 좌표계는 좌상단이 (0,0)이므로 y축 반전
-                float guiY = Screen.height - screenPos.y;
+                // 이름이 Unknown이거나 정확도가 0.5 미만이면 실패로 간주
+                bool isFailed = shape.Name == "Unknown" || shape.Name == "None" || shape.Accuracy < 0.5f;
 
-                // 점수에 따른 색상 지정
-                if (shape.Accuracy >= 0.85f)
-                    style.normal.textColor = Color.yellow; // 대성공
+                if (isFailed)
+                {
+                    displayName = "판정 실패";
+                    scoreText = ""; // 실패 시 점수는 숨기거나 표시 안함 (어떤 도형으로 판정 실패했는지 숨김)
+                    colorTag = "<color=gray>";
+                }
+                else if (shape.Accuracy >= 0.85f)
+                {
+                    colorTag = "<color=yellow>"; // 대성공
+                }
                 else if (shape.Accuracy >= 0.5f)
-                    style.normal.textColor = Color.green; // 성공
-                else
-                    style.normal.textColor = Color.red; // 실패
+                {
+                    colorTag = "<color=green>"; // 성공
+                }
 
-                Rect labelRect = new Rect(screenPos.x - 100, guiY - 20, 200, 40);
-                GUI.Label(labelRect, $"{shape.Name}\n{shape.Accuracy:F2}", style);
+                GUI.Label(new Rect(startX, startY + 30 + (displayIndex * 30), 300, 30), 
+                    $"{colorTag}[{displayIndex + 1}] {displayName}{scoreText}</color>", style);
+                
+                displayIndex++;
             }
         }
     }
