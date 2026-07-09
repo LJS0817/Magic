@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Magic.Combat;
+using Magic.Drawing;
 
 namespace Magic.Combat
 {
@@ -8,6 +9,7 @@ namespace Magic.Combat
     {
         Idle,
         PlayerTurn,
+        PlayerChanting,
         EnemyTurn,
         BattleEnd
     }
@@ -72,6 +74,10 @@ namespace Magic.Combat
                 case CombatState.PlayerTurn:
                     HandlePlayerTurn();
                     break;
+                case CombatState.PlayerChanting:
+                    // Chanting phase is primarily handled by CombatDrawingManager.
+                    // ATB and Turn timers are paused here.
+                    break;
                 case CombatState.EnemyTurn:
                     HandleEnemyTurn();
                     break;
@@ -112,6 +118,12 @@ namespace Magic.Combat
             }
         }
 
+        public void StartPlayerChanting()
+        {
+            CurrentState = CombatState.PlayerChanting;
+            Debug.Log("<color=magenta>[Combat] Chanting Phase Started!</color>");
+        }
+
         public void EndPlayerTurn()
         {
             currentPlayerATB = 0f;
@@ -140,10 +152,53 @@ namespace Magic.Combat
                 if (currentParryTimer <= 0)
                 {
                     IsParryWindowOpen = false;
-                    enemy.ExecuteAttack();
+                    enemy.ExecuteAttack(1f); // 패링 실패: 100% 데미지
                     EndEnemyTurn();
                 }
             }
+        }
+
+        public void EvaluateParryClash(string spellName, SpellType spellType, SpellElement playerElement)
+        {
+            if (!IsParryWindowOpen) return;
+            IsParryWindowOpen = false;
+
+            if (spellType == Magic.Drawing.SpellType.Defense)
+            {
+                Debug.Log($"<color=cyan>[Combat] 방어 마법({spellName}) 전개! 데미지 80% 경감!</color>");
+                enemy.ExecuteAttack(0.2f); // 방어 시 20% 데미지
+                EndEnemyTurn();
+                return;
+            }
+
+            SpellElement enemyElement = enemy.currentAttackElement;
+            bool isAdvantage = CheckAdvantage(playerElement, enemyElement);
+
+            if (isAdvantage)
+            {
+                // 패링 성공! 상성 우위
+                Debug.Log($"<color=lime>[Combat] 패링 성공! {playerElement} 속성이 적의 {enemyElement} 속성을 파훼했습니다!</color>");
+                enemy.OnParried();
+                enemy.TakeDamage(30f, playerElement); // 카운터 데미지
+                EndEnemyTurn();
+            }
+            else
+            {
+                // 상성 열위 또는 무속성 -> 크로스 카운터 (적은 데미지 안입고 유저만 피해 입음 - 수정된 룰 적용)
+                Debug.Log($"<color=red>[Combat] 패링 실패! 상성({playerElement} vs {enemyElement})이 불리하여 마법이 상쇄되었습니다!</color>");
+                enemy.ExecuteAttack(1f); // 유저 피해 100%
+                // 적 데미지 생략
+                EndEnemyTurn();
+            }
+        }
+
+        private bool CheckAdvantage(SpellElement player, SpellElement enemy)
+        {
+            if (player == SpellElement.Fire && enemy == SpellElement.Ice) return true;
+            if (player == SpellElement.Ice && enemy == SpellElement.Lightning) return true;
+            if (player == SpellElement.Lightning && enemy == SpellElement.Earth) return true;
+            if (player == SpellElement.Earth && enemy == SpellElement.Fire) return true;
+            return false;
         }
 
         public void SuccessfulParry()

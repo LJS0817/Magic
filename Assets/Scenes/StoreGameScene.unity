@@ -739,7 +739,7 @@ MonoBehaviour:
   selectedInkIndex: -1
   inkDrainRate: 10
   autoSaveTemplateOnRelease: 0
-  shapeNameToSave: MyNewShape
+  shapeNameToSave: Star
   recordRecipeMode: 0
   newRecipeName: MyAwesomeSpell
 --- !u!1001 &7849889936305553701

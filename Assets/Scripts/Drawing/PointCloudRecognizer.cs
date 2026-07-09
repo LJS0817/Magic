@@ -82,43 +82,60 @@ namespace Magic.Drawing
 
         private static Point[] Resample(Point[] points, int n)
         {
-            float interval = PathLength(points) / (n - 1);
+            float pathLen = PathLength(points);
+            if (pathLen <= 0.0001f)
+            {
+                List<Point> padded = new List<Point>();
+                for (int i = 0; i < n; i++) padded.Add(points[0]);
+                return padded.ToArray();
+            }
+
+            float interval = pathLen / (n - 1);
             float D = 0.0f;
             List<Point> newPoints = new List<Point> { points[0] };
 
-            for (int i = 1; i < points.Length; i++)
+            int idx = 1;
+            Point prevPoint = points[0];
+
+            while (idx < points.Length)
             {
-                if (points[i].StrokeID == points[i - 1].StrokeID)
+                // 무한루프 완벽 방지: 이미 필요한 점 개수를 모두 채웠다면 루프 탈출
+                if (newPoints.Count >= n)
+                    break;
+
+                if (points[idx].StrokeID == prevPoint.StrokeID)
                 {
-                    float d = Distance(points[i - 1], points[i]);
+                    float d = Distance(prevPoint, points[idx]);
                     if ((D + d) >= interval)
                     {
-                        float qx = points[i - 1].X;
-                        float qy = points[i - 1].Y;
-                        if (d > 0)
+                        float qx = prevPoint.X;
+                        float qy = prevPoint.Y;
+                        if (d > 0.0001f) // 0 나누기 및 부동소수점 오류 방지
                         {
-                            qx += ((interval - D) / d) * (points[i].X - points[i - 1].X);
-                            qy += ((interval - D) / d) * (points[i].Y - points[i - 1].Y);
+                            qx += ((interval - D) / d) * (points[idx].X - prevPoint.X);
+                            qy += ((interval - D) / d) * (points[idx].Y - prevPoint.Y);
                         }
-                        Point q = new Point(qx, qy, points[i].StrokeID);
+                        
+                        Point q = new Point(qx, qy, points[idx].StrokeID);
                         newPoints.Add(q);
-                        
-                        // Insert 'q' at position i so that the remaining segment is processed
-                        var tempList = new List<Point>(points);
-                        tempList.Insert(i, q);
-                        points = tempList.ToArray();
-                        
+
+                        prevPoint = q;
                         D = 0.0f;
+                        // idx는 증가시키지 않고, 새 기준점(q)부터 원래의 points[idx]까지의 거리를 다음 루프에서 마저 계산함.
                     }
                     else
                     {
                         D += d;
+                        prevPoint = points[idx];
+                        idx++;
                     }
                 }
+                else
+                {
+                    prevPoint = points[idx];
+                    idx++;
+                }
             }
-
-            if (newPoints.Count == n - 1)
-                newPoints.Add(new Point(points[points.Length - 1].X, points[points.Length - 1].Y, points[points.Length - 1].StrokeID));
 
             // 부동소수점 오차로 인해 점 개수가 모자란 경우를 대비해 패딩 처리
             while (newPoints.Count < n)

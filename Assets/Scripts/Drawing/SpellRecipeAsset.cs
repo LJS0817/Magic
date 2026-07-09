@@ -10,6 +10,13 @@ namespace Magic.Drawing
         Aligned     // targetIndices[0..N] are aligned in a straight line
     }
 
+    public enum SpellType
+    {
+        Attack,
+        Defense,
+        Utility
+    }
+
     [System.Serializable]
     public struct RuleData
     {
@@ -21,6 +28,7 @@ namespace Magic.Drawing
     public class SpellRecipeAsset : ScriptableObject
     {
         public string SpellName;
+        public SpellType Type = SpellType.Attack;
         
         [Header("Lore & Information")]
         [TextArea(3, 5)]

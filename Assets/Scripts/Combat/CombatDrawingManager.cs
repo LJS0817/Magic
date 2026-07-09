@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Magic.Drawing;
 using Magic.Inventory;
+using DG.Tweening;
 
 namespace Magic.Combat
 {
@@ -27,6 +28,21 @@ namespace Magic.Combat
         public List<KeyCode> currentChantInput = new List<KeyCode>();
         public SpellElement currentElement = SpellElement.None;
         private KeyCode[] chantKeys = { KeyCode.Q, KeyCode.W, KeyCode.E, KeyCode.R, KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.F };
+
+        [Header("Chanting Phase")]
+        public float chantTimeLimit = 1.5f;
+        public float currentChantTimer = 0f;
+        public bool isChantingPhase = false;
+        private string cachedSpellName = "";
+        private float cachedSpellScore = 0f;
+        private SpellType cachedSpellType = SpellType.Attack;
+        private Item_Scroll cachedScroll = null;
+
+        [Header("UI Animations")]
+        private float chantUIScale = 1f;
+        private float parryUIAlpha = 1f;
+        private bool wasParryOpen = false;
+        private Tween parryTween;
 
         // 오버라이드: CombatDrawingManager는 combatLoadout만 사용
         public override List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemData>();
@@ -58,6 +74,20 @@ namespace Magic.Combat
 
             bool canAct = CombatManager.Instance.CurrentState == CombatState.PlayerTurn || CombatManager.Instance.IsParryWindowOpen;
 
+            // 패링 윈도우 UI 애니메이션 트리거 (DOTween)
+            if (CombatManager.Instance.IsParryWindowOpen && !wasParryOpen)
+            {
+                wasParryOpen = true;
+                parryUIAlpha = 0f;
+                parryTween = DOTween.To(() => parryUIAlpha, x => parryUIAlpha = x, 1f, 0.2f).SetLoops(-1, LoopType.Yoyo);
+            }
+            else if (!CombatManager.Instance.IsParryWindowOpen && wasParryOpen)
+            {
+                wasParryOpen = false;
+                parryTween?.Kill();
+                parryUIAlpha = 1f;
+            }
+
             // 잉크/스크롤 전환 (숫자키 등 단축키를 쓰거나 UI 클릭)
             // 임시로 마우스 휠로 스크롤 전환
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
@@ -77,10 +107,23 @@ namespace Magic.Combat
             float canvasHeight = Screen.height * 0.5f;
             scrollCanvasRect = new Rect(0, (Screen.height - canvasHeight) / 2f, canvasWidth, canvasHeight);
 
-            if (canAct && selectedScrollIndex != -1)
+            bool isChanting = CombatManager.Instance.CurrentState == CombatState.PlayerChanting;
+
+            if (isChanting)
             {
+                currentChantTimer -= Time.deltaTime;
                 HandleChantInput();
 
+                if (currentChantTimer <= 0)
+                {
+                    Debug.Log("<color=red>[영창] 영창 시간이 초과되었습니다!</color>");
+                    ExecuteSpell(); // 시간 초과 시 현재까지의 속성(또는 None)으로 마법 발동
+                }
+                return; // 영창 중에는 다른 액션(그리기 등) 불가
+            }
+
+            if (canAct && selectedScrollIndex != -1)
+            {
                 Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
 
                 if (currentScroll != null && currentScroll.isEmpty)
@@ -119,6 +162,13 @@ namespace Magic.Combat
             else
             {
                 if (isDrawing) EndStroke();
+
+                // 자신의 턴(마법진 사용 가능 시간)이 아닐 때는 미리 모아둔 영창을 모두 초기화
+                if (currentElement != SpellElement.None || currentChantInput.Count > 0)
+                {
+                    currentElement = SpellElement.None;
+                    currentChantInput.Clear();
+                }
             }
         }
 
@@ -131,38 +181,95 @@ namespace Magic.Combat
                 return;
             }
 
+            SpellRecipeAsset matchedAsset = null;
+            if (drawingDatabase != null && drawingDatabase.recipes != null)
+            {
+                foreach (var r in drawingDatabase.recipes)
+                {
+                    if (r.SpellName == matchedSpell)
+                    {
+                        matchedAsset = r;
+                        break;
+                    }
+                }
+            }
+            SpellType sType = matchedAsset != null ? matchedAsset.Type : SpellType.Attack;
+
             Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
             if (currentScroll != null && currentScroll.isEmpty)
             {
-                string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
-                string elementText = currentElement == SpellElement.None ? "" : $" [{currentElement}]";
-                Debug.Log($"<color=cyan>[전투] 마법 발동! {rank}{elementText} [{matchedSpell}] (Score: {averageScore:F2})</color>");
+                cachedSpellName = matchedSpell;
+                cachedSpellScore = averageScore;
+                cachedSpellType = sType;
+                cachedScroll = currentScroll;
                 
-                // 마나 체크 (실제로는 마나 소모가 필요)
-                if (currentMana >= manaCostPerSpell)
+                // 기존에 잘못 입력된 영창 초기화
+                currentChantInput.Clear();
+                currentElement = SpellElement.None;
+
+                if (sType == SpellType.Defense)
                 {
-                    currentMana -= manaCostPerSpell;
-
-                    // 상태에 따른 처리
-                    if (CombatManager.Instance.IsParryWindowOpen)
-                    {
-                        // 패링 타이밍에 성공적으로 그렸을 때 (방어 마법인지 추가 체크 가능)
-                        CombatManager.Instance.SuccessfulParry();
-                    }
-                    else if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
-                    {
-                        // 플레이어 턴에 공격 (속성 정보 전달)
-                        CombatManager.Instance.enemy.TakeDamage(25f, currentElement); // 임시 데미지와 속성
-                        CombatManager.Instance.EndPlayerTurn();
-                    }
-
-                    // 스크롤 내구도 소모
-                    ConsumeScrollDurability(currentScroll);
+                    // 방어 마법은 영창(속성 부여) 없이 즉시 발사
+                    ExecuteSpell();
                 }
                 else
                 {
-                    Debug.Log("<color=red>[전투] 마나가 부족합니다!</color>");
+                    // 공격 마법 등은 영창 페이즈로 돌입
+                    isChantingPhase = true;
+                    currentChantTimer = chantTimeLimit;
+                    CombatManager.Instance.StartPlayerChanting();
+
+                    // 영창 UI 애니메이션 (통통 튀는 스케일)
+                    chantUIScale = 0f;
+                    DOTween.To(() => chantUIScale, x => chantUIScale = x, 1f, 0.5f).SetEase(Ease.OutBack);
                 }
+            }
+            else if (currentScroll != null && !currentScroll.isEmpty)
+            {
+                // 이미 속성과 마법이 완성된 스크롤은 영창 없이 즉시 발사
+                cachedSpellName = matchedSpell;
+                cachedSpellScore = averageScore;
+                cachedScroll = currentScroll;
+                ExecuteSpell();
+            }
+        }
+
+        private void ExecuteSpell()
+        {
+            isChantingPhase = false;
+            string rank = cachedSpellScore >= 0.85f ? "[대성공]" : "[성공]";
+            string elementText = currentElement == SpellElement.None ? "" : $" [{currentElement}]";
+            Debug.Log($"<color=cyan>[전투] 마법 발동! {rank}{elementText} [{cachedSpellName}] (Score: {cachedSpellScore:F2})</color>");
+            
+            // 마나 체크 (실제로는 마나 소모가 필요)
+            if (currentMana >= manaCostPerSpell)
+            {
+                currentMana -= manaCostPerSpell;
+
+                // 상태에 따른 처리
+                if (CombatManager.Instance.IsParryWindowOpen)
+                {
+                    CombatManager.Instance.EvaluateParryClash(cachedSpellName, cachedSpellType, currentElement);
+                }
+                else
+                {
+                    if (cachedSpellType == SpellType.Defense)
+                    {
+                        Debug.Log("<color=cyan>[전투] 방어 마법 전개! (자신에게 방어막 부여)</color>");
+                        // TODO: 실제 버프/쉴드 로직 구현 필요
+                    }
+                    else
+                    {
+                        CombatManager.Instance.enemy.TakeDamage(25f, currentElement);
+                    }
+                    CombatManager.Instance.EndPlayerTurn();
+                }
+
+                ConsumeScrollDurability(cachedScroll);
+            }
+            else
+            {
+                Debug.Log("<color=red>[전투] 마나가 부족합니다!</color>");
             }
 
             // 속성 영창 초기화
@@ -214,8 +321,10 @@ namespace Magic.Combat
                     {
                         currentElement = recipe.element;
                         Debug.Log($"<color=orange>[영창 완성] {currentElement} 속성이 부여되었습니다!</color>");
-                        // 영창 완성 시 입력 초기화할지 유지할지는 선택이나, 여기선 유지/초기화 중 초기화 선택 (완성되었으므로)
                         currentChantInput.Clear();
+                        
+                        // 영창이 완성되면 즉시 마법 발동
+                        ExecuteSpell();
                         return;
                     }
                 }
@@ -262,8 +371,22 @@ namespace Magic.Combat
             
             if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
                 GUI.Label(new Rect(20, 80, 400, 30), $"<color=green>Time Left: {pTime:F1}s</color>", style);
+            
             if (CombatManager.Instance.IsParryWindowOpen)
+            {
+                Color oldColor = GUI.color;
+                GUI.color = new Color(1f, 1f, 1f, parryUIAlpha);
                 GUI.Label(new Rect(20, 80, 400, 30), $"<color=yellow>Parry Window: {eTime:F1}s!</color>", style);
+                GUI.color = oldColor;
+            }
+
+            if (isChantingPhase)
+            {
+                Vector2 center = new Vector2(20 + 200, 110 + 15);
+                GUIUtility.ScaleAroundPivot(new Vector2(chantUIScale, chantUIScale), center);
+                GUI.Label(new Rect(20, 110, 400, 30), $"<color=magenta>CHANTING PHASE: {currentChantTimer:F1}s</color>", style);
+                GUIUtility.ScaleAroundPivot(new Vector2(1f / chantUIScale, 1f / chantUIScale), center); // Reset scale
+            }
 
             // 2. 중앙 그리기 캔버스 (화면 세로의 1/2)
             GUI.color = new Color(0.8f, 0.9f, 1f, 0.3f);
@@ -305,7 +428,18 @@ namespace Magic.Combat
                 
                 string elementStr = currentElement == SpellElement.None ? "" : $"<color=orange> (속성: {currentElement})</color>";
 
-                GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"영창: {chantStr}{elementStr}", centerStyle);
+                if (isChantingPhase)
+                {
+                    Vector2 center = new Vector2(Screen.width / 2f, Screen.height - 60f);
+                    GUIUtility.ScaleAroundPivot(new Vector2(chantUIScale, chantUIScale), center);
+                    GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"<color=magenta>영창을 입력하세요!</color> {chantStr}{elementStr}", centerStyle);
+                    GUIUtility.ScaleAroundPivot(new Vector2(1f / chantUIScale, 1f / chantUIScale), center); // Reset
+                }
+                else
+                {
+                    GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"영창: {chantStr}{elementStr}", centerStyle);
+                }
+                
                 GUI.Label(new Rect(0, Screen.height - 40, Screen.width, 30), $"[Active Scroll] {scrollName} (내구도: {activeScroll.currentDurability})", centerStyle);
             }
 
