@@ -28,7 +28,7 @@ namespace Magic.Drawing
         protected DrawingDatabase drawingDatabase;
 
         // 글로벌 인벤토리 시스템 참조
-        public virtual List<ItemData> inventory => (InventoryManager.Instance != null && InventoryManager.Instance.items != null) ? InventoryManager.Instance.items : new List<ItemData>();
+        public virtual List<ItemInstance> inventory => (InventoryManager.Instance != null && InventoryManager.Instance.items != null) ? InventoryManager.Instance.items : new List<ItemInstance>();
         
         public int selectedScrollIndex = -1;
         public int selectedInkIndex = -1;
@@ -191,9 +191,12 @@ namespace Magic.Drawing
 
             // 펜 확인
             Item_Pen currentPen = selectedPenIndex != -1 && selectedPenIndex < inv.Count ? inv[selectedPenIndex] as Item_Pen : null;
-            if (currentPen == null || currentPen.currentInkCapacity <= 0)
+            if (currentPen == null || !CanDrawWithPen(currentPen))
             {
-                Debug.LogWarning("[그리기 실패] 펜을 선택하지 않았거나 펜에 잉크가 없습니다. (스크롤 밖으로 나가서 충전하세요)");
+                string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana 
+                    ? "[그리기 실패] 마력이 부족하여 마나 펜을 사용할 수 없습니다." 
+                    : "[그리기 실패] 펜을 선택하지 않았거나 펜에 잉크가 없습니다. (스크롤 밖으로 나가서 충전하세요)";
+                Debug.LogWarning(warnMsg);
                 return;
             }
 
@@ -222,19 +225,43 @@ namespace Magic.Drawing
 
             if (ShouldConsumeInk())
             {
-                // 펜 잉크 소모 처리
                 Item_Pen currentPen = selectedPenIndex != -1 && selectedPenIndex < inventory.Count ? inventory[selectedPenIndex] as Item_Pen : null;
-                if (currentPen == null || currentPen.currentInkCapacity <= 0)
+                if (currentPen == null || !CanDrawWithPen(currentPen))
                 {
                     EndStroke();
-                    Debug.LogWarning("[그리기] 펜의 잉크가 바닥났습니다! 스크롤 밖으로 나가 잉크를 충전하세요.");
+                    string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana
+                        ? "[그리기] 플레이어 마력이 바닥나 그릴 수 없습니다!"
+                        : "[그리기] 펜의 잉크가 바닥났습니다! 스크롤 밖으로 나가 잉크를 충전하세요.";
+                    Debug.LogWarning(warnMsg);
                     return;
                 }
 
-                currentPen.currentInkCapacity -= currentPen.inkConsumptionRate * Time.deltaTime;
+                ConsumePenResource(currentPen);
             }
 
             currentLine.AddPoint(newPoint);
+        }
+
+        /// <summary>
+        /// 현재 장착한 펜으로 드로잉을 시작하거나 유지할 수 있는지 체크합니다.
+        /// </summary>
+        protected virtual bool CanDrawWithPen(Item_Pen pen)
+        {
+            if (pen == null) return false;
+            if (pen.PenData != null && pen.PenData.consumesMana) return true; // 일반 매니저에서는 마나 제한 없음
+            return pen.currentInkCapacity > 0f;
+        }
+
+        /// <summary>
+        /// 펜 사용 시 드로잉 자원(잉크 혹은 마나)을 소모합니다.
+        /// </summary>
+        protected virtual void ConsumePenResource(Item_Pen pen)
+        {
+            if (pen == null) return;
+            if (pen.PenData != null && pen.PenData.consumesMana) return; // 일반 매니저에서는 마나 차감 구현 생략 (전투 매니저에서 재정의)
+            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
+            pen.currentInkCapacity -= rate * Time.deltaTime;
+            if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
         }
 
         protected virtual bool ShouldConsumeInk()
@@ -453,6 +480,17 @@ namespace Magic.Drawing
         {
             isPenReady = false; // 밖으로 나가면 그리기 불가
 
+            if (selectedPenIndex != -1 && selectedPenIndex < inventory.Count)
+            {
+                Item_Pen pen = inventory[selectedPenIndex] as Item_Pen;
+                if (pen != null && pen.PenData != null && pen.PenData.consumesMana)
+                {
+                    // 마나 소모 펜은 잉크 리필 프로세스를 거치지 않고 즉시 그리기 가능
+                    isPenReady = true;
+                    return;
+                }
+            }
+
             if (inkBottleVisual == null) {
                 Debug.LogWarning("[RefillPen] inkBottleVisual이 할당되지 않아 잉크병 위치로 이동할 수 없습니다! 인스펙터를 확인해주세요.");
             }
@@ -522,13 +560,14 @@ namespace Magic.Drawing
         {
             if (selectedPenIndex == -1 || selectedPenIndex >= inventory.Count) return;
             Item_Pen pen = inventory[selectedPenIndex] as Item_Pen;
-            if (pen == null) return;
+            if (pen == null || (pen.PenData != null && pen.PenData.consumesMana)) return;
 
             if (selectedInkIndex == -1 || selectedInkIndex >= inventory.Count) return;
             Item_Ink ink = inventory[selectedInkIndex] as Item_Ink;
             if (ink == null || ink.currentAmount <= 0) return;
 
-            float amountNeeded = pen.maxInkCapacity - pen.currentInkCapacity;
+            float maxCap = pen.PenData != null ? pen.PenData.maxInkCapacity : 0f;
+            float amountNeeded = maxCap - pen.currentInkCapacity;
             if (amountNeeded <= 0) return;
 
             ExecuteRefillLogic(pen, ink, amountNeeded);

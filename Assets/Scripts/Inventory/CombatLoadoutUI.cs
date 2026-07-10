@@ -79,7 +79,7 @@ namespace Magic.Inventory
             loadoutScroll = GUILayout.BeginScrollView(loadoutScroll);
             
             // 리스트에서 삭제할 때 오류 방지를 위해 복사본 순회 또는 역순 순회
-            List<ItemData> loadoutCopy = new List<ItemData>(loadout);
+            List<ItemInstance> loadoutCopy = new List<ItemInstance>(loadout);
             foreach (var item in loadoutCopy)
             {
                 GUILayout.BeginHorizontal();
@@ -114,17 +114,19 @@ namespace Magic.Inventory
             GUI.DragWindow();
         }
 
-        private string GetDisplayName(ItemData item)
+        private string GetDisplayName(ItemInstance item)
         {
             if (item is Item_Scroll scroll)
             {
-                return scroll.isEmpty ? $"[빈 스크롤] 수명: {scroll.currentDurability}" : $"[스크롤] {scroll.spellName} (수명: {scroll.currentDurability})";
+                string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
+                return scroll.isEmpty ? $"[빈 스크롤] 수명: {scroll.currentDurability}" : $"[스크롤] {spell} (수명: {scroll.currentDurability})";
             }
             else if (item is Item_Ink ink)
             {
-                return $"[잉크] {ink.itemName} ({(int)ink.currentAmount}/{(int)ink.maxAmount})";
+                float max = ink.InkData != null ? ink.InkData.maxAmount : 0f;
+                return $"[잉크] {ink.ItemName} ({(int)ink.currentAmount}/{(int)max})";
             }
-            return item.itemName;
+            return item.ItemName;
         }
     }
 }

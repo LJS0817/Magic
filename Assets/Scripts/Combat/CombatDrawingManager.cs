@@ -45,7 +45,7 @@ namespace Magic.Combat
         private Tween parryTween;
 
         // 오버라이드: CombatDrawingManager는 combatLoadout만 사용
-        public override List<ItemData> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemData>();
+        public override List<ItemInstance> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemInstance>();
         
         // 화면 중앙 그리기 캔버스 영역
         public Rect scrollCanvasRect; 
@@ -152,10 +152,9 @@ namespace Magic.Combat
                     {
                         // 완성된 스크롤 즉시 발사
                         OnSpellMatched(currentScroll.spellName, currentScroll.accuracyScore);
-                        // 완성된 스크롤 발사 후 다시 빈 스크롤로 되돌림
+                        // 완성된 스크롤 발사 후 다시 빈 스크롤 상태로 되돌림 (임시)
                         currentScroll.isEmpty = true;
-                        currentScroll.spellName = "";
-                        currentScroll.itemName = "빈 스크롤";
+                        if (currentScroll.ScrollData != null) currentScroll.ScrollData.spellName = "";
                     }
                 }
             }
@@ -347,6 +346,32 @@ namespace Magic.Combat
             }
         }
 
+        protected override bool CanDrawWithPen(Item_Pen pen)
+        {
+            if (pen == null) return false;
+            if (pen.PenData != null && pen.PenData.consumesMana)
+            {
+                return currentMana > 0f;
+            }
+            return pen.currentInkCapacity > 0f;
+        }
+
+        protected override void ConsumePenResource(Item_Pen pen)
+        {
+            if (pen == null) return;
+            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
+            if (pen.PenData != null && pen.PenData.consumesMana)
+            {
+                currentMana -= rate * Time.deltaTime;
+                if (currentMana < 0) currentMana = 0;
+            }
+            else
+            {
+                pen.currentInkCapacity -= rate * Time.deltaTime;
+                if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
+            }
+        }
+
         protected override void OnGUI()
         {
             if (CombatManager.Instance == null) return;
@@ -405,7 +430,7 @@ namespace Magic.Combat
                 if (inventory[i] is Item_Ink ink)
                 {
                     string prefix = i == selectedInkIndex ? "<color=cyan>▶ </color>" : "  ";
-                    GUI.Label(new Rect(leftX, bottomYStart + 30 + (inkCount * 30), 200, 30), $"{prefix}{ink.itemName}", style);
+                    GUI.Label(new Rect(leftX, bottomYStart + 30 + (inkCount * 30), 200, 30), $"{prefix}{ink.ItemName}", style);
                     inkCount++;
                 }
             }
@@ -422,7 +447,8 @@ namespace Magic.Combat
                 GUI.DrawTexture(bottomCenter, Texture2D.whiteTexture);
                 GUI.color = Color.white;
                 
-                string scrollName = activeScroll.isEmpty ? "빈 스크롤" : activeScroll.spellName;
+                string spell = activeScroll.ScrollData != null ? activeScroll.ScrollData.spellName : "Unknown";
+                string scrollName = activeScroll.isEmpty ? activeScroll.ItemName : spell;
                 string chantStr = "";
                 foreach (var k in currentChantInput) chantStr += $"[{k}] ";
                 
@@ -452,7 +478,8 @@ namespace Magic.Combat
                 if (inventory[i] is Item_Scroll scroll)
                 {
                     string prefix = i == selectedScrollIndex ? "<color=yellow>▶ </color>" : "  ";
-                    string scrollName = scroll.isEmpty ? "빈 스크롤" : scroll.spellName;
+                    string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
+                    string scrollName = scroll.isEmpty ? scroll.ItemName : spell;
                     GUI.Label(new Rect(rightX, bottomYStart + 30 + (scrollCount * 30), 200, 30), $"{prefix}{scrollName}", style);
                     scrollCount++;
                 }

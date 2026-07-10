@@ -47,7 +47,8 @@ namespace Magic.Inventory
                 if (items[i] is Item_Scroll scroll)
                 {
                     scrollCount++;
-                    string state = scroll.isEmpty ? "빈 스크롤" : $"스크롤 [{scroll.spellName}]";
+                    string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
+                    string state = scroll.isEmpty ? "빈 스크롤" : $"스크롤 [{spell}]";
                     string selectedMark = (dm != null && dm.selectedScrollIndex == i) ? " <color=green>[선택됨]</color>" : "";
                     
                     GUILayout.BeginHorizontal();
@@ -74,7 +75,8 @@ namespace Magic.Inventory
                     string selectedMark = (dm != null && dm.selectedInkIndex == i) ? " <color=green>[선택됨]</color>" : "";
                     
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"- {ink.itemName} | 용량: {(int)ink.currentAmount}/{(int)ink.maxAmount}{selectedMark}");
+                    float maxCap = ink.InkData != null ? ink.InkData.maxAmount : 0f;
+                    GUILayout.Label($"- {ink.ItemName} | 용량: {(int)ink.currentAmount}/{(int)maxCap}{selectedMark}");
                     if (dm != null && GUILayout.Button("선택", GUILayout.Width(50)))
                     {
                         dm.SelectInk(i);

@@ -76,8 +76,7 @@ namespace Magic.Drawing
                 if (currentScroll != null && currentScroll.isEmpty)
                 {
                     currentScroll.isEmpty = false;
-                    currentScroll.spellName = newRecipeName;
-                    currentScroll.itemName = $"스크롤 [{newRecipeName}]";
+                    if (currentScroll.ScrollData != null) currentScroll.ScrollData.spellName = newRecipeName;
                     Debug.Log($"[그리기] 빈 스크롤이 '{newRecipeName}' 마법 스크롤로 영구히 변환되었습니다!");
                 }
             }

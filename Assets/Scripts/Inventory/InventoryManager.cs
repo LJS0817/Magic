@@ -9,10 +9,10 @@ namespace Magic.Inventory
         public static InventoryManager Instance { get; private set; }
 
         [Header("Inventory Data")]
-        public List<ItemData> items = new List<ItemData>();
+        public List<ItemInstance> items = new List<ItemInstance>();
 
         [Header("Combat Data")]
-        public List<ItemData> combatLoadout = new List<ItemData>();
+        public List<ItemInstance> combatLoadout = new List<ItemInstance>();
 
         private void Awake()
         {
@@ -33,38 +33,42 @@ namespace Magic.Inventory
             // 게임 시작 시 인벤토리가 비어있다면 테스트용 아이템 지급
             if (items.Count == 0)
             {
-                var scroll1 = new Item_Scroll(true, "", 5);
-                var scroll2 = new Item_Scroll(true, "", 5);
-                var impactScroll = new Item_Scroll(false, "Impact", 5);
-                var normalInk = new Item_Ink(100f, "일반");
-                var highInk = new Item_Ink(100f, "고급");
-                
-                Item_Pen basicPen = null;
-                PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+                ItemDatabase db = Resources.Load<ItemDatabase>("Items/ItemDatabase");
                 if (db != null)
                 {
-                    basicPen = db.CreatePenInstance("연습용 나무 펜");
-                }
+                    var scroll1 = db.CreateScrollInstance("해진 연습용 양피지");
+                    var scroll2 = db.CreateScrollInstance("표준 마법 스크롤");
+                    var impactScroll = db.CreateScrollInstance("단단한 가죽 스크롤");
+                    if (impactScroll != null)
+                    {
+                        impactScroll.isEmpty = false;
+                        if (impactScroll.ScrollData != null)
+                            impactScroll.ScrollData.spellName = "Impact";
+                    }
 
-                if (basicPen == null)
+                    var normalInk = db.CreateInkInstance("표준 마법 잉크");
+                    var highInk = db.CreateInkInstance("농축된 마력 잉크");
+                    var basicPen = db.CreatePenInstance("연습용 나무 펜");
+
+                    if (scroll1 != null) items.Add(scroll1);
+                    if (scroll2 != null) items.Add(scroll2);
+                    if (impactScroll != null) items.Add(impactScroll);
+                    if (normalInk != null) items.Add(normalInk);
+                    if (highInk != null) items.Add(highInk);
+                    if (basicPen != null) items.Add(basicPen);
+
+                    // 기본 전투 장비로 세팅 (테스트용)
+                    if (scroll1 != null) combatLoadout.Add(scroll1);
+                    if (impactScroll != null) combatLoadout.Add(impactScroll);
+                    if (normalInk != null) combatLoadout.Add(normalInk);
+                    if (basicPen != null) combatLoadout.Add(basicPen);
+
+                    Debug.Log("[InventoryManager] 기본 테스트 아이템 및 로드아웃 지급 완료.");
+                }
+                else
                 {
-                    basicPen = new Item_Pen(50f, 5f, "일반");
+                    Debug.LogWarning("[InventoryManager] Items/ItemDatabase 에셋을 Resources에서 찾을 수 없습니다.");
                 }
-
-                items.Add(scroll1);      // 빈 스크롤
-                items.Add(scroll2);      // 빈 스크롤
-                items.Add(impactScroll); // 임팩트 스크롤
-                items.Add(normalInk);    // 잉크 1병
-                items.Add(highInk);      // 잉크 2병
-                items.Add(basicPen);     // 펜 1자루
-
-                // 기본 전투 장비로 세팅 (테스트용)
-                combatLoadout.Add(scroll1);
-                combatLoadout.Add(impactScroll);
-                combatLoadout.Add(normalInk);
-                combatLoadout.Add(basicPen);
-
-                Debug.Log("[InventoryManager] 기본 테스트 아이템 및 로드아웃 지급 완료.");
             }
         }
 
@@ -73,7 +77,7 @@ namespace Magic.Inventory
         /// </summary>
         public void AddPenByName(string penName)
         {
-            PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+            ItemDatabase db = Resources.Load<ItemDatabase>("Items/ItemDatabase");
             if (db != null)
             {
                 var newPen = db.CreatePenInstance(penName);
@@ -89,7 +93,7 @@ namespace Magic.Inventory
             }
             else
             {
-                Debug.LogWarning("[InventoryManager] PenDatabase 에셋을 찾을 수 없습니다. Resources/PenDatabase.asset 파일이 필요합니다.");
+                Debug.LogWarning("[InventoryManager] ItemDatabase 에셋을 찾을 수 없습니다.");
             }
         }
 
@@ -98,14 +102,15 @@ namespace Magic.Inventory
         /// </summary>
         public void AddRandomPenOfGrade(string grade)
         {
-            PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+            ItemDatabase db = Resources.Load<ItemDatabase>("Items/ItemDatabase");
             if (db != null)
             {
-                var newPen = db.CreateRandomPenOfGrade(grade);
-                if (newPen != null)
+                var penData = db.GetRandomPenOfGrade(grade);
+                if (penData != null)
                 {
+                    var newPen = new Item_Pen(penData);
                     AddItem(newPen);
-                    Debug.Log($"[InventoryManager] 등급 '{grade}'의 펜 '{newPen.itemName}'이 인벤토리에 추가되었습니다.");
+                    Debug.Log($"[InventoryManager] 등급 '{grade}'의 펜 '{newPen.ItemName}'이 인벤토리에 추가되었습니다.");
                 }
                 else
                 {
@@ -114,11 +119,11 @@ namespace Magic.Inventory
             }
             else
             {
-                Debug.LogWarning("[InventoryManager] PenDatabase 에셋을 찾을 수 없습니다.");
+                Debug.LogWarning("[InventoryManager] ItemDatabase 에셋을 찾을 수 없습니다.");
             }
         }
 
-        public void AddToLoadout(ItemData item)
+        public void AddToLoadout(ItemInstance item)
         {
             if (!combatLoadout.Contains(item) && items.Contains(item))
             {
@@ -126,7 +131,7 @@ namespace Magic.Inventory
             }
         }
 
-        public void RemoveFromLoadout(ItemData item)
+        public void RemoveFromLoadout(ItemInstance item)
         {
             combatLoadout.Remove(item);
         }
@@ -136,12 +141,12 @@ namespace Magic.Inventory
             combatLoadout.Clear();
         }
 
-        public void AddItem(ItemData item)
+        public void AddItem(ItemInstance item)
         {
             items.Add(item);
         }
 
-        public void RemoveItem(ItemData item)
+        public void RemoveItem(ItemInstance item)
         {
             items.Remove(item);
             if (combatLoadout.Contains(item))
@@ -150,7 +155,7 @@ namespace Magic.Inventory
             }
         }
 
-        public List<T> GetItemsOfType<T>() where T : ItemData
+        public List<T> GetItemsOfType<T>() where T : ItemInstance
         {
             List<T> result = new List<T>();
             foreach (var item in items)
