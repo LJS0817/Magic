@@ -38,7 +38,18 @@ namespace Magic.Inventory
                 var impactScroll = new Item_Scroll(false, "Impact", 5);
                 var normalInk = new Item_Ink(100f, "일반");
                 var highInk = new Item_Ink(100f, "고급");
-                var basicPen = new Item_Pen(50f, 5f, "일반");
+                
+                Item_Pen basicPen = null;
+                PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+                if (db != null)
+                {
+                    basicPen = db.CreatePenInstance("연습용 나무 펜");
+                }
+
+                if (basicPen == null)
+                {
+                    basicPen = new Item_Pen(50f, 5f, "일반");
+                }
 
                 items.Add(scroll1);      // 빈 스크롤
                 items.Add(scroll2);      // 빈 스크롤
@@ -54,6 +65,56 @@ namespace Magic.Inventory
                 combatLoadout.Add(basicPen);
 
                 Debug.Log("[InventoryManager] 기본 테스트 아이템 및 로드아웃 지급 완료.");
+            }
+        }
+
+        /// <summary>
+        /// 특정 펜 이름으로 펜을 로드하여 인벤토리에 추가합니다.
+        /// </summary>
+        public void AddPenByName(string penName)
+        {
+            PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+            if (db != null)
+            {
+                var newPen = db.CreatePenInstance(penName);
+                if (newPen != null)
+                {
+                    AddItem(newPen);
+                    Debug.Log($"[InventoryManager] 펜 '{penName}'이 인벤토리에 추가되었습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning($"[InventoryManager] 펜 '{penName}'을 데이터베이스에서 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[InventoryManager] PenDatabase 에셋을 찾을 수 없습니다. Resources/PenDatabase.asset 파일이 필요합니다.");
+            }
+        }
+
+        /// <summary>
+        /// 특정 등급의 임의의 펜을 로드하여 인벤토리에 추가합니다.
+        /// </summary>
+        public void AddRandomPenOfGrade(string grade)
+        {
+            PenDatabase db = Resources.Load<PenDatabase>("PenDatabase");
+            if (db != null)
+            {
+                var newPen = db.CreateRandomPenOfGrade(grade);
+                if (newPen != null)
+                {
+                    AddItem(newPen);
+                    Debug.Log($"[InventoryManager] 등급 '{grade}'의 펜 '{newPen.itemName}'이 인벤토리에 추가되었습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning($"[InventoryManager] 등급 '{grade}'의 펜을 데이터베이스에서 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[InventoryManager] PenDatabase 에셋을 찾을 수 없습니다.");
             }
         }
 
