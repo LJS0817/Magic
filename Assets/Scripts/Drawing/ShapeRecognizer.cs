@@ -8,14 +8,28 @@ namespace Magic.Drawing
         private static List<GestureTemplate> templates = new List<GestureTemplate>();
         private static bool initialized = false;
 
+        // 스레드 안전성을 보장하기 위한 락 객체
+        private static readonly object lockObj = new object();
+
+        public static void EnsureInitialized()
+        {
+            if (!initialized)
+            {
+                lock (lockObj)
+                {
+                    if (!initialized)
+                    {
+                        InitializeTemplates();
+                    }
+                }
+            }
+        }
+
         public static RecognizerResult Recognize(DrawingData data)
         {
             if (data == null || data.strokes.Count == 0) return new RecognizerResult { Name = "Unknown", Score = 0f };
 
-            if (!initialized)
-            {
-                InitializeTemplates();
-            }
+            EnsureInitialized();
 
             // Convert DrawingData to Point array
             List<Point> pointsList = new List<Point>();
@@ -29,8 +43,22 @@ namespace Magic.Drawing
                 }
             }
 
+            // 백그라운드 스레드에서 안전하게 읽을 수 있도록 리스트의 복사본(배열)을 넘깁니다.
+            List<GestureTemplate> templatesSnapshot;
+            lock (lockObj)
+            {
+                templatesSnapshot = new List<GestureTemplate>(templates);
+            }
+
             // Run $P Recognizer
-            RecognizerResult result = PointCloudRecognizer.Classify(pointsList.ToArray(), templates);
+            RecognizerResult result = PointCloudRecognizer.Classify(pointsList.ToArray(), templatesSnapshot);
+
+            // 별(Star) 모양은 특성상 인식률이 떨어지기 쉬우므로 점수 보정치(+0.5)를 부여합니다.
+            // 단, 원래 점수가 0.25 이하일 정도로 전혀 비슷하지 않다면 보정하지 않습니다.
+            if (result.Name == "Star" && result.Score > 0.25f)
+            {
+                result.Score = UnityEngine.Mathf.Clamp01(result.Score + 0.5f);
+            }
 
             if (result.Score < 0.5f)
             {
@@ -77,7 +105,10 @@ namespace Magic.Drawing
             Debug.Log($"<color=cyan>[ShapeRecognizer] 새로운 템플릿 에셋 저장 완료: {assetPath}</color>");
             
             // 즉시 템플릿 목록에도 추가
-            templates.Add(new GestureTemplate(shapeName, normalized));
+            lock (lockObj)
+            {
+                templates.Add(new GestureTemplate(shapeName, normalized));
+            }
 #else
             Debug.LogWarning("SaveTemplateAsset는 에디터에서만 작동합니다.");
 #endif

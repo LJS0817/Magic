@@ -45,7 +45,7 @@ namespace Magic.Drawing
 
     public static class PointCloudRecognizer
     {
-        private const int NumPoints = 32;
+        private const int NumPoints = 64;
 
         public static RecognizerResult Classify(Point[] points, List<GestureTemplate> templates)
         {
@@ -59,7 +59,7 @@ namespace Magic.Drawing
 
             foreach (var template in templates)
             {
-                float dist = GreedyCloudMatch(normalizedPoints, template.Points);
+                float dist = GreedyCloudMatch(normalizedPoints, template.Points, minDistance);
                 if (dist < minDistance)
                 {
                     minDistance = dist;
@@ -224,21 +224,29 @@ namespace Magic.Drawing
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
 
-        private static float GreedyCloudMatch(Point[] points1, Point[] points2)
+        private static float SqDistance(Point p1, Point p2)
+        {
+            float dx = p2.X - p1.X;
+            float dy = p2.Y - p1.Y;
+            return dx * dx + dy * dy;
+        }
+
+        private static float GreedyCloudMatch(Point[] points1, Point[] points2, float minSoFar)
         {
             int e = points1.Length;
             int step = (int)Math.Floor(Math.Pow(e, 0.5));
             float min = float.MaxValue;
             for (int i = 0; i < e; i += step)
             {
-                float d1 = CloudDistance(points1, points2, i);
-                float d2 = CloudDistance(points2, points1, i);
+                float currentMinBound = Math.Min(min, minSoFar);
+                float d1 = CloudDistance(points1, points2, i, currentMinBound);
+                float d2 = CloudDistance(points2, points1, i, Math.Min(currentMinBound, d1));
                 min = Math.Min(min, Math.Min(d1, d2));
             }
             return min;
         }
 
-        private static float CloudDistance(Point[] pts1, Point[] pts2, int start)
+        private static float CloudDistance(Point[] pts1, Point[] pts2, int start, float minSoFar)
         {
             int n = pts1.Length;
             bool[] matched = new bool[n];
@@ -247,22 +255,28 @@ namespace Magic.Drawing
             do
             {
                 int index = -1;
-                float min = float.MaxValue;
+                float minSq = float.MaxValue;
                 for (int j = 0; j < n; j++)
                 {
                     if (!matched[j])
                     {
-                        float d = Distance(pts1[i], pts2[j]);
-                        if (d < min)
+                        float dSq = SqDistance(pts1[i], pts2[j]);
+                        if (dSq < minSq)
                         {
-                            min = d;
+                            minSq = dSq;
                             index = j;
                         }
                     }
                 }
                 matched[index] = true;
                 float weight = 1.0f - ((i - start + n) % n) / (float)n;
-                sum += weight * min;
+                sum += weight * (float)Math.Sqrt(minSq);
+
+                if (sum >= minSoFar)
+                {
+                    return sum; // Early abandoning
+                }
+
                 i = (i + 1) % n;
             } while (i != start);
             return sum;

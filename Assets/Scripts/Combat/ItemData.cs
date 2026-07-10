@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Magic.Inventory
 {
-    public enum ItemType { Scroll, Ink, Material, Potion }
+    public enum ItemType { Scroll, Ink, Material, Potion, Pen }
 
     [System.Serializable]
     public class ItemData
@@ -43,6 +43,25 @@ namespace Magic.Inventory
             currentAmount = amount;
             inkQuality = quality;
             itemName = $"{inkQuality} 잉크";
+        }
+    }
+
+    [System.Serializable]
+    public class Item_Pen : ItemData
+    {
+        public float maxInkCapacity;
+        public float currentInkCapacity;
+        public float inkConsumptionRate; // 잉크 소모율 (등급에 따라 다름)
+        public string penGrade; // 펜의 등급
+
+        public Item_Pen(float capacity = 50f, float consumptionRate = 5f, string grade = "Normal")
+        {
+            type = ItemType.Pen;
+            maxInkCapacity = capacity;
+            currentInkCapacity = 0f; // 처음엔 비어있을 수 있음
+            inkConsumptionRate = consumptionRate;
+            penGrade = grade;
+            itemName = $"{penGrade} 펜";
         }
     }
 }
