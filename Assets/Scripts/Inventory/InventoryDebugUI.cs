@@ -86,6 +86,40 @@ namespace Magic.Inventory
             }
             if (inkCount == 0) GUILayout.Label("- 없음");
 
+            GUILayout.Space(10);
+
+            // 펜 목록 출력
+            GUILayout.Label("<b>[펜]</b>");
+            int penCount = 0;
+            
+            GUILayout.BeginHorizontal();
+            string noPenSelected = (inv.EquippedPen == null) ? " <color=green>[선택됨]</color>" : "";
+            GUILayout.Label($"- 맨손 (장착 해제){noPenSelected}");
+            if (GUILayout.Button("선택", GUILayout.Width(50)))
+            {
+                inv.EquippedPen = null;
+            }
+            GUILayout.EndHorizontal();
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i] is Item_Pen pen)
+                {
+                    penCount++;
+                    string selectedMark = (inv.EquippedPen == pen) ? " <color=green>[선택됨]</color>" : "";
+                    
+                    GUILayout.BeginHorizontal();
+                    float maxCap = pen.PenData != null ? pen.PenData.maxInkCapacity : 0f;
+                    string manaText = (pen.PenData != null && pen.PenData.consumesMana) ? " (마나 소모)" : $" | 잉크: {(int)pen.currentInkCapacity}/{(int)maxCap}";
+                    GUILayout.Label($"- {pen.ItemName}{manaText}{selectedMark}");
+                    if (GUILayout.Button("선택", GUILayout.Width(50)))
+                    {
+                        inv.EquippedPen = pen;
+                    }
+                    GUILayout.EndHorizontal();
+                }
+            }
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("닫기"))
             {

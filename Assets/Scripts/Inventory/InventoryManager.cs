@@ -15,9 +15,43 @@ namespace Magic.Inventory
         public List<ItemInstance> items = new List<ItemInstance>();
 
         [Header("Equipped Drawing Items")]
-        public Item_Scroll EquippedScroll;
-        public Item_Ink EquippedInk;
-        public Item_Pen EquippedPen;
+        [SerializeField] private Item_Scroll _equippedScroll;
+        [SerializeField] private Item_Ink _equippedInk;
+        [SerializeField] private Item_Pen _equippedPen;
+
+        public event System.Action<Item_Scroll> OnScrollEquipped;
+        public event System.Action<Item_Ink> OnInkEquipped;
+        public event System.Action<Item_Pen> OnPenEquipped;
+
+        public Item_Scroll EquippedScroll
+        {
+            get => _equippedScroll;
+            set
+            {
+                _equippedScroll = value;
+                OnScrollEquipped?.Invoke(value);
+            }
+        }
+
+        public Item_Ink EquippedInk
+        {
+            get => _equippedInk;
+            set
+            {
+                _equippedInk = value;
+                OnInkEquipped?.Invoke(value);
+            }
+        }
+
+        public Item_Pen EquippedPen
+        {
+            get => _equippedPen;
+            set
+            {
+                _equippedPen = value;
+                OnPenEquipped?.Invoke(value);
+            }
+        }
 
         [Header("Combat Data")]
         public List<ItemInstance> combatLoadout = new List<ItemInstance>();

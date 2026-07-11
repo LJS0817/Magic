@@ -15,7 +15,7 @@ MonoBehaviour:
   type: 1
   itemName: "\uC2F8\uAD6C\uB824 \uD751\uC0C9 \uC789\uD06C"
   itemDescription: "\uBB3C\uC5D0 \uB9CE\uC774 \uD76C\uC11D\uB418\uC5B4 \uC0C9\uC774 \uD750\uB9B0 \uC800\uD488\uC9C8 \uC789\uD06C\uC785\uB2C8\uB2E4."
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 7398246884796691448, guid: 1a16bb1fb02d01741b5dd4f33ad47bcc, type: 3}
   maxAmount: 50
   inkQuality: "\uD558\uAE09"
   inkColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

@@ -7,16 +7,22 @@ namespace Magic.Drawing
     public class FloatingEffect : MonoBehaviour
     {
         [Header("Float Settings")]
-        public float floatAmount = 10f;       // 떠오르는 높이
-        public float floatDuration = 2.5f;    // 한 번 떠오르는 데 걸리는 시간
+        public float floatAmount = 20f;       // 떠오르는 높이 (상하 움직임 증가)
+        public float floatDuration = 4.5f;    // 한 번 떠오르는 데 걸리는 시간 (시간 늘림)
 
         [Header("Rotation Settings")]
-        public float rotationAmount = 1.5f;   // 좌우로 기우는 각도
-        public float rotationDuration = 3.5f; // 기우는 데 걸리는 시간 (높이와 다르게 주어 불규칙한 느낌 연출)
+        public float rotationAmount = 0.5f;   // 좌우로 기우는 각도 (좌우 움직임 감소)
+        public float rotationDuration = 6.0f; // 기우는 데 걸리는 시간 (높이와 다르게 주어 불규칙한 느낌 연출)
+
+        [Header("Randomize Settings")]
+        public bool randomizeTiming = true;   // 각자만의 타이밍(오프셋/속도)을 가질지 여부
 
         private RectTransform rectTransform;
         private Vector2 startPos;
         private Quaternion startRot;
+        private float randomTimeOffsetFloat;
+        private float randomTimeOffsetRot;
+        private float randomDurationMult;
 
         private void Start()
         {
@@ -25,23 +31,45 @@ namespace Magic.Drawing
             {
                 startPos = rectTransform.anchoredPosition;
                 startRot = rectTransform.localRotation;
-                StartFloating();
+
+                // 오브젝트마다 다른 타이밍을 갖도록 랜덤 오프셋 및 속도 배수 설정
+                if (randomizeTiming)
+                {
+                    randomTimeOffsetFloat = Random.Range(0f, floatDuration * 2f);
+                    randomTimeOffsetRot = Random.Range(0f, rotationDuration * 2f);
+                    randomDurationMult = Random.Range(0.85f, 1.15f);
+                }
+                else
+                {
+                    randomDurationMult = 1f;
+                }
+
+                StartFloating(true);
             }
         }
 
-        private void StartFloating()
+        private void StartFloating(bool useRandomOffset = false)
         {
             rectTransform.DOKill();
             
+            float fDuration = floatDuration * randomDurationMult;
+            float rDuration = rotationDuration * randomDurationMult;
+
             // 위아래로 둥둥 떠다니는 애니메이션
-            rectTransform.DOAnchorPosY(startPos.y + floatAmount, floatDuration)
+            Tween floatTween = rectTransform.DOAnchorPosY(startPos.y + floatAmount, fDuration)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine);
 
             // 미세하게 좌우로 흔들리는 애니메이션
-            rectTransform.DOLocalRotate(new Vector3(0, 0, rotationAmount), rotationDuration)
+            Tween rotTween = rectTransform.DOLocalRotate(new Vector3(0, 0, rotationAmount), rDuration)
                 .SetLoops(-1, LoopType.Yoyo)
                 .SetEase(Ease.InOutSine);
+
+            if (randomizeTiming && useRandomOffset)
+            {
+                floatTween.Goto(randomTimeOffsetFloat, true);
+                rotTween.Goto(randomTimeOffsetRot, true);
+            }
         }
 
         public void PauseFloating()
@@ -59,7 +87,7 @@ namespace Magic.Drawing
         {
             if (rectTransform != null && gameObject.activeInHierarchy)
             {
-                StartFloating();
+                StartFloating(false);
             }
         }
 
@@ -78,7 +106,7 @@ namespace Magic.Drawing
             // Start()가 실행되어 초기 좌표가 저장된 이후라면 다시 켤 때 애니메이션 재시작
             if (rectTransform != null && startPos != Vector2.zero) 
             {
-                StartFloating();
+                StartFloating(true);
             }
         }
     }

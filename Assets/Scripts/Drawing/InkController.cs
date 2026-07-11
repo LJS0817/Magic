@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Magic.Inventory;
 
 namespace Magic.Drawing
 {
@@ -8,8 +9,6 @@ namespace Magic.Drawing
     {
         [Header("Visuals")]
         public RectTransform inkBottleVisual;
-
-
 
         public Item_Ink CurrentInk
         {

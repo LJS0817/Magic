@@ -13,6 +13,7 @@ namespace Magic.Drawing
 
         [Header("References")]
         public RectTransform drawingArea; // 스크롤 UI 영역
+        FloatingEffect scrollFloatingEffect;
 
         [Header("Settings")]
         public Camera mainCamera;
@@ -53,6 +54,38 @@ namespace Magic.Drawing
                 inkController.TryRefillPen(penController.CurrentPen);
             }
 
+            scrollFloatingEffect = drawingArea.parent.GetComponent<FloatingEffect>();
+
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.OnInkEquipped += HandleInkEquipped;
+                InventoryManager.Instance.OnPenEquipped += HandlePenEquipped;
+            }
+        }
+
+        private void HandleInkEquipped(Item_Ink ink)
+        {
+            if (penController != null && penController.CurrentPen != null && ink != null)
+            {
+                RefillPen();
+            }
+        }
+
+        private void HandlePenEquipped(Item_Pen pen)
+        {
+            if (inkController != null && inkController.CurrentInk != null && pen != null)
+            {
+                RefillPen();
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.OnInkEquipped -= HandleInkEquipped;
+                InventoryManager.Instance.OnPenEquipped -= HandlePenEquipped;
+            }
         }
 
         protected virtual void Update()
@@ -80,6 +113,7 @@ namespace Magic.Drawing
                     if (!isOutsideArea)
                     {
                         isOutsideArea = true;
+                        if (scrollFloatingEffect != null) scrollFloatingEffect.ResumeFloating();
                         RefillPen();
                     }
                         
@@ -90,6 +124,7 @@ namespace Magic.Drawing
                     if (isOutsideArea)
                     {
                         isOutsideArea = false;
+                        if (scrollFloatingEffect != null) scrollFloatingEffect.PauseFloating();
                         ReturnPenToMouse();
                     }
                 }
@@ -144,28 +179,14 @@ namespace Magic.Drawing
 
         protected virtual void StartStroke()
         {
-            if (!isPenReady) 
+            if (!isPenReady || isRefilling || isOutsideArea) 
             {
-                Debug.LogWarning("[그리기 실패] 펜이 아직 완전히 나타나지 않았습니다.");
                 return; 
             }
 
-            if (drawingDatabase == null || drawingDatabase.linePrefab == null)
-            {
-                Debug.LogError("[그리기 실패] LinePrefab is not assigned in DrawingDatabase.");
-                return;
-            }
-
             Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
-            if (currentScroll == null)
+            if (currentScroll == null || !currentScroll.isEmpty)
             {
-                Debug.LogWarning("[그리기 실패] 스크롤을 먼저 장착해주세요.");
-                return;
-            }
-            
-            if (!currentScroll.isEmpty)
-            {
-                Debug.LogWarning("[그리기 실패] 유효한 빈 스크롤이 아닙니다.");
                 return;
             }
 
@@ -183,13 +204,7 @@ namespace Magic.Drawing
             isDrawing = true;
             if (penController != null) penController.PlayDrawAnimation();
             
-            if (drawingArea != null)
-            {
-                FloatingEffect effect = drawingArea.GetComponent<FloatingEffect>();
-                if (effect != null) effect.PauseFloating();
-            }
-            
-            GameObject lineObj = Instantiate(drawingDatabase.linePrefab, transform);
+            GameObject lineObj = Instantiate(drawingDatabase.linePrefab, drawingArea);
             currentLine = lineObj.GetComponent<DrawingLine>();
 
             // 장착된 잉크의 색상으로 선 색상 변경
@@ -213,7 +228,9 @@ namespace Magic.Drawing
             mousePos.z = Mathf.Abs(mainCamera.transform.position.z);
             Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
 
-            Vector2 newPoint = new Vector2(worldPos.x, worldPos.y);
+            // LineRenderer가 로컬 좌표계를 사용하므로 월드 좌표를 로컬 좌표로 변환합니다.
+            Vector3 localPos = currentLine.transform.InverseTransformPoint(worldPos);
+            Vector2 newPoint = new Vector2(localPos.x, localPos.y);
 
             if (currentLine.currentStroke == null) Debug.LogError("[UpdateStroke] currentStroke가 null입니다!");
             int prevCount = currentLine.currentStroke.points.Count;
@@ -265,13 +282,6 @@ namespace Magic.Drawing
             isDrawing = false;
             if (penController != null) penController.PlayIdleAnimation(true); // 마우스 클릭을 뗄 때는 부드럽게 복귀
             
-            if (drawingArea != null)
-            {
-                FloatingEffect effect = drawingArea.GetComponent<FloatingEffect>();
-                if (effect != null) effect.ResumeFloating();
-            }
-            
-
             if (currentLine != null)
             {
                 if (currentLine.currentStroke.points.Count < 2)
@@ -354,9 +364,26 @@ namespace Magic.Drawing
         {
             currentDrawingData.Clear();
             drawnShapes.Clear();
-            foreach (Transform child in transform)
+            
+            if (drawingArea != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in drawingArea)
+                {
+                    if (child.GetComponent<DrawingLine>() != null)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                foreach (Transform child in transform)
+                {
+                    if (child.GetComponent<DrawingLine>() != null)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
             }
         }
 

@@ -13,6 +13,7 @@ namespace Magic.Drawing
         private void Awake()
         {
             lineRenderer = GetComponent<LineRenderer>();
+            lineRenderer.useWorldSpace = false;
             currentStroke = new Stroke();
 
             // 매테리얼이 할당되지 않아 안보이는 현상 방지
@@ -44,8 +45,8 @@ namespace Magic.Drawing
             currentStroke.AddPoint(point);
             
             lineRenderer.positionCount = currentStroke.points.Count;
-            // 2D 환경에서는 기본적으로 0이지만, Screen Space - Camera 모드에서는 부모의 Z 위치(캔버스 평면)를 따라가도록 설정
-            lineRenderer.SetPosition(currentStroke.points.Count - 1, new Vector3(point.x, point.y, transform.position.z));
+            // useWorldSpace가 false이므로 로컬 좌표계를 사용합니다. Z는 0으로 둡니다.
+            lineRenderer.SetPosition(currentStroke.points.Count - 1, new Vector3(point.x, point.y, 0f));
         }
     }
 }
