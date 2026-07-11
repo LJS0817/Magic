@@ -11,6 +11,11 @@ namespace Magic.Drawing
         // 스레드 안전성을 보장하기 위한 락 객체
         private static readonly object lockObj = new object();
 
+        private void Awake()
+        {
+            EnsureInitialized();
+        }
+
         public static void EnsureInitialized()
         {
             if (!initialized)

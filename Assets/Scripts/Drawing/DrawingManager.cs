@@ -32,6 +32,11 @@ namespace Magic.Drawing
         [Header("Ink Controller")]
         public InkController inkController;
 
+        protected virtual void Awake()
+        {
+            ShapeRecognizer.EnsureInitialized();
+        }
+
         protected virtual void Start()
         {
             if (mainCamera == null)
