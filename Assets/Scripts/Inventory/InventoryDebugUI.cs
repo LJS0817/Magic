@@ -32,10 +32,10 @@ namespace Magic.Inventory
                 return;
             }
 
-            Magic.Drawing.DrawingManager dm = Object.FindObjectOfType<Magic.Drawing.DrawingManager>();
-            var items = dm != null ? dm.inventory : InventoryManager.Instance.items;
+            var inv = InventoryManager.Instance;
+            var items = inv.items;
             
-            GUILayout.Label(dm != null && dm is Magic.Combat.CombatDrawingManager ? "현재 로드아웃 아이템" : "전체 아이템");
+            GUILayout.Label("전체 아이템");
             GUILayout.Label($"총 개수: {items.Count}");
             GUILayout.Space(10);
 
@@ -49,13 +49,13 @@ namespace Magic.Inventory
                     scrollCount++;
                     string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
                     string state = scroll.isEmpty ? "빈 스크롤" : $"스크롤 [{spell}]";
-                    string selectedMark = (dm != null && dm.selectedScrollIndex == i) ? " <color=green>[선택됨]</color>" : "";
+                    string selectedMark = (inv.EquippedScroll == scroll) ? " <color=green>[선택됨]</color>" : "";
                     
                     GUILayout.BeginHorizontal();
                     GUILayout.Label($"- {state} | 남은 수명: {scroll.currentDurability}{selectedMark}");
-                    if (dm != null && GUILayout.Button("선택", GUILayout.Width(50)))
+                    if (GUILayout.Button("선택", GUILayout.Width(50)))
                     {
-                        dm.SelectScroll(i);
+                        inv.EquippedScroll = scroll;
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -72,14 +72,14 @@ namespace Magic.Inventory
                 if (items[i] is Item_Ink ink)
                 {
                     inkCount++;
-                    string selectedMark = (dm != null && dm.selectedInkIndex == i) ? " <color=green>[선택됨]</color>" : "";
+                    string selectedMark = (inv.EquippedInk == ink) ? " <color=green>[선택됨]</color>" : "";
                     
                     GUILayout.BeginHorizontal();
                     float maxCap = ink.InkData != null ? ink.InkData.maxAmount : 0f;
                     GUILayout.Label($"- {ink.ItemName} | 용량: {(int)ink.currentAmount}/{(int)maxCap}{selectedMark}");
-                    if (dm != null && GUILayout.Button("선택", GUILayout.Width(50)))
+                    if (GUILayout.Button("선택", GUILayout.Width(50)))
                     {
-                        dm.SelectInk(i);
+                        inv.EquippedInk = ink;
                     }
                     GUILayout.EndHorizontal();
                 }

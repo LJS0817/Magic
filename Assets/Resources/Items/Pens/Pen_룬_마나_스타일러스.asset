@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f5d697e30e2eb44bb3f37f4637dbf5b, type: 3}
+  m_Name: "Pen_\uB8EC_\uB9C8\uB098_\uC2A4\uD0C0\uC77C\uB7EC\uC2A4"
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemPenSO
+  type: 4
+  itemName: "\uB8EC \uB9C8\uB098 \uC2A4\uD0C0\uC77C\uB7EC\uC2A4"
+  itemDescription: "\uC789\uD06C \uB300\uC2E0 \uC220\uC0AC\uC758 \uAC00\uBCBC\uC6B4 \uB9C8\uB825\uC744 \uAC10\uC9C0\uD558\uC5EC \uBCF4\uB77C\uC0C9 \uB9C8\uB825\uC120\uC744 \uADF8\uB9AC\uB294 \uBCF4\uAE09\uD615 \uB9C8\uB098 \uD39C\uC785\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  maxInkCapacity: 0
+  inkConsumptionRate: 6
+  penGrade: "\uACE0\uAE09"
+  consumesMana: 1

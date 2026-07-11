@@ -22,6 +22,15 @@ namespace Magic.Drawing
             }
         }
 
+        public void SetColor(Color color)
+        {
+            if (lineRenderer != null)
+            {
+                lineRenderer.startColor = color;
+                lineRenderer.endColor = color;
+            }
+        }
+
         public void AddPoint(Vector2 point)
         {
             if (currentStroke.points.Count > 0)
@@ -35,8 +44,8 @@ namespace Magic.Drawing
             currentStroke.AddPoint(point);
             
             lineRenderer.positionCount = currentStroke.points.Count;
-            // Z=0 for 2D
-            lineRenderer.SetPosition(currentStroke.points.Count - 1, new Vector3(point.x, point.y, 0f));
+            // 2D 환경에서는 기본적으로 0이지만, Screen Space - Camera 모드에서는 부모의 Z 위치(캔버스 평면)를 따라가도록 설정
+            lineRenderer.SetPosition(currentStroke.points.Count - 1, new Vector3(point.x, point.y, transform.position.z));
         }
     }
 }

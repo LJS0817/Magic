@@ -17,7 +17,6 @@ namespace Magic.Drawing
         [Header("Settings")]
         public Camera mainCamera;
 
-
         public DrawingData currentDrawingData { get; protected set; }
         protected DrawingLine currentLine;
         protected bool isDrawing = false;
@@ -27,17 +26,10 @@ namespace Magic.Drawing
 
         protected DrawingDatabase drawingDatabase;
 
-        // 글로벌 인벤토리 시스템 참조
-        public virtual List<ItemInstance> inventory => (InventoryManager.Instance != null && InventoryManager.Instance.items != null) ? InventoryManager.Instance.items : new List<ItemInstance>();
-        
-        public int selectedScrollIndex = -1;
-        public int selectedInkIndex = -1;
-        public int selectedPenIndex = -1;
-        public float inkDrainRate = 10f; // 잉크 소모 속도 (초당)
-
         [Header("Pen Visuals")]
-        public RectTransform penVisual;
-        public RectTransform inkBottleVisual;
+        public PenController penController;
+        [Header("Ink Controller")]
+        public InkController inkController;
 
         protected virtual void Start()
         {
@@ -46,24 +38,20 @@ namespace Magic.Drawing
 
             currentDrawingData = new DrawingData();
             drawingDatabase = DrawingDatabase.Instance;
-
             // 처음에 펜을 잉크통에 위치시키고 바깥에 있는 것으로 처리
-            if (penVisual != null && inkBottleVisual != null)
+            if (penController != null && inkController != null && inkController.inkBottleVisual != null)
             {
-                penVisual.position = inkBottleVisual.position;
+                penController.GoToInkBottle(inkController.inkBottleVisual, null, () => {
+                    isPenReady = true;
+                });
             }
             isOutsideArea = true;
 
-            // 테스트 편의성을 위해 장착된 아이템이 없으면 인벤토리에서 첫 번째 항목을 자동 선택
-            if (inventory != null)
-            {
-                if (selectedScrollIndex == -1) selectedScrollIndex = inventory.FindIndex(i => i is Item_Scroll);
-                if (selectedInkIndex == -1) selectedInkIndex = inventory.FindIndex(i => i is Item_Ink);
-                if (selectedPenIndex == -1) selectedPenIndex = inventory.FindIndex(i => i is Item_Pen);
-            }
-
             // 시작 시 잉크가 비어있을 수 있으므로 충전 한 번 시도
-            TryExecuteRefillLogic();
+            if (inkController != null && penController != null)
+            {
+                inkController.TryRefillPen(penController.CurrentPen);
+            }
 
         }
 
@@ -107,9 +95,9 @@ namespace Magic.Drawing
                 }
             }
 
-            if (penVisual != null && !isRefilling)
+            if (penController != null && !isRefilling)
             {
-                penVisual.position = Input.mousePosition;
+                penController.TrackMouse(mainCamera);
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -168,30 +156,22 @@ namespace Magic.Drawing
                 return;
             }
 
-            // 스크롤 확인
-            var inv = inventory;
-            if (inv == null)
+            Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+            if (currentScroll == null)
             {
-                Debug.LogError("[그리기 실패] inventory가 null입니다! InventoryManager.Instance.items를 확인하세요.");
+                Debug.LogWarning("[그리기 실패] 스크롤을 먼저 장착해주세요.");
                 return;
             }
             
-            if (selectedScrollIndex == -1 || inv.Count <= selectedScrollIndex)
-            {
-                Debug.LogWarning("[그리기 실패] 스크롤을 먼저 선택해주세요.");
-                return;
-            }
-            
-            Item_Scroll currentScroll = inv[selectedScrollIndex] as Item_Scroll;
-            if (currentScroll == null || !currentScroll.isEmpty)
+            if (!currentScroll.isEmpty)
             {
                 Debug.LogWarning("[그리기 실패] 유효한 빈 스크롤이 아닙니다.");
                 return;
             }
 
             // 펜 확인
-            Item_Pen currentPen = selectedPenIndex != -1 && selectedPenIndex < inv.Count ? inv[selectedPenIndex] as Item_Pen : null;
-            if (currentPen == null || !CanDrawWithPen(currentPen))
+            Item_Pen currentPen = penController != null ? penController.CurrentPen : null;
+            if (penController == null || !penController.CanDraw())
             {
                 string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana 
                     ? "[그리기 실패] 마력이 부족하여 마나 펜을 사용할 수 없습니다." 
@@ -201,9 +181,24 @@ namespace Magic.Drawing
             }
 
             isDrawing = true;
+            if (penController != null) penController.PlayDrawAnimation();
+            
+            if (drawingArea != null)
+            {
+                FloatingEffect effect = drawingArea.GetComponent<FloatingEffect>();
+                if (effect != null) effect.PauseFloating();
+            }
             
             GameObject lineObj = Instantiate(drawingDatabase.linePrefab, transform);
             currentLine = lineObj.GetComponent<DrawingLine>();
+
+            // 장착된 잉크의 색상으로 선 색상 변경
+            Color lineColor = Color.black;
+            if (inkController != null && penController != null)
+            {
+                lineColor = inkController.GetLineColor(penController.CurrentPen);
+            }
+            currentLine.SetColor(lineColor);
 
             UpdateStroke();
         }
@@ -223,10 +218,10 @@ namespace Magic.Drawing
             if (currentLine.currentStroke == null) Debug.LogError("[UpdateStroke] currentStroke가 null입니다!");
             int prevCount = currentLine.currentStroke.points.Count;
 
-            if (ShouldConsumeInk())
+            if (ShouldConsumeInk() && penController != null)
             {
-                Item_Pen currentPen = selectedPenIndex != -1 && selectedPenIndex < inventory.Count ? inventory[selectedPenIndex] as Item_Pen : null;
-                if (currentPen == null || !CanDrawWithPen(currentPen))
+                Item_Pen currentPen = penController.CurrentPen;
+                if (!penController.CanDraw())
                 {
                     EndStroke();
                     string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana
@@ -236,43 +231,45 @@ namespace Magic.Drawing
                     return;
                 }
 
-                ConsumePenResource(currentPen);
+                penController.ConsumeResource();
             }
 
             currentLine.AddPoint(newPoint);
         }
 
-        /// <summary>
-        /// 현재 장착한 펜으로 드로잉을 시작하거나 유지할 수 있는지 체크합니다.
-        /// </summary>
-        protected virtual bool CanDrawWithPen(Item_Pen pen)
-        {
-            if (pen == null) return false;
-            if (pen.PenData != null && pen.PenData.consumesMana) return true; // 일반 매니저에서는 마나 제한 없음
-            return pen.currentInkCapacity > 0f;
-        }
-
-        /// <summary>
-        /// 펜 사용 시 드로잉 자원(잉크 혹은 마나)을 소모합니다.
-        /// </summary>
-        protected virtual void ConsumePenResource(Item_Pen pen)
-        {
-            if (pen == null) return;
-            if (pen.PenData != null && pen.PenData.consumesMana) return; // 일반 매니저에서는 마나 차감 구현 생략 (전투 매니저에서 재정의)
-            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
-            pen.currentInkCapacity -= rate * Time.deltaTime;
-            if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
-        }
 
         protected virtual bool ShouldConsumeInk()
         {
             return true;
         }
 
+        protected virtual bool CanDrawWithPen(Item_Pen pen)
+        {
+            if (pen == null) return false;
+            if (pen.PenData != null && pen.PenData.consumesMana) return true;
+            return pen.currentInkCapacity > 0f;
+        }
+
+        protected virtual void ConsumePenResource(Item_Pen pen)
+        {
+            if (pen == null) return;
+            if (pen.PenData != null && pen.PenData.consumesMana) return;
+            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
+            pen.currentInkCapacity -= rate * Time.deltaTime;
+            if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
+        }
+
         protected virtual async void EndStroke()
         {
             if (!isDrawing) return;
             isDrawing = false;
+            if (penController != null) penController.PlayIdleAnimation(true); // 마우스 클릭을 뗄 때는 부드럽게 복귀
+            
+            if (drawingArea != null)
+            {
+                FloatingEffect effect = drawingArea.GetComponent<FloatingEffect>();
+                if (effect != null) effect.ResumeFloating();
+            }
             
 
             if (currentLine != null)
@@ -368,229 +365,50 @@ namespace Magic.Drawing
             Debug.Log($"<color=yellow>[누적 도형] 현재 그려진 도형 수: {drawnShapes.Count}</color>");
         }
 
-        // 인벤토리에서 스크롤 직접 선택
-        public virtual void SelectScroll(int index)
-        {
-            if (index >= 0 && index < inventory.Count && inventory[index] is Item_Scroll)
-            {
-                selectedScrollIndex = index;
-            }
-        }
-
-        // 인벤토리에서 잉크 직접 선택
-        public virtual void SelectInk(int index)
-        {
-            if (index >= 0 && index < inventory.Count && inventory[index] is Item_Ink)
-            {
-                selectedInkIndex = index;
-            }
-        }
-
-        protected void ConsumeInkBottle()
-        {
-            if (selectedInkIndex == -1 || inventory.Count <= selectedInkIndex) return;
-            Item_Ink ink = inventory[selectedInkIndex] as Item_Ink;
-            if (ink != null && ink.currentAmount <= 0)
-            {
-                int idxToRemove = selectedInkIndex;
-                InventoryManager.Instance.RemoveItem(ink);
-                
-                if (selectedScrollIndex > idxToRemove) selectedScrollIndex--;
-                
-                selectedInkIndex = -1;
-            }
-        }
-
-        // 인벤토리에서 다음/이전 스크롤 찾기
-        public void FindNextScroll(int dir)
-        {
-            if (inventory.Count == 0) { selectedScrollIndex = -1; return; }
-            int startIdx = selectedScrollIndex == -1 ? 0 : selectedScrollIndex;
-            int idx = startIdx;
-            
-            for (int i = 0; i < inventory.Count; i++)
-            {
-                idx += dir;
-                if (idx >= inventory.Count) idx = 0;
-                if (idx < 0) idx = inventory.Count - 1;
-
-                if (inventory[idx] is Item_Scroll)
-                {
-                    selectedScrollIndex = idx;
-                    return;
-                }
-            }
-            selectedScrollIndex = -1; // 스크롤이 아예 없음
-        }
-
-        // 인벤토리에서 다음/이전 잉크 찾기
-        public void FindNextInk(int dir)
-        {
-            if (inventory.Count == 0) { selectedInkIndex = -1; return; }
-            int startIdx = selectedInkIndex == -1 ? 0 : selectedInkIndex;
-            int idx = startIdx;
-            
-            for (int i = 0; i < inventory.Count; i++)
-            {
-                idx += dir;
-                if (idx >= inventory.Count) idx = 0;
-                if (idx < 0) idx = inventory.Count - 1;
-
-                if (inventory[idx] is Item_Ink)
-                {
-                    selectedInkIndex = idx;
-                    return;
-                }
-            }
-            selectedInkIndex = -1;
-        }
-
-        // 인벤토리에서 펜 직접 선택
-        public virtual void SelectPen(int index)
-        {
-            if (index >= 0 && index < inventory.Count && inventory[index] is Item_Pen)
-            {
-                selectedPenIndex = index;
-            }
-        }
-
-        // 인벤토리에서 다음/이전 펜 찾기
-        public void FindNextPen(int dir)
-        {
-            if (inventory.Count == 0) { selectedPenIndex = -1; return; }
-            int startIdx = selectedPenIndex == -1 ? 0 : selectedPenIndex;
-            int idx = startIdx;
-            
-            for (int i = 0; i < inventory.Count; i++)
-            {
-                idx += dir;
-                if (idx >= inventory.Count) idx = 0;
-                if (idx < 0) idx = inventory.Count - 1;
-
-                if (inventory[idx] is Item_Pen)
-                {
-                    selectedPenIndex = idx;
-                    return;
-                }
-            }
-            selectedPenIndex = -1;
-        }
-
         protected virtual void RefillPen()
         {
-            isPenReady = false; // 밖으로 나가면 그리기 불가
-
-            if (selectedPenIndex != -1 && selectedPenIndex < inventory.Count)
+            isPenReady = false; 
+            
+            Item_Pen pen = penController != null ? penController.CurrentPen : null;
+            if (pen != null && pen.PenData != null && pen.PenData.consumesMana)
             {
-                Item_Pen pen = inventory[selectedPenIndex] as Item_Pen;
-                if (pen != null && pen.PenData != null && pen.PenData.consumesMana)
-                {
-                    // 마나 소모 펜은 잉크 리필 프로세스를 거치지 않고 즉시 그리기 가능
-                    isPenReady = true;
-                    return;
-                }
-            }
-
-            if (inkBottleVisual == null) {
-                Debug.LogWarning("[RefillPen] inkBottleVisual이 할당되지 않아 잉크병 위치로 이동할 수 없습니다! 인스펙터를 확인해주세요.");
+                isPenReady = true;
+                return;
             }
 
             isRefilling = true;
 
-            Image penImage = penVisual != null ? penVisual.GetComponent<Image>() : null;
-            if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+            if (penController != null && inkController != null)
             {
-                Material mat = penImage.material;
-                mat.DOKill();
-                mat.DOFloat(1f, "_DissolveAmount", 0.5f).OnComplete(() => {
-                    
-                    TryExecuteRefillLogic();
-                    
-                    if (penVisual != null && inkBottleVisual != null)
-                    {
-                        penVisual.position = inkBottleVisual.position;
-                    }
-                    
-                    mat.DOFloat(0f, "_DissolveAmount", 0.5f).OnComplete(() => {
-                        isPenReady = true;
-                    });
-                });
+                penController.GoToInkBottle(inkController.inkBottleVisual, 
+                    () => { inkController.TryRefillPen(penController.CurrentPen); }, 
+                    () => { isPenReady = true; }
+                );
             }
             else
             {
-                Debug.LogWarning("[RefillPen] 펜 이미지에 디졸브 머티리얼이 없어 연출 없이 즉시 이동합니다.");
-                TryExecuteRefillLogic();
-                if (penVisual != null && inkBottleVisual != null)
-                {
-                    penVisual.position = inkBottleVisual.position;
-                }
+                if (inkController != null && penController != null) inkController.TryRefillPen(penController.CurrentPen);
                 isPenReady = true;
+                isRefilling = false;
             }
         }
 
         protected virtual void ReturnPenToMouse()
         {
-            Image penImage = penVisual != null ? penVisual.GetComponent<Image>() : null;
-            if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+            isRefilling = true;
+            isPenReady = false;
+
+            if (penController != null)
             {
-                isRefilling = true;
-                isPenReady = false; // 아직 그리기 불가
-                Material mat = penImage.material;
-                mat.DOKill();
-                
-                mat.DOFloat(1f, "_DissolveAmount", 0.3f).OnComplete(() => {
-                    
-                    if (penVisual != null)
-                        penVisual.position = Input.mousePosition;
-                        
-                    isRefilling = false; // 마우스를 부드럽게 따라감
-                    mat.DOFloat(0f, "_DissolveAmount", 0.3f).OnComplete(() => {
-                        isPenReady = true; // 완전히 나타나면 그리기 허용!
-                    });
+                penController.ReturnToMouse(mainCamera, () => {
+                    isRefilling = false;
+                    isPenReady = true;
                 });
             }
             else
             {
                 isRefilling = false;
                 isPenReady = true;
-            }
-        }
-
-        private void TryExecuteRefillLogic()
-        {
-            if (selectedPenIndex == -1 || selectedPenIndex >= inventory.Count) return;
-            Item_Pen pen = inventory[selectedPenIndex] as Item_Pen;
-            if (pen == null || (pen.PenData != null && pen.PenData.consumesMana)) return;
-
-            if (selectedInkIndex == -1 || selectedInkIndex >= inventory.Count) return;
-            Item_Ink ink = inventory[selectedInkIndex] as Item_Ink;
-            if (ink == null || ink.currentAmount <= 0) return;
-
-            float maxCap = pen.PenData != null ? pen.PenData.maxInkCapacity : 0f;
-            float amountNeeded = maxCap - pen.currentInkCapacity;
-            if (amountNeeded <= 0) return;
-
-            ExecuteRefillLogic(pen, ink, amountNeeded);
-        }
-
-        private void ExecuteRefillLogic(Item_Pen pen, Item_Ink ink, float amountNeeded)
-        {
-            if (ink.currentAmount >= amountNeeded)
-            {
-                ink.currentAmount -= amountNeeded;
-                pen.currentInkCapacity += amountNeeded;
-            }
-            else
-            {
-                pen.currentInkCapacity += ink.currentAmount;
-                ink.currentAmount = 0;
-            }
-
-
-            if (ink.currentAmount <= 0)
-            {
-                Debug.LogWarning("[그리기] 잉크병이 바닥났습니다! 병이 버려집니다.");
-                ConsumeInkBottle();
             }
         }
 

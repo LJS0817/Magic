@@ -44,9 +44,6 @@ namespace Magic.Combat
         private bool wasParryOpen = false;
         private Tween parryTween;
 
-        // 오버라이드: CombatDrawingManager는 combatLoadout만 사용
-        public override List<ItemInstance> inventory => InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemInstance>();
-        
         // 화면 중앙 그리기 캔버스 영역
         public Rect scrollCanvasRect; 
 
@@ -64,8 +61,14 @@ namespace Magic.Combat
                 chantRecipes.Add(new ChantRecipe { element = SpellElement.Earth, combo = new List<KeyCode> { KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.W } });
             }
 
-            FindNextScroll(1);
-            FindNextInk(1);
+            // 기본 장비 설정: 로드아웃의 첫 번째 스크롤/잉크로 장착
+            if (InventoryManager.Instance != null)
+            {
+                if (InventoryManager.Instance.EquippedScroll == null)
+                    InventoryManager.Instance.CycleScroll(1);
+                if (InventoryManager.Instance.EquippedInk == null)
+                    InventoryManager.Instance.CycleInk(1);
+            }
         }
 
         protected override void Update()
@@ -93,13 +96,15 @@ namespace Magic.Combat
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
             if (scrollWheel != 0f)
             {
-                FindNextScroll(scrollWheel > 0f ? -1 : 1);
+                if (InventoryManager.Instance != null)
+                    InventoryManager.Instance.CycleScroll(scrollWheel > 0f ? -1 : 1);
                 ClearDrawing();
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
             {
-                FindNextInk(1);
+                if (InventoryManager.Instance != null)
+                    InventoryManager.Instance.CycleInk(1);
             }
 
             // 캔버스 영역 계산 (가로 전체, 세로 절반, 중앙 배치)
@@ -122,11 +127,11 @@ namespace Magic.Combat
                 return; // 영창 중에는 다른 액션(그리기 등) 불가
             }
 
-            if (canAct && selectedScrollIndex != -1)
-            {
-                Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
+            Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
 
-                if (currentScroll != null && currentScroll.isEmpty)
+            if (canAct && currentScroll != null)
+            {
+                if (currentScroll.isEmpty)
                 {
                     Vector2 mousePosGUI = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
                     if (scrollCanvasRect.Contains(mousePosGUI))
@@ -144,17 +149,17 @@ namespace Magic.Combat
                 // 마법 조합 (빈 스크롤) 또는 완성된 스크롤 즉시 발동
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    if (currentScroll != null && currentScroll.isEmpty)
+                    if (currentScroll.isEmpty)
                     {
                         MatchCombo();
                     }
-                    else if (currentScroll != null && !currentScroll.isEmpty)
+                    else if (currentScroll.ScrollData != null)
                     {
                         // 완성된 스크롤 즉시 발사
-                        OnSpellMatched(currentScroll.spellName, currentScroll.accuracyScore);
+                        OnSpellMatched(currentScroll.ScrollData.spellName, currentScroll.ScrollData.accuracyScore);
                         // 완성된 스크롤 발사 후 다시 빈 스크롤 상태로 되돌림 (임시)
                         currentScroll.isEmpty = true;
-                        if (currentScroll.ScrollData != null) currentScroll.ScrollData.spellName = "";
+                        currentScroll.ScrollData.spellName = "";
                     }
                 }
             }
@@ -194,7 +199,7 @@ namespace Magic.Combat
             }
             SpellType sType = matchedAsset != null ? matchedAsset.Type : SpellType.Attack;
 
-            Item_Scroll currentScroll = inventory[selectedScrollIndex] as Item_Scroll;
+            Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
             if (currentScroll != null && currentScroll.isEmpty)
             {
                 cachedSpellName = matchedSpell;
@@ -336,13 +341,7 @@ namespace Magic.Combat
             if (item.currentDurability <= 0)
             {
                 Debug.LogWarning("[전투] 스크롤이 파괴되었습니다!");
-                int idxToRemove = inventory.IndexOf(item);
-                InventoryManager.Instance.RemoveFromLoadout(item); // Loadout에서 제거
-                
-                if (selectedInkIndex > idxToRemove) selectedInkIndex--;
-                
-                selectedScrollIndex = -1;
-                FindNextScroll(1);
+                InventoryManager.Instance.RemoveItem(item); // 인벤토리 + 로드아웃에서 제거 및 자동 장착
             }
         }
 
@@ -421,22 +420,26 @@ namespace Magic.Combat
             GUI.color = Color.white;
 
             // 3. 좌측: 잉크 (세로 리스트)
+            Item_Ink equippedInk = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedInk : null;
+            var loadout = InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemInstance>();
+
             float leftX = 20f;
             float bottomYStart = Screen.height - 200f;
             GUI.Label(new Rect(leftX, bottomYStart, 200, 30), "--- Ink ---", style);
             int inkCount = 0;
-            for (int i = 0; i < inventory.Count; i++)
+            for (int i = 0; i < loadout.Count; i++)
             {
-                if (inventory[i] is Item_Ink ink)
+                if (loadout[i] is Item_Ink ink)
                 {
-                    string prefix = i == selectedInkIndex ? "<color=cyan>▶ </color>" : "  ";
+                    string prefix = ink == equippedInk ? "<color=cyan>▶ </color>" : "  ";
                     GUI.Label(new Rect(leftX, bottomYStart + 30 + (inkCount * 30), 200, 30), $"{prefix}{ink.ItemName}", style);
                     inkCount++;
                 }
             }
 
             // 4. 하단 중앙: 활성화된 스크롤 및 영창 상태
-            if (selectedScrollIndex != -1 && inventory[selectedScrollIndex] is Item_Scroll activeScroll)
+            Item_Scroll activeScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+            if (activeScroll != null)
             {
                 GUIStyle centerStyle = new GUIStyle(GUI.skin.label);
                 centerStyle.fontSize = 24;
@@ -470,14 +473,15 @@ namespace Magic.Combat
             }
 
             // 5. 우측: 스크롤 인벤토리 (그리드 형태)
+            Item_Scroll equippedScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
             float rightX = Screen.width - 250f;
             GUI.Label(new Rect(rightX, bottomYStart, 200, 30), "--- Scrolls ---", style);
             int scrollCount = 0;
-            for (int i = 0; i < inventory.Count; i++)
+            for (int i = 0; i < loadout.Count; i++)
             {
-                if (inventory[i] is Item_Scroll scroll)
+                if (loadout[i] is Item_Scroll scroll)
                 {
-                    string prefix = i == selectedScrollIndex ? "<color=yellow>▶ </color>" : "  ";
+                    string prefix = scroll == equippedScroll ? "<color=yellow>▶ </color>" : "  ";
                     string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
                     string scrollName = scroll.isEmpty ? scroll.ItemName : spell;
                     GUI.Label(new Rect(rightX, bottomYStart + 30 + (scrollCount * 30), 200, 30), $"{prefix}{scrollName}", style);

@@ -70,15 +70,13 @@ namespace Magic.Drawing
             RecipeGenerator.GenerateAndSaveRecipe(drawnShapes, newRecipeName);
             
             // 사용한 빈 스크롤을 완성된 스크롤로 상태 변환 (내구도 차감 없음)
-            if (selectedScrollIndex != -1 && selectedScrollIndex < inventory.Count)
+            Magic.Inventory.Item_Scroll currentScroll = Magic.Inventory.InventoryManager.Instance != null 
+                ? Magic.Inventory.InventoryManager.Instance.EquippedScroll : null;
+            if (currentScroll != null && currentScroll.isEmpty)
             {
-                Magic.Inventory.Item_Scroll currentScroll = inventory[selectedScrollIndex] as Magic.Inventory.Item_Scroll;
-                if (currentScroll != null && currentScroll.isEmpty)
-                {
-                    currentScroll.isEmpty = false;
-                    if (currentScroll.ScrollData != null) currentScroll.ScrollData.spellName = newRecipeName;
-                    Debug.Log($"[그리기] 빈 스크롤이 '{newRecipeName}' 마법 스크롤로 영구히 변환되었습니다!");
-                }
+                currentScroll.isEmpty = false;
+                if (currentScroll.ScrollData != null) currentScroll.ScrollData.spellName = newRecipeName;
+                Debug.Log($"[그리기] 빈 스크롤이 '{newRecipeName}' 마법 스크롤로 영구히 변환되었습니다!");
             }
 
             ClearDrawing();

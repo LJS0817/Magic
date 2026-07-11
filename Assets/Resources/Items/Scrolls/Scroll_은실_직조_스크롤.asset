@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a1dcaba4f0172f4984417d12ab15bf3, type: 3}
+  m_Name: "Scroll_\uC740\uC2E4_\uC9C1\uC870_\uC2A4\uD06C\uB864"
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemScrollSO
+  type: 0
+  itemName: "\uC740\uC2E4 \uC9C1\uC870 \uC2A4\uD06C\uB864"
+  itemDescription: "\uC740\uC2E4\uC774 \uC11E\uC5EC \uC9DC\uC5EC \uC788\uC5B4 \uB9C8\uBC95\uC9C4\uC774 \uB354 \uC815\uAD50\uD558\uAC8C \uADF8\uB824\uC9D1\uB2C8\uB2E4. (\uB9C8\uBC95 \uC644\uC131\uB3C4 \uD310\uC815 \uBCF4\uB108\uC2A4)"
+  itemIcon: {fileID: 0}
+  spellName: 
+  maxDurability: 8
+  accuracyScore: 1.2
+  scrollGrade: "\uD76C\uADC0"
