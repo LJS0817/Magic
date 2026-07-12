@@ -72,7 +72,7 @@ namespace Magic.Drawing
         {
             if (penController != null && penController.CurrentPen != null && ink != null)
             {
-                RefillPen();
+                if (inkController != null) inkController.TryRefillPen(penController.CurrentPen);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Magic.Drawing
         {
             if (inkController != null && inkController.CurrentInk != null && pen != null)
             {
-                RefillPen();
+                inkController.TryRefillPen(pen);
             }
         }
 
