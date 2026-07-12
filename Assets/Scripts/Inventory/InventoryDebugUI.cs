@@ -16,7 +16,12 @@ namespace Magic.Inventory
                 GameObject currencyGo = new GameObject("[CurrencySystem]");
                 currencyGo.AddComponent<CurrencyManager>();
                 currencyGo.AddComponent<CurrencyDebugUI>();
-                Debug.Log("[InventoryDebugUI] CurrencyManager와 CurrencyDebugUI가 자동으로 생성되었습니다.");
+                
+                // Store 시스템도 함께 붙입니다.
+                currencyGo.AddComponent<StoreManager>();
+                currencyGo.AddComponent<StoreDebugUI>();
+                
+                Debug.Log("[InventoryDebugUI] CurrencyManager와 StoreManager가 자동으로 생성되었습니다.");
             }
         }
 

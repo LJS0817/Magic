@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using Magic.Inventory;
 
 namespace Magic.Combat
 {
@@ -113,6 +114,19 @@ namespace Magic.Combat
         private void Die()
         {
             Debug.Log("<color=gray>[Enemy] Defeated!</color>");
+            
+            // --- 전리품 지급 로직 추가 ---
+            if (InventoryManager.Instance != null)
+            {
+                var lootSO = ScriptableObject.CreateInstance<ItemMaterialSO>();
+                lootSO.itemName = "하급 마석";
+                lootSO.basePriceInCopper = Random.Range(30, 80); // 30~80 동화 사이의 가치
+                
+                var lootInstance = new Item_Material(lootSO);
+                InventoryManager.Instance.AddItem(lootInstance);
+                Debug.Log($"<color=yellow>[Loot] {lootSO.itemName}을(를) 획득했습니다! (판매가: {lootSO.basePriceInCopper} Copper)</color>");
+            }
+
             // 사망 애니메이션: 위로 살짝 뜨며 작아지고 투명해짐
             transform.DOComplete();
             transform.DOMoveY(originalPosition.y + 2f, 0.8f).SetEase(Ease.OutQuad);

@@ -76,4 +76,12 @@ namespace Magic.Inventory
             }
         }
     }
+
+    [System.Serializable]
+    public class Item_Material : ItemInstance
+    {
+        public Item_Material(ItemDataSO data) : base(data)
+        {
+        }
+    }
 }
