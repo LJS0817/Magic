@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Magic.Inventory;
 using DG.Tweening;
 
@@ -11,8 +10,11 @@ namespace Magic.Drawing
         [Header("Visuals")]
         public RectTransform inkBottleVisual;
         public RectTransform inkAmountVisual;
+
+        Image inkAmountImage;
         const float inkAmountVisualMinHeight = 19.05f;
         float inkAmountVisualMaxHeight = 100f;
+        float intAmountVisualMaxAlpha = 1f;
 
         public Item_Ink CurrentInk
         {
@@ -24,6 +26,8 @@ namespace Magic.Drawing
 
         void Start()
         {
+            inkAmountImage = inkAmountVisual.GetComponent<Image>();
+            intAmountVisualMaxAlpha = inkAmountImage.color.a;
             inkAmountVisualMaxHeight = inkAmountVisual.rect.height;
             if (InventoryManager.Instance != null)
             {
@@ -53,7 +57,7 @@ namespace Magic.Drawing
                 // if amount > 0, instantly show (alpha 1)
                 if (newInk.currentAmount > 0)
                 {
-                    SetInkVisualAlpha(1f, 0f);
+                    SetInkVisualAlpha(intAmountVisualMaxAlpha, 0f);
                 }
                 else
                 {
@@ -66,28 +70,12 @@ namespace Magic.Drawing
         {
             if (inkAmountVisual == null) return;
             
-            UnityEngine.UI.Image img = inkAmountVisual.GetComponent<UnityEngine.UI.Image>();
-            if (img != null)
-            {
-                if (duration > 0f)
-                    img.DOFade(targetAlpha, duration);
-                else
-                {
-                    Color c = img.color;
-                    c.a = targetAlpha;
-                    img.color = c;
-                }
-            }
+            if (duration > 0f) inkAmountImage.DOFade(targetAlpha, duration);
             else
             {
-                CanvasGroup cg = inkAmountVisual.GetComponent<CanvasGroup>();
-                if (cg != null)
-                {
-                    if (duration > 0f)
-                        cg.DOFade(targetAlpha, duration);
-                    else
-                        cg.alpha = targetAlpha;
-                }
+                Color c = inkAmountImage.color;
+                c.a = targetAlpha;
+                inkAmountImage.color = c;
             }
         }
 

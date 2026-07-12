@@ -8,6 +8,18 @@ namespace Magic.Inventory
         private Rect windowRect = new Rect(20, 20, 300, 400);
         private bool showWindow = true;
 
+        private void Start()
+        {
+            // 씬 실행 시 CurrencyManager가 없으면 자동으로 생성하고 Debug UI도 함께 부착합니다.
+            if (FindObjectOfType<CurrencyManager>() == null)
+            {
+                GameObject currencyGo = new GameObject("[CurrencySystem]");
+                currencyGo.AddComponent<CurrencyManager>();
+                currencyGo.AddComponent<CurrencyDebugUI>();
+                Debug.Log("[InventoryDebugUI] CurrencyManager와 CurrencyDebugUI가 자동으로 생성되었습니다.");
+            }
+        }
+
         void OnGUI()
         {
             if (!showWindow)
