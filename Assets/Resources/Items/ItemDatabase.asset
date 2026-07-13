@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd9419de37bcdd4e9bf9a3a7a75bed8, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b0881800b92fcc46841c4f5721cc00d, type: 3}
   m_Name: ItemDatabase
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemDatabase
   pens:

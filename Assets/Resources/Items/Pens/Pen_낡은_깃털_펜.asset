@@ -9,13 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f5d697e30e2eb44bb3f37f4637dbf5b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a22f4081f94d3940b7bd3818a4b9f46, type: 3}
   m_Name: "Pen_\uB0A1\uC740_\uAE43\uD138_\uD39C"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemPenSO
   type: 4
   itemName: "\uB0A1\uC740 \uAE43\uD138 \uD39C"
   itemDescription: "\uAE43\uCD09\uC774 \uB2F3\uC544 \uB9C8\uBC95 \uC789\uD06C\uAC00 \uACE0\uB974\uAC8C \uB098\uC624\uC9C0 \uC54A\uB294 \uC5F0\uC2B5\uC6A9 \uB0A1\uC740 \uAE43\uD39C\uC785\uB2C8\uB2E4."
-  itemIcon: {fileID: 8787845490931733337, guid: b363852954e962d43b58d33bde3ffe3f, type: 3}
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
   maxInkCapacity: 30
   inkConsumptionRate: 5
   penGrade: "\uC77C\uBC18"

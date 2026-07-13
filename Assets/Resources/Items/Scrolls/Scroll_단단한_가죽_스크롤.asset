@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a1dcaba4f0172f4984417d12ab15bf3, type: 3}
+  m_Script: {fileID: 11500000, guid: eb0790edb63bb2e43b11e7a309d56ab7, type: 3}
   m_Name: "Scroll_\uB2E8\uB2E8\uD55C_\uAC00\uC8FD_\uC2A4\uD06C\uB864"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemScrollSO
   type: 0
   itemName: "\uB2E8\uB2E8\uD55C \uAC00\uC8FD \uC2A4\uD06C\uB864"
   itemDescription: "\uD2B9\uC218 \uCC98\uB9AC\uB41C \uAC00\uC8FD\uC73C\uB85C \uB9CC\uB4E4\uC5B4\uC838 \uB0B4\uAD6C\uB3C4\uAC00 \uB9E4\uC6B0 \uB6F0\uC5B4\uB0A9\uB2C8\uB2E4."
   itemIcon: {fileID: 0}
-  spellName: Impact
+  basePriceInCopper: 0
+  spellName: 
   maxDurability: 10
   accuracyScore: 1
   scrollGrade: "\uACE0\uAE09"

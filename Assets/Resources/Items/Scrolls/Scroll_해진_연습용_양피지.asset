@@ -9,13 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a1dcaba4f0172f4984417d12ab15bf3, type: 3}
+  m_Script: {fileID: 11500000, guid: eb0790edb63bb2e43b11e7a309d56ab7, type: 3}
   m_Name: "Scroll_\uD574\uC9C4_\uC5F0\uC2B5\uC6A9_\uC591\uD53C\uC9C0"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemScrollSO
   type: 0
   itemName: "\uD574\uC9C4 \uC5F0\uC2B5\uC6A9 \uC591\uD53C\uC9C0"
   itemDescription: "\uB05D\uC774 \uD574\uC9C0\uACE0 \uB0A1\uC740 \uC591\uD53C\uC9C0\uC785\uB2C8\uB2E4. \uB9C8\uBC95\uC744 \uB450\uC138 \uBC88 \uC4F0\uBA74 \uCC22\uC5B4\uC9C8 \uAC83 \uAC19\uC2B5\uB2C8\uB2E4."
-  itemIcon: {fileID: -7105172644484184711, guid: 33a34393be4709747bfc6dc7d6a1be3d, type: 3}
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
   spellName: 
   maxDurability: 2
   accuracyScore: 0.8

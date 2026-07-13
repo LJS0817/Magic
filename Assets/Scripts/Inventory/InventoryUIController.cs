@@ -18,6 +18,8 @@ namespace Magic.Inventory
         [SerializeField] private Image _infoIconImage;
         [SerializeField] private TMP_Text _infoNameText;
         [SerializeField] private TMP_Text _infoDescriptionText;
+        [SerializeField] private Button _equipButton;
+        [SerializeField] private TMP_Text _equipButtonText;
 
         [Header("Pagination")]
         [SerializeField] private int _slotsPerPage = 20;
@@ -28,11 +30,13 @@ namespace Magic.Inventory
         private List<InventorySlot> _slotPool = new List<InventorySlot>();
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
         private int _currentPage = 0;
+        private ItemInstance _selectedItem;
 
         private void Awake()
         {
             if (_prevPageButton != null) _prevPageButton.onClick.AddListener(OnPrevPage);
             if (_nextPageButton != null) _nextPageButton.onClick.AddListener(OnNextPage);
+            if (_equipButton != null) _equipButton.onClick.AddListener(OnEquipButtonClicked);
         }
 
         private void Start()
@@ -40,17 +44,27 @@ namespace Magic.Inventory
             if (_infoPanel != null)
                 _infoPanel.SetActive(false); // 처음에는 숨김
             
-            if (InventoryManager.Instance != null)
-            {
-                InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
-            }
+            InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
+            InventoryManager.Instance.OnScrollEquipped += OnScrollEquipped;
+            InventoryManager.Instance.OnInkEquipped += OnInkEquipped;
+            InventoryManager.Instance.OnPenEquipped += OnPenEquipped;
+            
+            // 처음에 인벤토리에 있는 아이템들을 UI에 반영
+            RefreshInventory();
         }
+
+        private void OnScrollEquipped(Item_Scroll item) => RefreshInventory();
+        private void OnInkEquipped(Item_Ink item) => RefreshInventory();
+        private void OnPenEquipped(Item_Pen item) => RefreshInventory();
 
         private void OnDestroy()
         {
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.OnInventoryChanged -= RefreshInventory;
+                InventoryManager.Instance.OnScrollEquipped -= OnScrollEquipped;
+                InventoryManager.Instance.OnInkEquipped -= OnInkEquipped;
+                InventoryManager.Instance.OnPenEquipped -= OnPenEquipped;
             }
         }
 
@@ -93,12 +107,14 @@ namespace Magic.Inventory
                 if (i < displayCount)
                 {
                     int itemIndex = startIndex + i;
-                    slot.SetInfo(items[itemIndex], GetSlotBackground(items[itemIndex]), _emptySlotIcon);
+                    ItemInstance currentItem = items[itemIndex];
+                    bool isEquipped = IsItemEquipped(currentItem);
+                    slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, isEquipped);
                 }
                 else
                 {
                     // 빈 슬롯
-                    slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon);
+                    slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
                 }
             }
 
@@ -112,6 +128,8 @@ namespace Magic.Inventory
             if (_pageText != null) _pageText.text = $"{_currentPage + 1} / {totalPages}";
             if (_prevPageButton != null) _prevPageButton.interactable = _currentPage > 0;
             if (_nextPageButton != null) _nextPageButton.interactable = _currentPage < totalPages - 1;
+
+            UpdateEquipButtonState();
         }
 
         private void OnPrevPage()
@@ -154,6 +172,8 @@ namespace Magic.Inventory
 
         private void OnSlotClicked(ItemInstance item)
         {
+            _selectedItem = item;
+
             // 슬롯 클릭 시 우측/하단 등에 정보 패널을 띄우고 데이터 적용
             if (_infoPanel != null)
                 _infoPanel.SetActive(true);
@@ -166,6 +186,45 @@ namespace Magic.Inventory
 
             if (_infoDescriptionText != null)
                 _infoDescriptionText.text = item.ItemDescription;
+
+            UpdateEquipButtonState();
+        }
+
+        private void OnEquipButtonClicked()
+        {
+            if (_selectedItem == null || InventoryManager.Instance == null) return;
+            
+            var inv = InventoryManager.Instance;
+            if (_selectedItem is Item_Scroll scroll) inv.EquippedScroll = scroll;
+            else if (_selectedItem is Item_Ink ink) inv.EquippedInk = ink;
+            else if (_selectedItem is Item_Pen pen) inv.EquippedPen = pen;
+        }
+
+        private bool IsItemEquipped(ItemInstance item)
+        {
+            if (item == null) return false;
+            var inv = InventoryManager.Instance;
+            if (inv == null) return false;
+            
+            if (item is Item_Scroll scroll) return inv.EquippedScroll == scroll;
+            if (item is Item_Ink ink) return inv.EquippedInk == ink;
+            if (item is Item_Pen pen) return inv.EquippedPen == pen;
+            
+            return false;
+        }
+
+        private void UpdateEquipButtonState()
+        {
+            if (_equipButton == null || _selectedItem == null) return;
+            
+            bool isEquipped = IsItemEquipped(_selectedItem);
+            
+            if (_equipButtonText != null)
+            {
+                _equipButtonText.text = isEquipped ? "장착 중" : "장착하기";
+            }
+            
+            _equipButton.interactable = !isEquipped;
         }
 
         Sprite GetSlotBackground(ItemInstance item)

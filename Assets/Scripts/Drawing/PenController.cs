@@ -32,10 +32,16 @@ namespace Magic.Drawing
 
         private void Start()
         {
-            // 시작 시 디졸브 초기화 방어 (에디터에서 값이 남아있는 현상 방지)
-            if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+            // 매터리얼 인스턴스를 생성하여 원본 에셋(Asset)이 변형되면서 발생하는 에디터 렉 방지
+            if (penImage != null && penImage.material != null)
             {
-                penImage.material.SetFloat("_DissolveAmount", 0f);
+                penImage.material = new Material(penImage.material);
+
+                // 시작 시 디졸브 초기화 방어
+                if (penImage.material.HasProperty("_DissolveAmount"))
+                {
+                    penImage.material.SetFloat("_DissolveAmount", 0f);
+                }
             }
         }
 
@@ -193,9 +199,13 @@ namespace Magic.Drawing
                     // 디졸브(나타나기) 전, 펜이 보이지 않을 때 미리 각도와 애니메이션 세팅
                     PlayIdleAnimation();
                     
-                    mat.DOFloat(0f, "_DissolveAmount", 0.3f).OnComplete(() => {
-                        onComplete?.Invoke();
-                    });
+                    mat.DOFloat(0f, "_DissolveAmount", 0.3f)
+                       .OnUpdate(() => {
+                           TrackMouse(mainCamera);
+                       })
+                       .OnComplete(() => {
+                           onComplete?.Invoke();
+                       });
                 });
             }
             else
