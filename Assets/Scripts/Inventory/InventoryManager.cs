@@ -13,6 +13,7 @@ namespace Magic.Inventory
 
         [Header("Inventory Data")]
         public List<ItemInstance> items = new List<ItemInstance>();
+        public event System.Action OnInventoryChanged;
 
         [Header("Equipped Drawing Items")]
         [SerializeField] private Item_Scroll _equippedScroll;
@@ -190,11 +191,13 @@ namespace Magic.Inventory
         public void AddItem(ItemInstance item)
         {
             items.Add(item);
+            OnInventoryChanged?.Invoke();
         }
 
         public void RemoveItem(ItemInstance item)
         {
             items.Remove(item);
+            OnInventoryChanged?.Invoke();
             if (combatLoadout.Contains(item))
             {
                 combatLoadout.Remove(item);
