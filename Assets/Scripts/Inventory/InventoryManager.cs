@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Magic.Inventory;
+using Magic.Data;
 
 namespace Magic.Inventory
 {
@@ -11,14 +12,13 @@ namespace Magic.Inventory
         [Header("Database")]
         public ItemDatabase itemDatabase;
 
-        [Header("Inventory Data")]
-        public List<ItemInstance> items = new List<ItemInstance>();
+        public List<ItemInstance> items => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.items : new List<ItemInstance>();
         public event System.Action OnInventoryChanged;
 
-        [Header("Equipped Drawing Items")]
-        [SerializeField] private Item_Scroll _equippedScroll;
-        [SerializeField] private Item_Ink _equippedInk;
-        [SerializeField] private Item_Pen _equippedPen;
+        public void NotifyInventoryChanged()
+        {
+            OnInventoryChanged?.Invoke();
+        }
 
         public event System.Action<Item_Scroll> OnScrollEquipped;
         public event System.Action<Item_Ink> OnInkEquipped;
@@ -26,36 +26,35 @@ namespace Magic.Inventory
 
         public Item_Scroll EquippedScroll
         {
-            get => _equippedScroll;
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedScroll : null;
             set
             {
-                _equippedScroll = value;
+                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedScroll = value;
                 OnScrollEquipped?.Invoke(value);
             }
         }
 
         public Item_Ink EquippedInk
         {
-            get => _equippedInk;
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedInk : null;
             set
             {
-                _equippedInk = value;
+                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedInk = value;
                 OnInkEquipped?.Invoke(value);
             }
         }
 
         public Item_Pen EquippedPen
         {
-            get => _equippedPen;
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedPen : null;
             set
             {
-                _equippedPen = value;
+                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedPen = value;
                 OnPenEquipped?.Invoke(value);
             }
         }
 
-        [Header("Combat Data")]
-        public List<ItemInstance> combatLoadout = new List<ItemInstance>();
+        public List<ItemInstance> combatLoadout => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.combatLoadout : new List<ItemInstance>();
 
         private void Awake()
         {

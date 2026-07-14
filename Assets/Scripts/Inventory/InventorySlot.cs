@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace Magic.Inventory
 {
-    public class InventorySlot : MonoBehaviour
+    public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Image _bg;
         [SerializeField] private Image _iconImage;
@@ -11,11 +12,22 @@ namespace Magic.Inventory
         [SerializeField] private GameObject _equippedMark;
 
         private ItemInstance _item;
-        private System.Action<ItemInstance> _onClickCallback;
+        public ItemInstance Item => _item;
+        private System.Action<InventorySlot> _onClickCallback;
+        private System.Action<InventorySlot> _onEnterCallback;
+        private System.Action<InventorySlot> _onExitCallback;
+        private System.Action<InventorySlot> _onDoubleClickCallback;
+        private float _lastClickTime = 0f;
 
-        public void Initialize(System.Action<ItemInstance> onClickCallback)
+        public void Initialize(System.Action<InventorySlot> onClickCallback, 
+                               System.Action<InventorySlot> onEnterCallback = null, 
+                               System.Action<InventorySlot> onExitCallback = null,
+                               System.Action<InventorySlot> onDoubleClickCallback = null)
         {
             _onClickCallback = onClickCallback;
+            _onEnterCallback = onEnterCallback;
+            _onExitCallback = onExitCallback;
+            _onDoubleClickCallback = onDoubleClickCallback;
             if (_slotButton != null)
             {
                 _slotButton.onClick.RemoveAllListeners();
@@ -57,7 +69,32 @@ namespace Magic.Inventory
         {
             if (_item != null)
             {
-                _onClickCallback?.Invoke(_item);
+                if (Time.unscaledTime - _lastClickTime < 0.3f)
+                {
+                    _onDoubleClickCallback?.Invoke(this);
+                    _lastClickTime = 0f;
+                }
+                else
+                {
+                    _onClickCallback?.Invoke(this);
+                    _lastClickTime = Time.unscaledTime;
+                }
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (_item != null)
+            {
+                _onEnterCallback?.Invoke(this);
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (_item != null)
+            {
+                _onExitCallback?.Invoke(this);
             }
         }
     }

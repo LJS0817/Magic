@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: MyAwesomeSpell
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: MyAwesomeSpell
+  Type: 0
+  manaCost: 40
+  Description: 
+  ActivationCondition: 
+  ActivationHint: 
   RequiredShapes:
   - Circle
   - Star

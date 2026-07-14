@@ -1,16 +1,26 @@
 using UnityEngine;
+using Magic.Data;
 
 namespace Magic.Combat
 {
     public class PlayerController : MonoBehaviour
     {
         [Header("Status")]
-        public float maxHealth = 100f;
-        public float health = 100f;
+        public float maxHealth 
+        {
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.maxHealth : 100f;
+            set { if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.maxHealth = value; }
+        }
+
+        public float health 
+        {
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.currentHealth : 100f;
+            set { if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.currentHealth = value; }
+        }
 
         void Awake()
         {
-            health = maxHealth;
+            // Initialization is handled by PlayerDataManager
         }
 
         void Update()

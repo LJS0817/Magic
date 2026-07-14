@@ -14,12 +14,8 @@ namespace Magic.Inventory
         [SerializeField] private Sprite _emptySlotIcon;
 
         [Header("Info Panel")]
-        [SerializeField] private GameObject _infoPanel;
-        [SerializeField] private Image _infoIconImage;
-        [SerializeField] private TMP_Text _infoNameText;
-        [SerializeField] private TMP_Text _infoDescriptionText;
-        [SerializeField] private Button _equipButton;
-        [SerializeField] private TMP_Text _equipButtonText;
+        [SerializeField] private ItemInfoPanel _infoPanel;
+        [SerializeField] private RectTransform _inventoryPanel;
 
         [Header("Pagination")]
         [SerializeField] private int _slotsPerPage = 20;
@@ -31,18 +27,18 @@ namespace Magic.Inventory
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
         private int _currentPage = 0;
         private ItemInstance _selectedItem;
+        private InventorySlot _hoveredSlot;
 
         private void Awake()
         {
             if (_prevPageButton != null) _prevPageButton.onClick.AddListener(OnPrevPage);
             if (_nextPageButton != null) _nextPageButton.onClick.AddListener(OnNextPage);
-            if (_equipButton != null) _equipButton.onClick.AddListener(OnEquipButtonClicked);
         }
 
         private void Start()
         {
             if (_infoPanel != null)
-                _infoPanel.SetActive(false); // 처음에는 숨김
+                _infoPanel.Close();
             
             InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
             InventoryManager.Instance.OnScrollEquipped += OnScrollEquipped;
@@ -102,7 +98,7 @@ namespace Magic.Inventory
             {
                 InventorySlot slot = GetOrCreateSlot(i);
                 slot.gameObject.SetActive(true);
-                slot.Initialize(OnSlotClicked);
+                slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked);
 
                 if (i < displayCount)
                 {
@@ -128,8 +124,6 @@ namespace Magic.Inventory
             if (_pageText != null) _pageText.text = $"{_currentPage + 1} / {totalPages}";
             if (_prevPageButton != null) _prevPageButton.interactable = _currentPage > 0;
             if (_nextPageButton != null) _nextPageButton.interactable = _currentPage < totalPages - 1;
-
-            UpdateEquipButtonState();
         }
 
         private void OnPrevPage()
@@ -170,35 +164,118 @@ namespace Magic.Inventory
             return slot;
         }
 
-        private void OnSlotClicked(ItemInstance item)
+        private void OnSlotClicked(InventorySlot slot)
         {
-            _selectedItem = item;
-
-            // 슬롯 클릭 시 우측/하단 등에 정보 패널을 띄우고 데이터 적용
-            if (_infoPanel != null)
-                _infoPanel.SetActive(true);
-
-            if (_infoIconImage != null)
-                _infoIconImage.sprite = item.ItemIcon;
-
-            if (_infoNameText != null)
-                _infoNameText.text = item.ItemName;
-
-            if (_infoDescriptionText != null)
-                _infoDescriptionText.text = item.ItemDescription;
-
-            UpdateEquipButtonState();
+            if (slot == null || slot.Item == null) return;
+            
+            _selectedItem = slot.Item;
         }
 
-        private void OnEquipButtonClicked()
+        private void OnSlotDoubleClicked(InventorySlot slot)
         {
-            if (_selectedItem == null || InventoryManager.Instance == null) return;
+            if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
             
             var inv = InventoryManager.Instance;
-            if (_selectedItem is Item_Scroll scroll) inv.EquippedScroll = scroll;
-            else if (_selectedItem is Item_Ink ink) inv.EquippedInk = ink;
-            else if (_selectedItem is Item_Pen pen) inv.EquippedPen = pen;
+            if (slot.Item is Item_Scroll scroll) inv.EquippedScroll = scroll;
+            else if (slot.Item is Item_Ink ink) inv.EquippedInk = ink;
+            else if (slot.Item is Item_Pen pen) inv.EquippedPen = pen;
         }
+
+        private void OnSlotPointerEnter(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null) return;
+            
+            _hoveredSlot = slot;
+
+            // 슬롯 호버 시 정보 패널을 띄우고 위치를 슬롯 아래로 이동
+            if (_infoPanel != null)
+            {
+                _infoPanel.Open();
+                _infoPanel.Setup(slot.Item);
+
+                RectTransform infoRect = _infoPanel.GetComponent<RectTransform>();
+                RectTransform slotRect = slot.GetComponent<RectTransform>();
+
+                if (infoRect != null && slotRect != null && _inventoryPanel != null)
+                {
+                    // UI 크기 갱신 (ContentSizeFitter 적용 시 정확한 크기 측정)
+                    UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(infoRect);
+
+                    Vector3[] slotCorners = new Vector3[4];
+                    slotRect.GetWorldCorners(slotCorners);
+                    Vector3 bottomCenter = (slotCorners[0] + slotCorners[3]) / 2f;
+                    Vector3 topCenter = (slotCorners[1] + slotCorners[2]) / 2f;
+                    
+                    Vector3[] invCorners = new Vector3[4];
+                    _inventoryPanel.GetWorldCorners(invCorners);
+                    
+                    // 인벤토리 상단에서 75% 지점 (하위 25%)을 기준으로 삼음 (반 + 반의 반)
+                    float thresholdY = Mathf.Lerp(invCorners[2].y, invCorners[0].y, 0.75f);
+
+                    // 슬롯이 해당 기준치보다 아래쪽에 있다면 패널을 슬롯 위(Top)로 표시
+                    bool showAbove = slotRect.position.y < thresholdY;
+                    
+                    Vector3[] initialPanelCorners = new Vector3[4];
+                    
+                    if (showAbove)
+                    {
+                        // 패널의 Bottom-Center를 슬롯의 Top-Center에 맞춤
+                        infoRect.position = topCenter;
+                        infoRect.GetWorldCorners(initialPanelCorners);
+                        Vector3 panelBottomCenter = (initialPanelCorners[0] + initialPanelCorners[3]) / 2f;
+                        Vector3 pivotToBottomShift = infoRect.position - panelBottomCenter;
+                        
+                        infoRect.position = topCenter + pivotToBottomShift;
+                        infoRect.anchoredPosition += new Vector2(0, 5f);
+                    }
+                    else
+                    {
+                        // 패널의 Top-Center를 슬롯의 하단(Bottom-Center)에 맞춤
+                        infoRect.position = bottomCenter;
+                        infoRect.GetWorldCorners(initialPanelCorners);
+                        Vector3 panelTopCenter = (initialPanelCorners[1] + initialPanelCorners[2]) / 2f;
+                        Vector3 pivotToTopShift = infoRect.position - panelTopCenter;
+                        
+                        infoRect.position = bottomCenter + pivotToTopShift;
+                        infoRect.anchoredPosition += new Vector2(0, -5f);
+                    }
+                    
+                    Vector3[] panelCorners = new Vector3[4];
+                    infoRect.GetWorldCorners(panelCorners);
+                    
+                    Vector3 offset = Vector3.zero;
+
+                    // 좌/우 (Width) 보정 (월드 좌표 차이로 구함)
+                    if (panelCorners[0].x < invCorners[0].x)
+                        offset.x = invCorners[0].x - panelCorners[0].x;
+                    else if (panelCorners[2].x > invCorners[2].x)
+                        offset.x = invCorners[2].x - panelCorners[2].x;
+                        
+                    // 가로 보정치 적용
+                    infoRect.position += offset;
+                }
+            }
+        }
+
+        private void OnSlotPointerExit(InventorySlot slot)
+        {
+            if (_hoveredSlot == slot)
+            {
+                _hoveredSlot = null;
+            }
+            StartCoroutine(CheckAndClosePanel());
+        }
+
+        private System.Collections.IEnumerator CheckAndClosePanel()
+        {
+            yield return null; // 1프레임 대기
+            
+            if (_infoPanel != null && _hoveredSlot == null)
+            {
+                _infoPanel.Close();
+            }
+        }
+
 
         private bool IsItemEquipped(ItemInstance item)
         {
@@ -213,19 +290,6 @@ namespace Magic.Inventory
             return false;
         }
 
-        private void UpdateEquipButtonState()
-        {
-            if (_equipButton == null || _selectedItem == null) return;
-            
-            bool isEquipped = IsItemEquipped(_selectedItem);
-            
-            if (_equipButtonText != null)
-            {
-                _equipButtonText.text = isEquipped ? "장착 중" : "장착하기";
-            }
-            
-            _equipButton.interactable = !isEquipped;
-        }
 
         Sprite GetSlotBackground(ItemInstance item)
         {

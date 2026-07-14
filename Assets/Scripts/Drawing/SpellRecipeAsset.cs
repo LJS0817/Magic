@@ -30,6 +30,9 @@ namespace Magic.Drawing
         public string SpellName;
         public SpellType Type = SpellType.Attack;
         
+        [Tooltip("이 마법을 사용할 때 총 필요한 마나량 (그릴 때 50%, 발동 시 50% 소모)")]
+        public float manaCost = 30f;
+        
         [Header("Lore & Information")]
         [TextArea(3, 5)]
         [Tooltip("마법서에 기록될 판타지 느낌의 설명")]

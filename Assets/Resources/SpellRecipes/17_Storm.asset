@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: 17_LightningStorm
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Storm
+  Type: 0
+  manaCost: 30
   Description: "\uAC70\uB300\uD55C \uD3ED\uD48D\uC6B0\uB97C \uD615\uC131\uD558\uC5EC \uC801\uC744 \uD729\uC4F8\uC5B4\uBC84\uB9BD\uB2C8\uB2E4."
+  ActivationCondition: 
   ActivationHint: "\uC138 \uAC1C\uC758 \uBCC4 \uC911 \uD558\uB098\uC5D0 \uD3ED\uD48D\uC758 \uB208(\uC6D0)\uC744 \uC0C8\uACA8 \uB123\uC73C\uC138\uC694."
   RequiredShapes:
   - Star

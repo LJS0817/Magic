@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using Magic.Inventory;
 using DG.Tweening;
+using Magic.UI;
+using Magic.Data;
 
 namespace Magic.Drawing
 {
@@ -10,6 +12,9 @@ namespace Magic.Drawing
     {
         [Header("Magic Combo Stats")]
         public List<DrawnShape> drawnShapes = new List<DrawnShape>();
+
+        [Header("Resources (UI Only)")]
+        public CustomSlider manaSlider;
 
         [Header("References")]
         public RectTransform drawingArea; // 스크롤 UI 영역
@@ -65,6 +70,11 @@ namespace Magic.Drawing
             {
                 InventoryManager.Instance.OnInkEquipped += HandleInkEquipped;
                 InventoryManager.Instance.OnPenEquipped += HandlePenEquipped;
+            }
+
+            if (manaSlider != null && PlayerDataManager.Instance != null)
+            {
+                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
             }
         }
 
@@ -268,17 +278,28 @@ namespace Magic.Drawing
         protected virtual bool CanDrawWithPen(Item_Pen pen)
         {
             if (pen == null) return false;
-            if (pen.PenData != null && pen.PenData.consumesMana) return true;
+            if (pen.PenData != null && pen.PenData.consumesMana)
+            {
+                return PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana > 0f;
+            }
             return pen.currentInkCapacity > 0f;
         }
 
         protected virtual void ConsumePenResource(Item_Pen pen)
         {
             if (pen == null) return;
-            if (pen.PenData != null && pen.PenData.consumesMana) return;
             float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
-            pen.currentInkCapacity -= rate * Time.deltaTime;
-            if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
+            if (pen.PenData != null && pen.PenData.consumesMana && PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.currentMana -= rate * Time.deltaTime;
+                if (PlayerDataManager.Instance.currentMana < 0) PlayerDataManager.Instance.currentMana = 0;
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+            }
+            else
+            {
+                pen.currentInkCapacity -= rate * Time.deltaTime;
+                if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
+            }
         }
 
         protected virtual async void EndStroke()
@@ -344,8 +365,52 @@ namespace Magic.Drawing
             }
             else
             {
-                string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
-                Debug.Log($"<color=cyan>✨ [마법 발동 / 완성] {rank} {matchedSpell} (Score: {averageScore:F2}) ✨</color>");
+                Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+                float spellManaCost = 30f;
+                if (drawingDatabase != null && drawingDatabase.recipes != null)
+                {
+                    foreach (var r in drawingDatabase.recipes)
+                    {
+                        if (r.SpellName == matchedSpell)
+                        {
+                            spellManaCost = r.manaCost;
+                            break;
+                        }
+                    }
+                }
+
+                if (currentScroll != null && currentScroll.isEmpty)
+                {
+                    float drawCost = spellManaCost * 0.5f;
+                    if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= drawCost)
+                    {
+                        PlayerDataManager.Instance.currentMana -= drawCost;
+                        if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                        
+                        currentScroll.isEmpty = false;
+                        if (currentScroll.ScrollData != null)
+                        {
+                            currentScroll.ScrollData.spellName = matchedSpell;
+                            currentScroll.ScrollData.accuracyScore = averageScore;
+                        }
+                        string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
+                        Debug.Log($"<color=cyan>✨ [마법 정착] {rank} {matchedSpell} (마나 소모: {drawCost:F1}) ✨</color>");
+                        
+                        if (InventoryManager.Instance != null)
+                        {
+                            InventoryManager.Instance.NotifyInventoryChanged();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"<color=red>[그리기 실패] 마나가 부족하여 스크롤에 마법을 새길 수 없습니다. (필요 마나: {drawCost:F1})</color>");
+                    }
+                }
+                else
+                {
+                    string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
+                    Debug.Log($"<color=cyan>✨ [마법 발동 / 완성] {rank} {matchedSpell} (Score: {averageScore:F2}) ✨</color>");
+                }
             }
             ClearDrawing();
         }

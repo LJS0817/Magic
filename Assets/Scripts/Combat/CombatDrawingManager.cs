@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Magic.Drawing;
 using Magic.Inventory;
 using DG.Tweening;
+using Magic.UI;
+using Magic.Data;
 
 namespace Magic.Combat
 {
@@ -18,10 +20,7 @@ namespace Magic.Combat
         [Header("Combat References")]
         public PlayerController player;
 
-        [Header("Resources")]
-        public float maxMana = 100f;
-        public float currentMana = 100f;
-        public float manaCostPerSpell = 30f;
+
 
         [Header("Chanting System")]
         public List<ChantRecipe> chantRecipes = new List<ChantRecipe>();
@@ -61,7 +60,6 @@ namespace Magic.Combat
                 chantRecipes.Add(new ChantRecipe { element = SpellElement.Earth, combo = new List<KeyCode> { KeyCode.A, KeyCode.S, KeyCode.D, KeyCode.W } });
             }
 
-            // 기본 장비 설정: 로드아웃의 첫 번째 스크롤/잉크로 장착
             if (InventoryManager.Instance != null)
             {
                 if (InventoryManager.Instance.EquippedScroll == null)
@@ -69,6 +67,9 @@ namespace Magic.Combat
                 if (InventoryManager.Instance.EquippedInk == null)
                     InventoryManager.Instance.CycleInk(1);
             }
+            
+            if (manaSlider != null && PlayerDataManager.Instance != null)
+                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
         }
 
         protected override void Update()
@@ -198,10 +199,34 @@ namespace Magic.Combat
                 }
             }
             SpellType sType = matchedAsset != null ? matchedAsset.Type : SpellType.Attack;
+            float spellCost = matchedAsset != null ? matchedAsset.manaCost : 30f;
 
             Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
             if (currentScroll != null && currentScroll.isEmpty)
             {
+                float drawCost = spellCost * 0.5f;
+                if (PlayerDataManager.Instance == null || PlayerDataManager.Instance.currentMana < drawCost)
+                {
+                    Debug.Log($"<color=red>[전투] 마나가 부족하여 마법을 스크롤에 새길 수 없습니다! (필요 마나: {drawCost:F1})</color>");
+                    ClearDrawing();
+                    return;
+                }
+
+                PlayerDataManager.Instance.currentMana -= drawCost;
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+
+                currentScroll.isEmpty = false;
+                if (currentScroll.ScrollData != null)
+                {
+                    currentScroll.ScrollData.spellName = matchedSpell;
+                    currentScroll.ScrollData.accuracyScore = averageScore;
+                }
+                
+                if (InventoryManager.Instance != null)
+                {
+                    InventoryManager.Instance.NotifyInventoryChanged();
+                }
+
                 cachedSpellName = matchedSpell;
                 cachedSpellScore = averageScore;
                 cachedSpellType = sType;
@@ -244,11 +269,25 @@ namespace Magic.Combat
             string rank = cachedSpellScore >= 0.85f ? "[대성공]" : "[성공]";
             string elementText = currentElement == SpellElement.None ? "" : $" [{currentElement}]";
             Debug.Log($"<color=cyan>[전투] 마법 발동! {rank}{elementText} [{cachedSpellName}] (Score: {cachedSpellScore:F2})</color>");
-            
-            // 마나 체크 (실제로는 마나 소모가 필요)
-            if (currentMana >= manaCostPerSpell)
+            float spellCost = 30f;
+            if (drawingDatabase != null && drawingDatabase.recipes != null)
             {
-                currentMana -= manaCostPerSpell;
+                foreach (var r in drawingDatabase.recipes)
+                {
+                    if (r.SpellName == cachedSpellName)
+                    {
+                        spellCost = r.manaCost;
+                        break;
+                    }
+                }
+            }
+            float castCost = spellCost * 0.5f;
+
+            // 마나 체크 (실제로는 마나 소모가 필요)
+            if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= castCost)
+            {
+                PlayerDataManager.Instance.currentMana -= castCost;
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
 
                 // 상태에 따른 처리
                 if (CombatManager.Instance.IsParryWindowOpen)
@@ -345,31 +384,7 @@ namespace Magic.Combat
             }
         }
 
-        protected override bool CanDrawWithPen(Item_Pen pen)
-        {
-            if (pen == null) return false;
-            if (pen.PenData != null && pen.PenData.consumesMana)
-            {
-                return currentMana > 0f;
-            }
-            return pen.currentInkCapacity > 0f;
-        }
 
-        protected override void ConsumePenResource(Item_Pen pen)
-        {
-            if (pen == null) return;
-            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
-            if (pen.PenData != null && pen.PenData.consumesMana)
-            {
-                currentMana -= rate * Time.deltaTime;
-                if (currentMana < 0) currentMana = 0;
-            }
-            else
-            {
-                pen.currentInkCapacity -= rate * Time.deltaTime;
-                if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
-            }
-        }
 
         protected override void OnGUI()
         {
