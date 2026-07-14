@@ -18,7 +18,7 @@ namespace Magic.Inventory
             if (CurrencyManager.Instance != null)
             {
                 CurrencyManager.Instance.OnCurrencyChanged += UpdateCurrencyUI;
-                
+
                 // Initialize UI with current values
                 UpdateCurrencyUI(CurrencyType.Copper, CurrencyManager.Instance.Copper);
                 UpdateCurrencyUI(CurrencyType.Silver, CurrencyManager.Instance.Silver);
@@ -59,6 +59,11 @@ namespace Magic.Inventory
                     if (_gemText != null) _gemText.text = amountStr;
                     break;
             }
+        }
+
+        public void TestAdd(int type)
+        {
+            CurrencyManager.Instance.AddCurrency((CurrencyType)type, 10);
         }
     }
 }

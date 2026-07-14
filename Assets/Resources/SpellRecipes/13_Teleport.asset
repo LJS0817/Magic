@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Teleport
   Type: 0
-  manaCost: 50
+  manaCost: 30
   Description: "\uACF5\uAC04\uC744 \uBE44\uD2C0\uC5B4 \uC9C0\uC815\uB41C \uB2E4\uB978 \uCC28\uC6D0\uC758 \uC704\uCE58\uB85C \uC21C\uC2DD\uAC04\uC5D0 \uC774\uB3D9\uD569\uB2C8\uB2E4."
   ActivationCondition: "\uB124\uBAA8 2\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
   ActivationHint: "\uACF5\uAC04\uC744 \uC787\uB294 \uB450 \uAC1C\uC758 \uCD9C\uC785\uAD6C(\uB124\uBAA8)\uB97C \uB098\uB780\uD788 \uBC30\uCE58\uD558\uC138\uC694."

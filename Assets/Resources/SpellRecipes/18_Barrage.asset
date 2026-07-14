@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Barrage
   Type: 0
-  manaCost: 50
+  manaCost: 20
   Description: "\uC140 \uC218 \uC5C6\uC774 \uB9CE\uC740 \uB9C8\uB825\uD0C4\uC744 \uB300\uC9C0\uC5D0 \uD37C\uBD80\uC5B4 \uCD08\uD1A0\uD654\uC2DC\uD0B5\uB2C8\uB2E4."
   ActivationCondition: 
   ActivationHint: "\uD558\uB298\uC744 \uB4A4\uB36E\uB294 5\uAC1C\uC758 \uAC70\uB300\uD55C \uB9C8\uB825\uD0C4(\uBCC4)\uC744 \uC77C\uC9C1\uC120\uC73C\uB85C \uADF8\uB824\uB0B4\uC138\uC694."

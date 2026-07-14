@@ -69,7 +69,7 @@ namespace Magic.Combat
             }
             
             if (manaSlider != null && PlayerDataManager.Instance != null)
-                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
         }
 
         protected override void Update()
@@ -213,13 +213,28 @@ namespace Magic.Combat
                 }
 
                 PlayerDataManager.Instance.currentMana -= drawCost;
-                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
 
                 currentScroll.isEmpty = false;
                 if (currentScroll.ScrollData != null)
                 {
                     currentScroll.ScrollData.spellName = matchedSpell;
                     currentScroll.ScrollData.accuracyScore = averageScore;
+                    
+                    Magic.Combat.SpellElement penElem = Magic.Combat.SpellElement.None;
+                    Magic.Combat.SpellElement inkElem = Magic.Combat.SpellElement.None;
+                    Magic.Combat.SpellElement baseScrollElem = currentScroll.ScrollData.scrollElement;
+
+                    if (InventoryManager.Instance != null)
+                    {
+                        if (InventoryManager.Instance.EquippedPen != null && InventoryManager.Instance.EquippedPen.PenData != null)
+                            penElem = InventoryManager.Instance.EquippedPen.PenData.penElement;
+                        
+                        if (InventoryManager.Instance.EquippedInk != null && InventoryManager.Instance.EquippedInk.InkData != null)
+                            inkElem = InventoryManager.Instance.EquippedInk.InkData.inkElement;
+                    }
+
+                    currentScroll.ScrollData.scrollElement = DetermineFinalElement(penElem, inkElem, baseScrollElem);
                 }
                 
                 if (InventoryManager.Instance != null)
@@ -263,6 +278,41 @@ namespace Magic.Combat
             }
         }
 
+        private Magic.Combat.SpellElement DetermineFinalElement(Magic.Combat.SpellElement e1, Magic.Combat.SpellElement e2, Magic.Combat.SpellElement e3)
+        {
+            int fireCount = 0, iceCount = 0, lightningCount = 0, earthCount = 0;
+            
+            void AddCount(Magic.Combat.SpellElement e) {
+                if (e == Magic.Combat.SpellElement.Fire) fireCount++;
+                else if (e == Magic.Combat.SpellElement.Ice) iceCount++;
+                else if (e == Magic.Combat.SpellElement.Lightning) lightningCount++;
+                else if (e == Magic.Combat.SpellElement.Earth) earthCount++;
+            }
+
+            AddCount(e1); AddCount(e2); AddCount(e3);
+
+            int maxCount = 0;
+            Magic.Combat.SpellElement winner = Magic.Combat.SpellElement.None;
+            bool tie = false;
+
+            void CheckMax(int count, Magic.Combat.SpellElement e) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    winner = e;
+                    tie = false;
+                } else if (count > 0 && count == maxCount) {
+                    tie = true;
+                }
+            }
+
+            CheckMax(fireCount, Magic.Combat.SpellElement.Fire);
+            CheckMax(iceCount, Magic.Combat.SpellElement.Ice);
+            CheckMax(lightningCount, Magic.Combat.SpellElement.Lightning);
+            CheckMax(earthCount, Magic.Combat.SpellElement.Earth);
+
+            return tie ? Magic.Combat.SpellElement.None : winner;
+        }
+
         private void ExecuteSpell()
         {
             isChantingPhase = false;
@@ -287,7 +337,7 @@ namespace Magic.Combat
             if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= castCost)
             {
                 PlayerDataManager.Instance.currentMana -= castCost;
-                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
 
                 // 상태에 따른 처리
                 if (CombatManager.Instance.IsParryWindowOpen)

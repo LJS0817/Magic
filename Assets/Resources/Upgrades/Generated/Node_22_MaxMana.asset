@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_22_MaxMana
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: ddfdfa3a-4dda-43d1-8ee0-12d0689fc445
+  nodeName: MaxMana Lv.2
+  description: Increases your MaxMana.
+  requiredParents:
+  - {fileID: 11400000, guid: a5bf6be546339bd4a998436b1831f0b6, type: 2}
+  costAmount: 30
+  effects:
+  - upgradeType: 1
+    value: 20
+    targetName: 
+  uiPosition: {x: -603.32465, y: 461.52557}

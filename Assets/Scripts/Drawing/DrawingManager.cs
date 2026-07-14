@@ -74,7 +74,7 @@ namespace Magic.Drawing
 
             if (manaSlider != null && PlayerDataManager.Instance != null)
             {
-                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
             }
         }
 
@@ -293,7 +293,7 @@ namespace Magic.Drawing
             {
                 PlayerDataManager.Instance.currentMana -= rate * Time.deltaTime;
                 if (PlayerDataManager.Instance.currentMana < 0) PlayerDataManager.Instance.currentMana = 0;
-                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
             }
             else
             {
@@ -385,7 +385,7 @@ namespace Magic.Drawing
                     if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= drawCost)
                     {
                         PlayerDataManager.Instance.currentMana -= drawCost;
-                        if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.maxMana);
+                        if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
                         
                         currentScroll.isEmpty = false;
                         if (currentScroll.ScrollData != null)

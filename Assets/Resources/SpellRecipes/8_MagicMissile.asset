@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: MagicMissile
   Type: 0
-  manaCost: 20
+  manaCost: 50
   Description: "\uB9C8\uB098\uB85C \uC774\uB8E8\uC5B4\uC9C4 \uC720\uB3C4\uD0C4 \uC138 \uBC1C\uC744 \uC5F0\uC18D\uC73C\uB85C \uBC1C\uC0AC\uD569\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 3\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
   ActivationHint: "\uB9C8\uB825\uC774 \uC751\uC9D1\uB41C \uC138 \uAC1C\uC758 \uB465\uADFC \uAD6C\uCCB4\uB97C \uD55C \uC904\uB85C \uB744\uC6B0\uC138\uC694."

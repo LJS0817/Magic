@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Starfall
   Type: 0
-  manaCost: 20
+  manaCost: 40
   Description: "\uD558\uB298\uC744 \uAC00\uB85C\uC9C0\uB974\uB294 \uC720\uC131\uC6B0\uB97C \uC18C\uD658\uD569\uB2C8\uB2E4. \uC544\uB984\uB2F5\uC9C0\uB9CC \uCE58\uBA85\uC801\uC785\uB2C8\uB2E4."
   ActivationCondition: "\uBCC4 3\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
   ActivationHint: "\uBC24\uD558\uB298\uC744 \uAC00\uB974\uB294 \uC138 \uAC1C\uC758 \uC720\uC131(\uBCC4)\uC744 \uC77C\uC9C1\uC120\uC73C\uB85C \uADF8\uB824\uB0B4\uC138\uC694."

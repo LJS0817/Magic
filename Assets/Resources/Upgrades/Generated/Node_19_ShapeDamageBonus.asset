@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_19_ShapeDamageBonus
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: b2c62ad0-00f3-4407-a09b-8ff5c8971cd3
+  nodeName: Circle Dmg Lv.2
+  description: Increases your ShapeDamageBonus.
+  requiredParents:
+  - {fileID: 11400000, guid: acdb0bc5d92abd24aa7c67ccafc7d78f, type: 2}
+  costAmount: 30
+  effects:
+  - upgradeType: 10
+    value: 3
+    targetName: Circle
+  uiPosition: {x: -236.01497, y: -455.7591}

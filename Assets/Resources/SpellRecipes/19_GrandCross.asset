@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: GrandCross
   Type: 0
-  manaCost: 60
+  manaCost: 50
   Description: "\uB9C8\uB825\uC758 \uC2ED\uC790\uC131\uC88C\uB97C \uADF8\uB824 \uC545\uC744 \uC815\uD654\uD558\uB294 \uAC70\uB300\uD55C \uC2ED\uC790\uAC00 \uBE5B\uC744 \uB0B4\uB9BD\uB2C8\uB2E4."
   ActivationCondition: "\uBCC4 4\uAC1C (\uBB34\uADDC\uCE59 \uC870\uD569)"
   ActivationHint: "\uC544\uBB34 \uACF5\uAC04\uC5D0\uB098 \uC131\uC2A4\uB7EC\uC6B4 \uBE5B\uC758 \uD30C\uD3B8(\uBCC4) 4\uAC1C\uB97C \uADF8\uB824\uB123\uC5B4 \uC2ED\uC790\uC131\uC744 \uC644\uC131\uD558\uC138\uC694."

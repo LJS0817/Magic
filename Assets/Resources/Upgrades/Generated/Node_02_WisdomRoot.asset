@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_02_WisdomRoot
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 895ffe82-db20-4117-b31e-b2aaf360b944
+  nodeName: Path of Wisdom
+  description: Unlocks the Wisdom upgrade tree.
+  requiredParents:
+  - {fileID: 11400000, guid: 8b4527d09fe45084c9aaa0bce20bc84c, type: 2}
+  costAmount: 10
+  effects:
+  - upgradeType: 1
+    value: 10
+    targetName: 
+  uiPosition: {x: -127.27922, y: 127.27922}

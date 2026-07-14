@@ -59,6 +59,17 @@ namespace Magic.Drawing
             if (pen == null) return;
             if (pen.PenData != null && pen.PenData.consumesMana) return; 
             
+            // --- Free Ink Chance 적용 ---
+            if (Magic.Upgrade.UpgradeManager.Instance != null)
+            {
+                float freeChance = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.FreeInkChance);
+                // 1% chance per level -> e.g. 5 means 5% chance to skip consumption
+                if (UnityEngine.Random.value * 100f < freeChance)
+                {
+                    return; // 이번 프레임의 잉크 소모 무효화!
+                }
+            }
+
             float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
             pen.currentInkCapacity -= rate * Time.deltaTime;
             if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;

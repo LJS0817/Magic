@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_57_MaxHealth
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: a2a985d1-57df-4b19-aaf9-c600a5cd692c
+  nodeName: MaxHealth Lv.7
+  description: Increases your MaxHealth.
+  requiredParents:
+  - {fileID: 11400000, guid: bb92e6e03a0decf46928d4ff9225b0fb, type: 2}
+  costAmount: 105
+  effects:
+  - upgradeType: 0
+    value: 70
+    targetName: 
+  uiPosition: {x: 983.1601, y: 456.15582}

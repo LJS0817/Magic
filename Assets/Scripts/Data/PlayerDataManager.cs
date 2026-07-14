@@ -9,11 +9,27 @@ namespace Magic.Data
         public static PlayerDataManager Instance { get; private set; }
 
         [Header("Player Status")]
-        public float maxHealth = 100f;
+        public float baseMaxHealth = 100f;
         public float currentHealth = 100f;
 
-        public float maxMana = 100f;
+        public float baseMaxMana = 100f;
         public float currentMana = 100f;
+
+        public float GetMaxHealth()
+        {
+            float upgradeBonus = Magic.Upgrade.UpgradeManager.Instance != null 
+                ? Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.MaxHealth) 
+                : 0f;
+            return baseMaxHealth + upgradeBonus;
+        }
+
+        public float GetMaxMana()
+        {
+            float upgradeBonus = Magic.Upgrade.UpgradeManager.Instance != null 
+                ? Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.MaxMana) 
+                : 0f;
+            return baseMaxMana + upgradeBonus;
+        }
 
         [Header("Inventory Data")]
         public List<ItemInstance> items = new List<ItemInstance>();

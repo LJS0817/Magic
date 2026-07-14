@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_49_HealthRegeneration
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 791795dc-88d1-4423-8e67-93eb69f49393
+  nodeName: HealthRegeneration Lv.4
+  description: Increases your HealthRegeneration.
+  requiredParents:
+  - {fileID: 11400000, guid: e5f0e3139ddadbb41924eb887ed352b0, type: 2}
+  costAmount: 60
+  effects:
+  - upgradeType: 4
+    value: 40
+    targetName: 
+  uiPosition: {x: 1409.6296, y: 1143.5618}

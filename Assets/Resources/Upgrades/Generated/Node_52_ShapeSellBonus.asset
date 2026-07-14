@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_52_ShapeSellBonus
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: c8e3e09d-1a31-49cc-ad01-9f0e88671b05
+  nodeName: Triangle Sell Lv.4
+  description: Increases your ShapeSellBonus.
+  requiredParents:
+  - {fileID: 11400000, guid: ae80894a8bf5b574e843706782663346, type: 2}
+  costAmount: 60
+  effects:
+  - upgradeType: 9
+    value: 10
+    targetName: Triangle
+  uiPosition: {x: 663.12805, y: -930.5451}

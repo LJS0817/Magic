@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_13_DropRateBonus
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 9be1b3f9-f4bb-4ae1-ac94-2014741826d6
+  nodeName: DropRateBonus Lv.2
+  description: Increases your DropRateBonus.
+  requiredParents:
+  - {fileID: 11400000, guid: 6593e2ef807e7ee4c9812850a5937b78, type: 2}
+  costAmount: 30
+  effects:
+  - upgradeType: 11
+    value: 2
+    targetName: 
+  uiPosition: {x: 576.90076, y: 260.2483}

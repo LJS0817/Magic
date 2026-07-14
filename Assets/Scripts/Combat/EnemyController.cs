@@ -125,6 +125,27 @@ namespace Magic.Combat
                 var lootInstance = new Item_Material(lootSO);
                 InventoryManager.Instance.AddItem(lootInstance);
                 Debug.Log($"<color=yellow>[Loot] {lootSO.itemName}을(를) 획득했습니다! (판매가: {lootSO.basePriceInCopper} Copper)</color>");
+
+                // --- Drop Rate Bonus 적용 ---
+                if (Magic.Upgrade.UpgradeManager.Instance != null)
+                {
+                    float dropBonus = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.DropRateBonus);
+                    
+                    while (dropBonus >= 100f)
+                    {
+                        var extraLoot = new Item_Material(lootSO);
+                        InventoryManager.Instance.AddItem(extraLoot);
+                        Debug.Log($"<color=yellow>[Loot Bonus] {lootSO.itemName} 추가 획득!</color>");
+                        dropBonus -= 100f;
+                    }
+
+                    if (Random.value * 100f < dropBonus)
+                    {
+                        var extraLoot = new Item_Material(lootSO);
+                        InventoryManager.Instance.AddItem(extraLoot);
+                        Debug.Log($"<color=yellow>[Loot Bonus] 아이템 드롭 확률 증가({dropBonus}%) 발동! {lootSO.itemName} 추가 획득!</color>");
+                    }
+                }
             }
 
             // 사망 애니메이션: 위로 살짝 뜨며 작아지고 투명해짐

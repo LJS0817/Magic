@@ -8,8 +8,8 @@ namespace Magic.Combat
         [Header("Status")]
         public float maxHealth 
         {
-            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.maxHealth : 100f;
-            set { if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.maxHealth = value; }
+            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.GetMaxHealth() : 100f;
+            set { if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.baseMaxHealth = value; }
         }
 
         public float health 

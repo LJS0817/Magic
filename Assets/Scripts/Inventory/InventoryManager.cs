@@ -187,10 +187,27 @@ namespace Magic.Inventory
             combatLoadout.Clear();
         }
 
-        public void AddItem(ItemInstance item)
+        [Header("Inventory Capacity")]
+        public int baseInventoryCapacity = 20;
+
+        public int GetMaxCapacity()
         {
+            int upgradeBonus = Magic.Upgrade.UpgradeManager.Instance != null
+                ? Mathf.RoundToInt(Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.InventoryCapacity))
+                : 0;
+            return baseInventoryCapacity + upgradeBonus;
+        }
+
+        public bool AddItem(ItemInstance item)
+        {
+            if (items.Count >= GetMaxCapacity())
+            {
+                Debug.LogWarning("[InventoryManager] 인벤토리가 가득 찼습니다! (Inventory is full)");
+                return false;
+            }
             items.Add(item);
             OnInventoryChanged?.Invoke();
+            return true;
         }
 
         public void RemoveItem(ItemInstance item)

@@ -84,38 +84,40 @@ namespace Magic.Inventory
             }
             foreach (var key in keysToRemove) _itemBackgroundMap.Remove(key);
 
-            // 전체 페이지 계산 및 현재 페이지 유효성 검사
-            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)items.Count / _slotsPerPage));
+            int maxCapacity = InventoryManager.Instance.GetMaxCapacity();
+
+            // 전체 페이지 계산 및 현재 페이지 유효성 검사 (아이템 수가 아니라 '최대 슬롯 개수' 기준)
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)maxCapacity / _slotsPerPage));
             if (_currentPage >= totalPages) _currentPage = totalPages - 1;
             if (_currentPage < 0) _currentPage = 0;
 
             int startIndex = _currentPage * _slotsPerPage;
-            int endIndex = Mathf.Min(startIndex + _slotsPerPage, items.Count);
-            int displayCount = endIndex - startIndex;
+            int endIndex = Mathf.Min(startIndex + _slotsPerPage, maxCapacity); // 한 페이지에 그릴 최대 인덱스는 maxCapacity를 넘지 않음
+            int displayCount = endIndex - startIndex; // 이번 페이지에 실제로 Instantiate해서 띄워야 할 슬롯의 개수
 
-            // 현재 페이지의 슬롯들을 전부(최대 _slotsPerPage) 활성화하고 빈 칸에는 null 전달
-            for (int i = 0; i < _slotsPerPage; i++)
+            // 현재 페이지의 슬롯들을 활성화하고, 아이템이 있으면 데이터를, 없으면 빈 칸을 전달
+            for (int i = 0; i < displayCount; i++)
             {
                 InventorySlot slot = GetOrCreateSlot(i);
                 slot.gameObject.SetActive(true);
                 slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked);
 
-                if (i < displayCount)
+                int itemIndex = startIndex + i;
+                if (itemIndex < items.Count)
                 {
-                    int itemIndex = startIndex + i;
                     ItemInstance currentItem = items[itemIndex];
                     bool isEquipped = IsItemEquipped(currentItem);
                     slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, isEquipped);
                 }
                 else
                 {
-                    // 빈 슬롯
+                    // 언락된 빈 슬롯
                     slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
                 }
             }
 
-            // 남는 슬롯들은 비활성화 (풀의 크기는 최대 _slotsPerPage 까지만 커짐)
-            for (int i = _slotsPerPage; i < _slotPool.Count; i++)
+            // 남는 슬롯들은 비활성화
+            for (int i = displayCount; i < _slotPool.Count; i++)
             {
                 _slotPool[i].gameObject.SetActive(false);
             }
@@ -138,8 +140,8 @@ namespace Magic.Inventory
         private void OnNextPage()
         {
             if (InventoryManager.Instance == null) return;
-            var items = InventoryManager.Instance.items;
-            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)items.Count / _slotsPerPage));
+            int maxCapacity = InventoryManager.Instance.GetMaxCapacity();
+            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)maxCapacity / _slotsPerPage));
             
             if (_currentPage < totalPages - 1)
             {

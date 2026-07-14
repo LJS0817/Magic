@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_28_InventoryCapacity
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 54ca98cf-ae9d-445e-849d-1a2aa1e07fd6
+  nodeName: InventoryCapacity Lv.1
+  description: Increases your InventoryCapacity.
+  requiredParents:
+  - {fileID: 11400000, guid: 8a4464cb4a2a701428ca419ac0c75d0f, type: 2}
+  costAmount: 15
+  effects:
+  - upgradeType: 2
+    value: 5
+    targetName: 
+  uiPosition: {x: 476.6651, y: -666.3433}

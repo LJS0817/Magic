@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_56_ShapeSellBonus
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 7410b875-e1d6-4506-ad2b-f0104938d27f
+  nodeName: Square Sell Lv.5
+  description: Increases your ShapeSellBonus.
+  requiredParents:
+  - {fileID: 11400000, guid: 6c95ca490c49c3948afaa0d026c6d27b, type: 2}
+  costAmount: 75
+  effects:
+  - upgradeType: 9
+    value: 10
+    targetName: Square
+  uiPosition: {x: 734.9369, y: -227.23053}

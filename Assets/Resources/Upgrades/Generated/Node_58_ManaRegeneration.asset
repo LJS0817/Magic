@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e111b4be2104ffd49a8c4bd1f68a720f, type: 3}
+  m_Name: Node_58_ManaRegeneration
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeNodeSO
+  nodeID: 978d8235-3f67-4314-a60f-b9596d9228b8
+  nodeName: ManaRegeneration Lv.5
+  description: Increases your ManaRegeneration.
+  requiredParents:
+  - {fileID: 11400000, guid: e7650e00b076cc345a1a695b0328caf2, type: 2}
+  costAmount: 75
+  effects:
+  - upgradeType: 5
+    value: 50
+    targetName: 
+  uiPosition: {x: -446.01068, y: 571.8801}
