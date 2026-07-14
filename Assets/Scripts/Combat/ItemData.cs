@@ -2,22 +2,34 @@ using UnityEngine;
 
 namespace Magic.Inventory
 {
-    public enum ItemType { Scroll, Ink, Material, Potion, Pen }
+    public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook }
 
     [System.Serializable]
     public abstract class ItemInstance
     {
         public ItemDataSO data;
+        public long acquisitionId;
 
         // 자주 접근하는 데이터에 대한 편의성 프로퍼티
         public string ItemName => data != null ? data.itemName : "Unknown";
         public string ItemDescription => data != null ? data.itemDescription : "";
         public ItemType Type => data != null ? data.type : ItemType.Pen;
+        public ItemRarity Rarity => data != null ? data.rarity : ItemRarity.Common;
         public Sprite ItemIcon => data != null ? data.itemIcon : null;
+
+        private static long _lastAcquisitionTicks = 0;
+        private static long GetUniqueAcquisitionId()
+        {
+            long ticks = System.DateTime.UtcNow.Ticks;
+            if (ticks <= _lastAcquisitionTicks) ticks = _lastAcquisitionTicks + 1;
+            _lastAcquisitionTicks = ticks;
+            return ticks;
+        }
 
         public ItemInstance(ItemDataSO data)
         {
             this.data = data;
+            this.acquisitionId = GetUniqueAcquisitionId();
         }
     }
 
@@ -82,6 +94,30 @@ namespace Magic.Inventory
     {
         public Item_Material(ItemDataSO data) : base(data)
         {
+        }
+    }
+
+    [System.Serializable]
+    public class Item_RecipeBook : ItemInstance
+    {
+        public ItemRecipeBookSO RecipeBookData => data as ItemRecipeBookSO;
+
+        public Item_RecipeBook(ItemRecipeBookSO data) : base(data)
+        {
+        }
+
+        public void Consume()
+        {
+            if (RecipeBookData == null) return;
+
+            if (RecipeBookData.isHintOnly)
+            {
+                Magic.Data.PlayerDataManager.Instance.UnlockHint(RecipeBookData.targetSpellName);
+            }
+            else
+            {
+                Magic.Data.PlayerDataManager.Instance.UnlockRecipe(RecipeBookData.targetSpellName);
+            }
         }
     }
 }

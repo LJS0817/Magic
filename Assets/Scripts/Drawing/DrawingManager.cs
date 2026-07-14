@@ -10,6 +10,8 @@ namespace Magic.Drawing
 {
     public class DrawingManager : MonoBehaviour
     {
+        public static bool IsDrawingBlocked = false;
+
         [Header("Magic Combo Stats")]
         public List<DrawnShape> drawnShapes = new List<DrawnShape>();
 
@@ -110,6 +112,12 @@ namespace Magic.Drawing
 
         protected virtual void HandleDrawingInput()
         {
+            if (IsDrawingBlocked)
+            {
+                if (isDrawing) EndStroke();
+                return;
+            }
+
             // 그리기 영역(UI) 제한 검사
             if (drawingArea != null)
             {
@@ -393,6 +401,12 @@ namespace Magic.Drawing
                             currentScroll.ScrollData.spellName = matchedSpell;
                             currentScroll.ScrollData.accuracyScore = averageScore;
                         }
+
+                        if (PlayerDataManager.Instance != null)
+                        {
+                            PlayerDataManager.Instance.UnlockRecipe(matchedSpell);
+                        }
+
                         string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
                         Debug.Log($"<color=cyan>✨ [마법 정착] {rank} {matchedSpell} (마나 소모: {drawCost:F1}) ✨</color>");
                         

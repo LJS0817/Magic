@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: "Pen_\uB9C8\uBC95_\uAE43\uD138_\uD39C"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemPenSO
   type: 4
+  rarity: 1
   itemName: "\uB9C8\uBC95 \uAE43\uD138 \uD39C"
   itemDescription: "\uD478\uB978 \uADF8\uB9AC\uD3F0\uC758 \uAE43\uD138\uC5D0 \uC18C\uB7C9\uC758 \uB9C8\uB825\uC744 \uC8FC\uC785\uD558\uC5EC \uD544\uAE30\uAC10\uC744 \uC0B4\uB9B0 \uC911\uAE09 \uAE43\uD39C\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: 0}
   basePriceInCopper: 0
   maxInkCapacity: 60
   inkConsumptionRate: 3.5
-  penGrade: "\uACE0\uAE09"
   consumesMana: 0
+  penElement: 0

@@ -113,7 +113,7 @@ namespace Magic.Editor
                 asset.itemName = def.name;
                 asset.maxInkCapacity = def.capacity;
                 asset.inkConsumptionRate = def.consumptionRate;
-                asset.penGrade = def.grade;
+                asset.rarity = GetRarityFromString(def.grade);
                 asset.itemDescription = def.description;
                 asset.consumesMana = def.consumesMana;
                 
@@ -129,7 +129,7 @@ namespace Magic.Editor
                 
                 asset.itemName = def.name;
                 asset.maxAmount = def.maxAmount;
-                asset.inkQuality = def.quality;
+                asset.rarity = GetRarityFromString(def.quality);
                 asset.itemDescription = def.description;
                 asset.inkColor = def.color;
                 
@@ -146,7 +146,7 @@ namespace Magic.Editor
                 asset.itemName = def.name;
                 asset.maxDurability = def.maxDurability;
                 asset.accuracyScore = def.accuracyScore;
-                asset.scrollGrade = def.grade;
+                asset.rarity = GetRarityFromString(def.grade);
                 asset.itemDescription = def.description;
                 
                 EditorUtility.SetDirty(asset);
@@ -186,6 +186,17 @@ namespace Magic.Editor
             {
                 AssetDatabase.CreateFolder(parentPath, folderName);
             }
+        }
+
+        private static ItemRarity GetRarityFromString(string grade)
+        {
+            if (grade == "전설") return ItemRarity.Legendary;
+            if (grade == "영웅") return ItemRarity.Epic;
+            if (grade == "희귀") return ItemRarity.Rare;
+            if (grade == "고급") return ItemRarity.Uncommon;
+            if (grade == "일반") return ItemRarity.Common;
+            if (grade == "하급") return ItemRarity.Common;
+            return ItemRarity.Common;
         }
     }
 }

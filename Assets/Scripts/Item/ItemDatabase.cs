@@ -12,14 +12,14 @@ namespace Magic.Inventory
         public List<ItemScrollSO> scrolls = new List<ItemScrollSO>();
 
         private Dictionary<string, ItemDataSO> _itemCache;
-        private Dictionary<string, List<ItemPenSO>> _penGradeCache;
+        private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
 
         public void InitializeCache()
         {
             if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count)) return;
 
             _itemCache = new Dictionary<string, ItemDataSO>();
-            _penGradeCache = new Dictionary<string, List<ItemPenSO>>();
+            _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
 
             foreach (var pen in pens)
             {
@@ -27,9 +27,9 @@ namespace Magic.Inventory
                 {
                     _itemCache.Add(pen.itemName, pen);
 
-                    if (!_penGradeCache.ContainsKey(pen.penGrade))
-                        _penGradeCache[pen.penGrade] = new List<ItemPenSO>();
-                    _penGradeCache[pen.penGrade].Add(pen);
+                    if (!_penGradeCache.ContainsKey(pen.rarity))
+                        _penGradeCache[pen.rarity] = new List<ItemPenSO>();
+                    _penGradeCache[pen.rarity].Add(pen);
                 }
             }
 
@@ -56,10 +56,10 @@ namespace Magic.Inventory
             return null;
         }
 
-        public ItemPenSO GetRandomPenOfGrade(string grade)
+        public ItemPenSO GetRandomPenOfGrade(ItemRarity rarity)
         {
             InitializeCache();
-            if (_penGradeCache.TryGetValue(grade, out var filtered) && filtered.Count > 0)
+            if (_penGradeCache.TryGetValue(rarity, out var filtered) && filtered.Count > 0)
             {
                 return filtered[Random.Range(0, filtered.Count)];
             }

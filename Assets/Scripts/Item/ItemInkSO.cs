@@ -7,7 +7,6 @@ namespace Magic.Inventory
     {
         [Header("Ink Specifics")]
         public float maxAmount;
-        public string inkQuality; // 잉크 품질
         public Color inkColor = Color.black; // 그려지는 잉크의 색상
         public Magic.Combat.SpellElement inkElement = Magic.Combat.SpellElement.None;
 

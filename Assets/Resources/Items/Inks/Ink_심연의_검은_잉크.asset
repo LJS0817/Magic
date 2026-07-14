@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: "Ink_\uC2EC\uC5F0\uC758_\uAC80\uC740_\uC789\uD06C"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemInkSO
   type: 1
+  rarity: 4
   itemName: "\uC2EC\uC5F0\uC758 \uAC80\uC740 \uC789\uD06C"
   itemDescription: "\uC808\uB300\uC801\uC778 \uC5B4\uB460\uC758 \uB18D\uB3C4\uB97C \uC9C0\uB140, \uD30C\uAD34\uC801\uC778 \uB9C8\uBC95 \uC704\uB825\uC744 \uBC1C\uD718\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: 0}
   basePriceInCopper: 0
   maxAmount: 300
-  inkQuality: "\uC804\uC124"
   inkColor: {r: 0.1, g: 0, b: 0.1, a: 1}
+  inkElement: 0

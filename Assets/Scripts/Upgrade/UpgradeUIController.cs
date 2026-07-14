@@ -52,6 +52,7 @@ namespace Magic.Upgrade
             _canvasGroup.interactable = true;
             _canvasGroup.blocksRaycasts = true;
             _canvas.enabled = true;
+            Magic.Drawing.DrawingManager.IsDrawingBlocked = true;
         }
 
         public void Close()
@@ -60,6 +61,7 @@ namespace Magic.Upgrade
             _canvasGroup.interactable = false;
             _canvasGroup.blocksRaycasts = false;
             _canvas.enabled = false;
+            Magic.Drawing.DrawingManager.IsDrawingBlocked = false;
         }
 
         private void OnDestroy()

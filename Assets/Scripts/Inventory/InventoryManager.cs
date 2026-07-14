@@ -20,6 +20,47 @@ namespace Magic.Inventory
             OnInventoryChanged?.Invoke();
         }
 
+        public void SortInventory()
+        {
+            if (PlayerDataManager.Instance == null) return;
+
+            var targetList = PlayerDataManager.Instance.items;
+            if (targetList == null || targetList.Count == 0) return;
+
+            try
+            {
+                targetList.Sort((a, b) =>
+                {
+                    if (a == null && b == null) return 0;
+                    if (a == null) return 1;
+                    if (b == null) return -1;
+
+                    // 1. 기본 정렬: 카테고리 (ItemType 오름차순)
+                    int typeCompare = a.Type.CompareTo(b.Type);
+                    if (typeCompare != 0) return typeCompare;
+
+                    // 2. 희귀도 정렬 (내림차순: 높은 등급이 앞)
+                    int rarityCompare = b.Rarity.CompareTo(a.Rarity);
+                    if (rarityCompare != 0) return rarityCompare;
+
+                    // 3. 신규 획득순 정렬 (내림차순: 가장 최근에 획득한 것이 앞)
+                    int acquisitionCompare = b.acquisitionId.CompareTo(a.acquisitionId);
+                    if (acquisitionCompare != 0) return acquisitionCompare;
+
+                    // 4. 이름순 정렬 (오름차순)
+                    return string.Compare(a.ItemName ?? "", b.ItemName ?? "");
+                });
+
+                Debug.Log("[InventoryManager] 인벤토리 정렬 완료 (종류 -> 희귀도 -> 획득순 -> 이름순)");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[InventoryManager] 정렬 중 오류 발생: {e}");
+            }
+
+            NotifyInventoryChanged();
+        }
+
         public event System.Action<Item_Scroll> OnScrollEquipped;
         public event System.Action<Item_Ink> OnInkEquipped;
         public event System.Action<Item_Pen> OnPenEquipped;
@@ -146,21 +187,21 @@ namespace Magic.Inventory
         /// <summary>
         /// 특정 등급의 임의의 펜을 로드하여 인벤토리에 추가합니다.
         /// </summary>
-        public void AddRandomPenOfGrade(string grade)
+        public void AddRandomPenOfGrade(ItemRarity rarity)
         {
             if (itemDatabase == null) itemDatabase = Resources.Load<ItemDatabase>("Items/ItemDatabase");
             if (itemDatabase != null)
             {
-                var penData = itemDatabase.GetRandomPenOfGrade(grade);
+                var penData = itemDatabase.GetRandomPenOfGrade(rarity);
                 if (penData != null)
                 {
                     var newPen = new Item_Pen(penData);
                     AddItem(newPen);
-                    Debug.Log($"[InventoryManager] 등급 '{grade}'의 펜 '{newPen.ItemName}'이 인벤토리에 추가되었습니다.");
+                    Debug.Log($"[InventoryManager] 등급 '{rarity}'의 펜 '{newPen.ItemName}'이 인벤토리에 추가되었습니다.");
                 }
                 else
                 {
-                    Debug.LogWarning($"[InventoryManager] 등급 '{grade}'의 펜을 데이터베이스에서 찾을 수 없습니다.");
+                    Debug.LogWarning($"[InventoryManager] 등급 '{rarity}'의 펜을 데이터베이스에서 찾을 수 없습니다.");
                 }
             }
             else

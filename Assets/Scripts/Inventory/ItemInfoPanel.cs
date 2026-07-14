@@ -51,29 +51,30 @@ namespace Magic.Inventory
             if (item is Item_Scroll scroll)
             {
                 _infoStateText.gameObject.SetActive(true);
-                string grade = scroll.ScrollData != null ? scroll.ScrollData.scrollGrade : "Normal";
-                _infoNameText.text = _infoNameText.text + $" (내구도: {scroll.currentDurability}/{scroll.ScrollData.maxDurability})";
+                string grade = item.Rarity.ToString();
+                _infoNameText.text = _infoNameText.text + $" (내구도: {scroll.currentDurability}/{(scroll.ScrollData != null ? scroll.ScrollData.maxDurability : 5)})";
                 if (scroll.isEmpty)
                 {
                     _infoStateText.text = $"등급: {grade} | 상태: 빈 스크롤";
                 }
                 else
                 {
-                    string spell = string.IsNullOrEmpty(scroll.ScrollData.spellName) ? "알 수 없는 마법" : scroll.ScrollData.spellName;
+                    string spell = (scroll.ScrollData != null && !string.IsNullOrEmpty(scroll.ScrollData.spellName)) ? scroll.ScrollData.spellName : "알 수 없는 마법";
                     _infoStateText.text = $"등급: {grade} | 마법진: {spell}";
                 }
             }
             else if (item is Item_Ink ink)
             {
                 _infoStateText.gameObject.SetActive(true);
+                string grade = item.Rarity.ToString();
                 string colorHex = ink.InkData != null ? ColorUtility.ToHtmlStringRGB(ink.InkData.inkColor) : "FFFFFF";
                 float maxAmt = ink.InkData != null ? ink.InkData.maxAmount : 100f;
-                _infoStateText.text = $"색상: <color=#{colorHex}>■</color> | 남은 양: {((int)ink.currentAmount).ToShortFormat()}/{((int)maxAmt).ToShortFormat()}";
+                _infoStateText.text = $"등급: {grade} | 색상: <color=#{colorHex}>■</color> | 남은 양: {((int)ink.currentAmount).ToShortFormat()}/{((int)maxAmt).ToShortFormat()}";
             }
             else if (item is Item_Pen pen)
             {
                 _infoStateText.gameObject.SetActive(true);
-                string grade = pen.PenData != null ? pen.PenData.penGrade : "Normal";
+                string grade = item.Rarity.ToString();
                 float maxCap = pen.PenData != null ? pen.PenData.maxInkCapacity : 0f;
                 _infoStateText.text = $"등급: {grade} | 잉크 용량: {((int)pen.currentInkCapacity).ToShortFormat()}/{((int)maxCap).ToShortFormat()}";
             }

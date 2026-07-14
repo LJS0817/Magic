@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: "Scroll_\uD45C\uC900_\uB9C8\uBC95_\uC2A4\uD06C\uB864"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemScrollSO
   type: 0
+  rarity: 0
   itemName: "\uD45C\uC900 \uB9C8\uBC95 \uC2A4\uD06C\uB864"
   itemDescription: "\uADDC\uACA9\uC5D0 \uB9DE\uCDB0 \uC81C\uC791\uB41C \uD754\uD55C \uB9C8\uBC95 \uC2A4\uD06C\uB864\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: 0}
@@ -20,4 +21,4 @@ MonoBehaviour:
   spellName: 
   maxDurability: 5
   accuracyScore: 1
-  scrollGrade: "\uC77C\uBC18"
+  scrollElement: 0

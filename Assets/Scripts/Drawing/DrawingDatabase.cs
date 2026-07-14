@@ -25,5 +25,18 @@ namespace Magic.Drawing
                 Destroy(gameObject);
             }
         }
+
+        public SpellRecipeAsset GetRecipeByName(string name)
+        {
+            if (recipes == null) return null;
+            foreach (var recipe in recipes)
+            {
+                if (recipe != null && recipe.SpellName == name)
+                {
+                    return recipe;
+                }
+            }
+            return null;
+        }
     }
 }

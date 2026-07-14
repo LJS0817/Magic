@@ -134,16 +134,23 @@ namespace Magic.Combat
             {
                 if (currentScroll.isEmpty)
                 {
-                    Vector2 mousePosGUI = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
-                    if (scrollCanvasRect.Contains(mousePosGUI))
+                    if (IsDrawingBlocked)
                     {
-                        if (Input.GetMouseButtonDown(0)) StartStroke();
-                        else if (Input.GetMouseButton(0)) UpdateStroke();
-                        else if (Input.GetMouseButtonUp(0)) EndStroke();
+                        if (isDrawing) EndStroke();
                     }
-                    else if (Input.GetMouseButtonUp(0) && isDrawing)
+                    else
                     {
-                        EndStroke();
+                        Vector2 mousePosGUI = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+                        if (scrollCanvasRect.Contains(mousePosGUI))
+                        {
+                            if (Input.GetMouseButtonDown(0)) StartStroke();
+                            else if (Input.GetMouseButton(0)) UpdateStroke();
+                            else if (Input.GetMouseButtonUp(0)) EndStroke();
+                        }
+                        else if (Input.GetMouseButtonUp(0) && isDrawing)
+                        {
+                            EndStroke();
+                        }
                     }
                 }
 
@@ -240,6 +247,11 @@ namespace Magic.Combat
                 if (InventoryManager.Instance != null)
                 {
                     InventoryManager.Instance.NotifyInventoryChanged();
+                }
+
+                if (PlayerDataManager.Instance != null)
+                {
+                    PlayerDataManager.Instance.UnlockRecipe(matchedSpell);
                 }
 
                 cachedSpellName = matchedSpell;

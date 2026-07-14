@@ -2,9 +2,19 @@ using UnityEngine;
 
 namespace Magic.Inventory
 {
+    public enum ItemRarity
+    {
+        Common = 0,
+        Uncommon = 1,
+        Rare = 2,
+        Epic = 3,
+        Legendary = 4
+    }
+
     public abstract class ItemDataSO : ScriptableObject
     {
         public ItemType type;
+        public ItemRarity rarity = ItemRarity.Common;
         public string itemName;
         [TextArea(2, 5)]
         public string itemDescription;

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6db023c8ac065ab4e93e0c992e3b0701
+guid: f5d74893b11a64441971c281e5025a6c
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -77,6 +77,72 @@ TextureImporter:
   - first:
       213: -2005390814890206160
     second: pureeraser_transparent (1)_24
+  - first:
+      213: -6188375261368570359
+    second: pureeraser_transparent (1)_25
+  - first:
+      213: -1840669667210848200
+    second: pureeraser_transparent (1)_26
+  - first:
+      213: -4184988775090241999
+    second: pureeraser_transparent (1)_27
+  - first:
+      213: -2753071823076977924
+    second: pureeraser_transparent (1)_28
+  - first:
+      213: -6048691177156598725
+    second: pureeraser_transparent (1)_29
+  - first:
+      213: 7559532805022866974
+    second: pureeraser_transparent (1)_30
+  - first:
+      213: -1326359239119076949
+    second: pureeraser_transparent (1)_31
+  - first:
+      213: 387737652392931378
+    second: pureeraser_transparent (1)_32
+  - first:
+      213: -8027308962531710948
+    second: pureeraser_transparent (1)_33
+  - first:
+      213: -7934733783636981017
+    second: pureeraser_transparent (1)_34
+  - first:
+      213: 4214396505686194433
+    second: pureeraser_transparent (1)_35
+  - first:
+      213: -4980529350558358225
+    second: pureeraser_transparent (1)_36
+  - first:
+      213: -3389033117194935705
+    second: pureeraser_transparent (1)_37
+  - first:
+      213: 8549284284548984686
+    second: pureeraser_transparent (1)_38
+  - first:
+      213: -5178674266237532469
+    second: pureeraser_transparent (1)_39
+  - first:
+      213: 344404688416929078
+    second: pureeraser_transparent (1)_40
+  - first:
+      213: -4555370938800191512
+    second: pureeraser_transparent (1)_41
+  - first:
+      213: 106310869109160753
+    second: pureeraser_transparent (1)_42
+  - first:
+      213: -6560259563243773268
+    second: pureeraser_transparent (1)_43
+  - first:
+      213: 6298388706619929246
+    second: pureeraser_transparent (1)_44
+  - first:
+      213: 7634323288648201254
+    second: pureeraser_transparent (1)_45
+  - first:
+      213: 4691144055456954513
+    second: pureeraser_transparent (1)_46
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -124,8 +190,8 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 250
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteBorder: {x: 125, y: 380, z: 125, w: 324}
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationMethod: 0
@@ -191,41 +257,19 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 2
+        y: 0
         width: 1029
-        height: 1290
+        height: 1311
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 133, y: 210, z: 133, w: 380}
+      border: {x: 133, y: 380, z: 133, w: 210}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 34823fbe672c1e04f9618b3085a130b0
+      spriteID: 8d55720e7cb243650800000000000000
       internalID: 6211637923509917144
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: pureeraser_transparent (1)_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 1292
-        width: 1029
-        height: 184
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 133, y: 82, z: 133, w: 82}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8bc76bc7e7d824648b6afe38f7e5a7e4
-      internalID: -8208608894797940685
       vertices: []
       indices: 
       edges: []
@@ -234,8 +278,8 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 284726482fb6fc142bbfc767abf4d0cc
-    internalID: 0
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 1537655665
     vertices: []
     indices: 
     edges: []
@@ -262,8 +306,30 @@ TextureImporter:
       pureeraser_transparent (1)_22: -3793173941059727991
       pureeraser_transparent (1)_23: -8745088081421780962
       pureeraser_transparent (1)_24: -2005390814890206160
+      pureeraser_transparent (1)_25: -6188375261368570359
+      pureeraser_transparent (1)_26: -1840669667210848200
+      pureeraser_transparent (1)_27: -4184988775090241999
+      pureeraser_transparent (1)_28: -2753071823076977924
+      pureeraser_transparent (1)_29: -6048691177156598725
       pureeraser_transparent (1)_3: 6175060536029810235
+      pureeraser_transparent (1)_30: 7559532805022866974
+      pureeraser_transparent (1)_31: -1326359239119076949
+      pureeraser_transparent (1)_32: 387737652392931378
+      pureeraser_transparent (1)_33: -8027308962531710948
+      pureeraser_transparent (1)_34: -7934733783636981017
+      pureeraser_transparent (1)_35: 4214396505686194433
+      pureeraser_transparent (1)_36: -4980529350558358225
+      pureeraser_transparent (1)_37: -3389033117194935705
+      pureeraser_transparent (1)_38: 8549284284548984686
+      pureeraser_transparent (1)_39: -5178674266237532469
       pureeraser_transparent (1)_4: -155832159362474057
+      pureeraser_transparent (1)_40: 344404688416929078
+      pureeraser_transparent (1)_41: -4555370938800191512
+      pureeraser_transparent (1)_42: 106310869109160753
+      pureeraser_transparent (1)_43: -6560259563243773268
+      pureeraser_transparent (1)_44: 6298388706619929246
+      pureeraser_transparent (1)_45: 7634323288648201254
+      pureeraser_transparent (1)_46: 4691144055456954513
       pureeraser_transparent (1)_5: 4159796764175472242
       pureeraser_transparent (1)_6: 3489314978199804377
       pureeraser_transparent (1)_7: 1808654095436867964
