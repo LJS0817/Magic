@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 19c5208edf9714e488c0080b6a0aa470
+guid: 8a81f72af92404f49a830d23b5b2b000
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7320547195760214525
-    second: Scroll_1_0
+      213: -859035456634602026
+    second: Scroll_3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -48,12 +48,12 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 0
+  spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationMethod: 0
@@ -115,7 +115,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Scroll_1_0
+      name: Scroll_3_0
       rect:
         serializedVersion: 2
         x: 0
@@ -123,15 +123,15 @@ TextureImporter:
         width: 656
         height: 667
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 30efa338c11386a90800000000000000
-      internalID: -7320547195760214525
+      spriteID: 6dd34d5bdc71414f0800000000000000
+      internalID: -859035456634602026
       vertices: []
       indices: 
       edges: []
@@ -140,7 +140,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5da29da5f60eb1540a6169050e6c099a
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -150,7 +150,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Scroll_1_0: -7320547195760214525
+      Scroll_3_0: -859035456634602026
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

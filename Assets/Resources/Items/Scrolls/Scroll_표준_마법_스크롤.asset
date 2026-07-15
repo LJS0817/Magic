@@ -16,8 +16,8 @@ MonoBehaviour:
   rarity: 0
   itemName: "\uD45C\uC900 \uB9C8\uBC95 \uC2A4\uD06C\uB864"
   itemDescription: "\uADDC\uACA9\uC5D0 \uB9DE\uCDB0 \uC81C\uC791\uB41C \uD754\uD55C \uB9C8\uBC95 \uC2A4\uD06C\uB864\uC785\uB2C8\uB2E4."
-  itemIcon: {fileID: 0}
-  basePriceInCopper: 0
+  itemIcon: {fileID: 7934099500301188840, guid: 908e5267bf2a85b478d3170f42589b94, type: 3}
+  basePriceInCopper: 100
   spellName: 
   maxDurability: 5
   accuracyScore: 1

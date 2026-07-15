@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 namespace Magic.Inventory
 {
-    public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         [SerializeField] private Image _bg;
         [SerializeField] private Image _iconImage;
@@ -17,17 +17,20 @@ namespace Magic.Inventory
         private System.Action<InventorySlot> _onEnterCallback;
         private System.Action<InventorySlot> _onExitCallback;
         private System.Action<InventorySlot> _onDoubleClickCallback;
+        private System.Action<InventorySlot> _onRightClickCallback;
         private float _lastClickTime = 0f;
 
         public void Initialize(System.Action<InventorySlot> onClickCallback, 
                                System.Action<InventorySlot> onEnterCallback = null, 
                                System.Action<InventorySlot> onExitCallback = null,
-                               System.Action<InventorySlot> onDoubleClickCallback = null)
+                               System.Action<InventorySlot> onDoubleClickCallback = null,
+                               System.Action<InventorySlot> onRightClickCallback = null)
         {
             _onClickCallback = onClickCallback;
             _onEnterCallback = onEnterCallback;
             _onExitCallback = onExitCallback;
             _onDoubleClickCallback = onDoubleClickCallback;
+            _onRightClickCallback = onRightClickCallback;
             if (_slotButton != null)
             {
                 _slotButton.onClick.RemoveAllListeners();
@@ -95,6 +98,17 @@ namespace Magic.Inventory
             if (_item != null)
             {
                 _onExitCallback?.Invoke(this);
+            }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                if (_item != null)
+                {
+                    _onRightClickCallback?.Invoke(this);
+                }
             }
         }
     }

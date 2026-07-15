@@ -100,7 +100,7 @@ namespace Magic.Inventory
             {
                 InventorySlot slot = GetOrCreateSlot(i);
                 slot.gameObject.SetActive(true);
-                slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked);
+                slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked, OnSlotRightClicked);
 
                 int itemIndex = startIndex + i;
                 if (itemIndex < items.Count)
@@ -178,9 +178,39 @@ namespace Magic.Inventory
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
             
             var inv = InventoryManager.Instance;
-            if (slot.Item is Item_Scroll scroll) inv.EquippedScroll = scroll;
-            else if (slot.Item is Item_Ink ink) inv.EquippedInk = ink;
-            else if (slot.Item is Item_Pen pen) inv.EquippedPen = pen;
+            if (slot.Item is Item_Scroll scroll) 
+            {
+                if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
+                else inv.EquippedScroll = scroll;
+            }
+            else if (slot.Item is Item_Ink ink)
+            {
+                if (inv.EquippedInk == ink) inv.EquippedInk = null;
+                else inv.EquippedInk = ink;
+            }
+            else if (slot.Item is Item_Pen pen)
+            {
+                if (inv.EquippedPen == pen) inv.EquippedPen = null;
+                else inv.EquippedPen = pen;
+            }
+            
+            // 장착 상태가 바뀌었으므로 툴팁 정보 갱신
+            if (_infoPanel != null && _hoveredSlot == slot)
+            {
+                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+            }
+        }
+
+        private void OnSlotRightClicked(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
+
+            InventoryManager.Instance.RemoveItem(slot.Item);
+            if (_hoveredSlot == slot)
+            {
+                _hoveredSlot = null;
+                if (_infoPanel != null) _infoPanel.Close();
+            }
         }
 
         private void OnSlotPointerEnter(InventorySlot slot)
@@ -193,7 +223,7 @@ namespace Magic.Inventory
             if (_infoPanel != null)
             {
                 _infoPanel.Open();
-                _infoPanel.Setup(slot.Item);
+                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
 
                 RectTransform infoRect = _infoPanel.GetComponent<RectTransform>();
                 RectTransform slotRect = slot.GetComponent<RectTransform>();

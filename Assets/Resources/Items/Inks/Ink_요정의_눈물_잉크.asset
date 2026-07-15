@@ -21,3 +21,7 @@ MonoBehaviour:
   maxAmount: 200
   inkColor: {r: 0.2, g: 0.8, b: 0.4, a: 1}
   inkElement: 0
+  inkBaseSprite: {fileID: 0}
+  inkLiquidSprite: {fileID: 0}
+  inkLabelSprite: {fileID: 0}
+  inkCapSprite: {fileID: 0}

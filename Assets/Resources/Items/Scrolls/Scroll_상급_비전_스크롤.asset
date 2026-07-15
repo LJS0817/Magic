@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb0790edb63bb2e43b11e7a309d56ab7, type: 3}
+  m_Name: "Scroll_\uC0C1\uAE09_\uBE44\uC804_\uC2A4\uD06C\uB864"
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemScrollSO
+  type: 0
+  rarity: 3
+  itemName: "\uC0C1\uAE09 \uBE44\uC804 \uC2A4\uD06C\uB864"
+  itemDescription: "\uBD88\uC21C\uBB3C\uC744 \uB35C\uC5B4\uB0B8 \uACE0\uAE09 \uC591\uD53C\uC9C0\uB97C \uC0AC\uC6A9\uD558\uC5EC \uBCF5\uC7A1\uD558\uACE0 \uC608\uBBFC\uD55C \uACE0\uC704 \uB9C8\uBC95\uC2DD\uB3C4 \uBB34\uB9AC \uC5C6\uC774 \uAE30\uB85D\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  itemIcon: {fileID: -859035456634602026, guid: 8a81f72af92404f49a830d23b5b2b000, type: 3}
+  basePriceInCopper: 0
+  spellName: 
+  maxDurability: 15
+  accuracyScore: 1.3
+  scrollElement: 0

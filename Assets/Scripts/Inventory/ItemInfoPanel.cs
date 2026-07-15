@@ -12,6 +12,7 @@ namespace Magic.Inventory
         [SerializeField] private TMP_Text _infoNameText;
         [SerializeField] private TMP_Text _infoDescriptionText;
         [SerializeField] private TMP_Text _infoStateText;
+        [SerializeField] private TMP_Text _clickInfoText;
         RectTransform _rectTransform;
 
         private ItemInstance _currentItem;
@@ -35,7 +36,7 @@ namespace Magic.Inventory
             _canvasGroup.alpha = 0f;
         }
 
-        public void Setup(ItemInstance item)
+        public void Setup(ItemInstance item, bool isEquipped = false)
         {
             _currentItem = item;
 
@@ -83,6 +84,16 @@ namespace Magic.Inventory
                 _infoStateText.gameObject.SetActive(false);
             }
 
+            if (_clickInfoText != null)
+            {
+                string actionText = "선택";
+                if (item is Item_Scroll || item is Item_Ink || item is Item_Pen)
+                {
+                    actionText = isEquipped ? "장착 해제" : "장착";
+                }
+                _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
+            }
+
             // 텍스트 내용 변경 후 즉시 크기를 반영하기 위한 강제 갱신
             Canvas.ForceUpdateCanvases();
 
@@ -94,6 +105,9 @@ namespace Magic.Inventory
 
             if (_infoStateText != null && _infoStateText.gameObject.activeSelf)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_infoStateText.GetComponent<RectTransform>());
+
+            if (_clickInfoText != null && _clickInfoText.gameObject.activeSelf)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_clickInfoText.GetComponent<RectTransform>());
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
         }
