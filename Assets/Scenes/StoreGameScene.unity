@@ -1562,6 +1562,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e025560f464c4b14e90d761a4c6d5e2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.CurrencyManager
+  bankruptcyThresholdCopper: 0
 --- !u!4 &429854017
 Transform:
   m_ObjectHideFlags: 0
@@ -2037,6 +2038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b311c1772fc4c48dc9404d08198d86b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.FloatingEffect
+  playInStart: 0
   floatAmount: 10
   floatDuration: 2.5
   rotationAmount: 1.5
@@ -2388,7 +2390,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93b479edb22c9d044a0ca44a6ef147aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.InventoryManager
-  itemDatabase: {fileID: 0}
+  itemDatabase: {fileID: 11400000, guid: 17ee5cedda1f15d4cbf2f77c78bfab1c, type: 2}
+  _player: {fileID: 1649513456}
   baseInventoryCapacity: 20
 --- !u!4 &653578147
 Transform:
@@ -3711,14 +3714,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66c21768a84b60945bf3096cca9a47e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.StoreManager
-  currentOrder:
-    customerName: 
-    orderDescription: 
-    requestedSpellName: 
-    requestedElement: 0
-    marketPrice: 0
-    customerBudget: 0
-    offeredReward: 0
 --- !u!114 &1152165938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5575,7 +5570,7 @@ MonoBehaviour:
   _scrollEmptyGo: {fileID: 0}
   _penImage: {fileID: 1808845214}
   _penEmptyGo: {fileID: 0}
-  _inkContainer: {fileID: 1819499052}
+  _inkContainer: {fileID: 1819499058}
   _inkBaseLayer: {fileID: 1962323034}
   _inkLiquidLayer: {fileID: 555924044}
   _inkLabelLayer: {fileID: 1890890840}
@@ -6488,6 +6483,7 @@ GameObject:
   - component: {fileID: 1819499055}
   - component: {fileID: 1819499056}
   - component: {fileID: 1819499057}
+  - component: {fileID: 1819499058}
   m_Layer: 0
   m_Name: Ink
   m_TagString: Untagged
@@ -6552,11 +6548,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b311c1772fc4c48dc9404d08198d86b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.FloatingEffect
+  playInStart: 0
   floatAmount: 10
   floatDuration: 2.5
   rotationAmount: 1.5
   rotationDuration: 3.5
   randomizeTiming: 1
+--- !u!225 &1819499058
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1819499052}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1822510766
 GameObject:
   m_ObjectHideFlags: 0

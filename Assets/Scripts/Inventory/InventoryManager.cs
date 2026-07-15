@@ -11,8 +11,9 @@ namespace Magic.Inventory
 
         [Header("Database")]
         public ItemDatabase itemDatabase;
+        [SerializeField] private PlayerDataManager _player;
 
-        public List<ItemInstance> items => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.items : new List<ItemInstance>();
+        public List<ItemInstance> items => _player.items;
         public event System.Action OnInventoryChanged;
 
         public void NotifyInventoryChanged()
@@ -24,7 +25,7 @@ namespace Magic.Inventory
         {
             if (PlayerDataManager.Instance == null) return;
 
-            var targetList = PlayerDataManager.Instance.items;
+            var targetList = items;
             if (targetList == null || targetList.Count == 0) return;
 
             try
@@ -67,35 +68,35 @@ namespace Magic.Inventory
 
         public Item_Scroll EquippedScroll
         {
-            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedScroll : null;
+            get => _player.equippedScroll;
             set
             {
-                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedScroll = value;
+                _player.equippedScroll = value;
                 OnScrollEquipped?.Invoke(value);
             }
         }
 
         public Item_Ink EquippedInk
         {
-            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedInk : null;
+            get => _player.equippedInk;
             set
             {
-                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedInk = value;
+                _player.equippedInk = value;
                 OnInkEquipped?.Invoke(value);
             }
         }
 
         public Item_Pen EquippedPen
         {
-            get => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.equippedPen : null;
+            get => _player.equippedPen;
             set
             {
-                if (PlayerDataManager.Instance != null) PlayerDataManager.Instance.equippedPen = value;
+                _player.equippedPen = value;
                 OnPenEquipped?.Invoke(value);
             }
         }
 
-        public List<ItemInstance> combatLoadout => PlayerDataManager.Instance != null ? PlayerDataManager.Instance.combatLoadout : new List<ItemInstance>();
+        public List<ItemInstance> combatLoadout => _player.combatLoadout;
 
         private void Awake()
         {
@@ -103,110 +104,10 @@ namespace Magic.Inventory
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-                InitializeDefaultItems();
             }
             else
             {
                 Destroy(gameObject);
-            }
-        }
-
-        private void InitializeDefaultItems()
-        {
-            // 게임 시작 시 인벤토리가 비어있다면 테스트용 아이템 지급
-            if (items.Count == 0)
-            {
-                if (itemDatabase == null)
-                {
-                    itemDatabase = Resources.Load<ItemDatabase>("Items/ItemDatabase");
-                }
-                
-                if (itemDatabase != null)
-                {
-                    var scroll1 = itemDatabase.CreateScrollInstance("해진 연습용 양피지");
-                    var scroll2 = itemDatabase.CreateScrollInstance("표준 마법 스크롤");
-                    var impactScroll = itemDatabase.CreateScrollInstance("단단한 가죽 스크롤");
-                    if (impactScroll != null)
-                    {
-                        impactScroll.isEmpty = false;
-                        if (impactScroll.ScrollData != null)
-                            impactScroll.ScrollData.spellName = "Impact";
-                    }
-
-                    var normalInk = itemDatabase.CreateInkInstance("표준 마법 잉크");
-                    var highInk = itemDatabase.CreateInkInstance("농축된 마력 잉크");
-                    var basicPen = itemDatabase.CreatePenInstance("연습용 나무 펜");
-
-                    if (scroll1 != null) { items.Add(scroll1); if (EquippedScroll == null) EquippedScroll = scroll1; }
-                    if (scroll2 != null) items.Add(scroll2);
-                    if (impactScroll != null) items.Add(impactScroll);
-                    if (normalInk != null) { items.Add(normalInk); if (EquippedInk == null) EquippedInk = normalInk; }
-                    if (highInk != null) items.Add(highInk);
-                    if (basicPen != null) { items.Add(basicPen); if (EquippedPen == null) EquippedPen = basicPen; }
-
-                    // 기본 전투 장비로 세팅 (테스트용)
-                    if (scroll1 != null) combatLoadout.Add(scroll1);
-                    if (impactScroll != null) combatLoadout.Add(impactScroll);
-                    if (normalInk != null) combatLoadout.Add(normalInk);
-                    if (basicPen != null) combatLoadout.Add(basicPen);
-
-                    Debug.Log("[InventoryManager] 기본 테스트 아이템 및 로드아웃 지급 완료.");
-                }
-                else
-                {
-                    Debug.LogWarning("[InventoryManager] Items/ItemDatabase 에셋을 Resources에서 찾을 수 없습니다.");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 특정 펜 이름으로 펜을 로드하여 인벤토리에 추가합니다.
-        /// </summary>
-        public void AddPenByName(string penName)
-        {
-            if (itemDatabase == null) itemDatabase = Resources.Load<ItemDatabase>("Items/ItemDatabase");
-            if (itemDatabase != null)
-            {
-                var newPen = itemDatabase.CreatePenInstance(penName);
-                if (newPen != null)
-                {
-                    AddItem(newPen);
-                    Debug.Log($"[InventoryManager] 펜 '{penName}'이 인벤토리에 추가되었습니다.");
-                }
-                else
-                {
-                    Debug.LogWarning($"[InventoryManager] 펜 '{penName}'을 데이터베이스에서 찾을 수 없습니다.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[InventoryManager] ItemDatabase 에셋을 찾을 수 없습니다.");
-            }
-        }
-
-        /// <summary>
-        /// 특정 등급의 임의의 펜을 로드하여 인벤토리에 추가합니다.
-        /// </summary>
-        public void AddRandomPenOfGrade(ItemRarity rarity)
-        {
-            if (itemDatabase == null) itemDatabase = Resources.Load<ItemDatabase>("Items/ItemDatabase");
-            if (itemDatabase != null)
-            {
-                var penData = itemDatabase.GetRandomPenOfGrade(rarity);
-                if (penData != null)
-                {
-                    var newPen = new Item_Pen(penData);
-                    AddItem(newPen);
-                    Debug.Log($"[InventoryManager] 등급 '{rarity}'의 펜 '{newPen.ItemName}'이 인벤토리에 추가되었습니다.");
-                }
-                else
-                {
-                    Debug.LogWarning($"[InventoryManager] 등급 '{rarity}'의 펜을 데이터베이스에서 찾을 수 없습니다.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[InventoryManager] ItemDatabase 에셋을 찾을 수 없습니다.");
             }
         }
 

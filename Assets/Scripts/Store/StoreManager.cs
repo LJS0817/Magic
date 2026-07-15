@@ -20,7 +20,7 @@ namespace Magic.Inventory
         }
 
         [Header("Customer Orders")]
-        public Magic.Store.CustomerOrder currentOrder;
+        public System.Collections.Generic.Dictionary<string, Magic.Store.CustomerOrder> activeOrders = new System.Collections.Generic.Dictionary<string, Magic.Store.CustomerOrder>();
 
         private string[] customerNames = { "마을 청년", "지친 용병", "마법 학도", "수상한 상인", "지나가는 행인" };
 
@@ -78,12 +78,35 @@ namespace Magic.Inventory
                 
                 int marketPrice = Mathf.RoundToInt(baseVal * marketMultiplier);
                 
-                // Generate Customer Budget (-3% to +5%)
-                float budgetMultiplier = UnityEngine.Random.Range(0.97f, 1.05f);
-                int budget = Mathf.RoundToInt(marketPrice * budgetMultiplier);
+                // Generate Faction and Budget
+                Magic.Store.CustomerFaction faction = (Magic.Store.CustomerFaction)UnityEngine.Random.Range(0, 5);
+                float trueBudgetMultiplier = 1f;
+                bool isBluffing = false;
+                
+                switch(faction)
+                {
+                    case Magic.Store.CustomerFaction.Peasant: trueBudgetMultiplier = UnityEngine.Random.Range(0.8f, 1.1f); isBluffing = UnityEngine.Random.value < 0.2f; break;
+                    case Magic.Store.CustomerFaction.Mercenary: trueBudgetMultiplier = UnityEngine.Random.Range(0.9f, 1.3f); isBluffing = UnityEngine.Random.value < 0.8f; break; // 거짓말쟁이
+                    case Magic.Store.CustomerFaction.Noble: trueBudgetMultiplier = UnityEngine.Random.Range(1.5f, 3.0f); isBluffing = UnityEngine.Random.value < 0.4f; break;
+                    case Magic.Store.CustomerFaction.MageGuild: trueBudgetMultiplier = UnityEngine.Random.Range(1.2f, 2.0f); isBluffing = UnityEngine.Random.value < 0.1f; break; // 거의 거짓말 안함
+                    case Magic.Store.CustomerFaction.Cultist: trueBudgetMultiplier = UnityEngine.Random.Range(1.0f, 1.5f); isBluffing = UnityEngine.Random.value < 0.5f; break;
+                }
 
-                currentOrder = new Magic.Store.CustomerOrder(name, desc, randomRecipe.SpellName, reqElement, marketPrice, budget);
-                Debug.Log($"<color=cyan>[Store] 새 주문 도착! {name} - {elementText} {randomRecipe.SpellName} (Market: {marketPrice}, Budget: {budget})</color>");
+                int trueBudget = Mathf.RoundToInt(marketPrice * trueBudgetMultiplier);
+                int claimedBudget = trueBudget;
+
+                if (isBluffing)
+                {
+                    // 거짓말을 하면 진짜 예산보다 낮게 부름 (30% ~ 70% 수준)
+                    claimedBudget = Mathf.RoundToInt(trueBudget * UnityEngine.Random.Range(0.3f, 0.7f));
+                }
+
+                var order = new Magic.Store.CustomerOrder(name, desc, randomRecipe.SpellName, reqElement, marketPrice, trueBudget, claimedBudget, isBluffing, faction);
+                activeOrders.Add(order.orderID, order);
+                
+                order.chatHistory.Add($"[{faction}] {name}: {desc} (예산: 약 {claimedBudget} 동화 생각합니다.)");
+
+                Debug.Log($"<color=cyan>[Store] 새 주문 도착! ID:{order.orderID} {name} - {elementText} {randomRecipe.SpellName} (Market: {marketPrice}, TrueBudget: {trueBudget}, Claimed: {claimedBudget}, Bluff: {isBluffing})</color>");
             }
             else
             {
@@ -92,13 +115,51 @@ namespace Magic.Inventory
         }
 
         /// <summary>
-        /// 손님의 주문에 맞는 아이템을 제시된 가격(askingPrice)에 판매를 시도합니다.
+        /// 손님과 가격을 흥정합니다.
         /// </summary>
-        public bool FulfillOrder(ItemInstance item, int askingPrice)
+        public bool HaggleOrder(string orderId, int askingPrice)
         {
-            if (currentOrder == null)
+            if (!activeOrders.TryGetValue(orderId, out var order)) return false;
+            
+            if (order.state != Magic.Store.OrderState.Received && order.state != Magic.Store.OrderState.Haggling) return false;
+
+            order.chatHistory.Add($"플레이어: {askingPrice} 동화에 드리겠습니다.");
+
+            if (askingPrice <= order.trueBudget)
             {
-                Debug.LogWarning("[StoreManager] 현재 대기 중인 주문이 없습니다.");
+                order.agreedPrice = askingPrice;
+                order.state = Magic.Store.OrderState.Pending;
+                order.chatHistory.Add($"손님: 좋습니다. 스크롤을 전송해 주십시오.");
+                Debug.Log($"[Store] 주문 {orderId} 흥정 성공! 타결 가격: {askingPrice}");
+                return true;
+            }
+            else
+            {
+                order.patience -= 30f;
+                order.chatHistory.Add($"손님: 너무 비쌉니다. 깎아주지 않으면 거래하지 않겠습니다.");
+                order.state = Magic.Store.OrderState.Haggling;
+
+                if (order.patience <= 0)
+                {
+                    order.state = Magic.Store.OrderState.Failed;
+                    order.chatHistory.Add($"손님: 인내심의 한계입니다. 거래를 취소하겠습니다!");
+                    activeOrders.Remove(orderId);
+                    Debug.Log($"[Store] 손님이 화를 내며 나갔습니다. (주문 삭제됨)");
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 손님의 주문에 맞는 아이템을 배송하고 에스크로 판정을 진행합니다.
+        /// </summary>
+        public bool DeliverOrder(string orderId, ItemInstance item)
+        {
+            if (!activeOrders.TryGetValue(orderId, out var order)) return false;
+            
+            if (order.state != Magic.Store.OrderState.Pending)
+            {
+                Debug.LogWarning("[StoreManager] 가격이 아직 타결되지 않았거나 거래가 종료된 주문입니다.");
                 return false;
             }
 
@@ -107,35 +168,62 @@ namespace Magic.Inventory
                 return false;
             }
 
-            // Check if it's a scroll and matches the requested spell and element
             if (item is Item_Scroll scroll && scroll.ScrollData != null)
             {
-                if (scroll.ScrollData.spellName != currentOrder.requestedSpellName || scroll.ScrollData.scrollElement != currentOrder.requestedElement)
+                // C. 단순 실패 및 부정행위 판정
+                if (scroll.ScrollData.spellName != order.requestedSpellName || scroll.ScrollData.scrollElement != order.requestedElement)
                 {
-                    Debug.Log($"<color=red>[Store] 손님이 원하던 물건이 아닙니다! (요구: {currentOrder.requestedElement} {currentOrder.requestedSpellName}, 제출: {scroll.ScrollData.scrollElement} {scroll.ScrollData.spellName})</color>");
+                    int penalty = order.agreedPrice * 2;
+                    Debug.Log($"<color=red>[Store] 사기 적발! 위약금 {penalty} 차감 및 아이템 파괴됨.</color>");
+                    
+                    CurrencyManager.Instance.SpendCurrency(CurrencyType.Copper, penalty, autoConvert: true, allowNegative: true);
+                    CurrencyManager.Instance.CompressCurrency();
+                    
+                    InventoryManager.Instance.RemoveItem(item); // 스크롤 소각
+
+                    order.state = Magic.Store.OrderState.Failed;
+                    order.chatHistory.Add($"[시스템] 계약 위반! 마법사 길드에 의해 위약금 {penalty} 동화가 압류되고 스크롤은 소각되었습니다.");
+                    
+                    activeOrders.Remove(orderId);
                     return false;
                 }
 
-                // Check Budget
-                if (askingPrice <= currentOrder.customerBudget)
-                {
-                    InventoryManager.Instance.RemoveItem(item);
-                    CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, askingPrice);
-                    CurrencyManager.Instance.CompressCurrency();
+                // A. 초과 달성 및 B. 부분 성공 판정
+                bool isOverachievement = scroll.ScrollData.accuracyScore >= 1.2f; 
+                bool isPartialSuccess = scroll.ScrollData.accuracyScore < 1.0f;
 
-                    Debug.Log($"<color=green>[Store] 거래 성사! {currentOrder.customerName}에게 {item.ItemName}을(를) {askingPrice} 동화에 판매했습니다.</color>");
+                int finalPayment = order.agreedPrice;
+
+                if (isOverachievement)
+                {
+                    int maxTip = order.trueBudget - order.agreedPrice;
+                    int actualTip = Mathf.RoundToInt(order.agreedPrice * 0.2f); // 20% 팁
+                    if (actualTip > maxTip) actualTip = maxTip;
                     
-                    GenerateRandomOrder();
-                    return true;
+                    finalPayment += actualTip;
+                    order.chatHistory.Add($"손님: 기대 이상의 퀄리티군요! 팁을 {actualTip} 동화 더 얹어 드리겠습니다.");
+                }
+                else if (isPartialSuccess)
+                {
+                    int discount = Mathf.RoundToInt(order.agreedPrice * 0.3f); // 30% 강제 할인
+                    finalPayment -= discount;
+                    order.chatHistory.Add($"손님: 품질이 생각보다 별로네요. {discount} 동화만큼은 빼고 드리겠습니다.");
                 }
                 else
                 {
-                    Debug.Log($"<color=orange>[Store] 너무 비쌉니다! (손님 예산 초과)</color>");
-                    // Reduce budget as penalty
-                    currentOrder.customerBudget = Mathf.RoundToInt(currentOrder.customerBudget * 0.95f);
-                    Debug.Log($"<color=gray>[Store] 손님의 예산이 깎였습니다. 현재 예산 추정치: 약 {currentOrder.customerBudget}</color>");
-                    return false;
+                    order.chatHistory.Add($"손님: 거래 감사합니다.");
                 }
+
+                InventoryManager.Instance.RemoveItem(item);
+                CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, finalPayment);
+                CurrencyManager.Instance.CompressCurrency();
+
+                order.state = Magic.Store.OrderState.Completed;
+                activeOrders.Remove(orderId);
+
+                Debug.Log($"<color=green>[Store] 거래 성사! 최종 입금액: {finalPayment} 동화</color>");
+                GenerateRandomOrder(); // 새로운 주문 보충
+                return true;
             }
             
             return false;

@@ -15,7 +15,6 @@ MonoBehaviour:
   pens:
   - {fileID: 11400000, guid: c8e9031d06efb88449844c43200ca1fa, type: 2}
   - {fileID: 11400000, guid: f4eb26ad4599785408f2a95361e71bda, type: 2}
-  - {fileID: 11400000, guid: 8ffcfc9066f405c4faa2310dddd9c640, type: 2}
   - {fileID: 11400000, guid: 656fd63c09169f5479b416a313b7505c, type: 2}
   - {fileID: 11400000, guid: 021077348642b6a499fa33d51cd6dbc7, type: 2}
   - {fileID: 11400000, guid: 6c4b74768ce36f74c990cf411300a253, type: 2}

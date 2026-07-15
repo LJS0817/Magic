@@ -31,6 +31,42 @@ namespace Magic.Inventory
             this.data = data;
             this.acquisitionId = GetUniqueAcquisitionId();
         }
+
+        public override string ToString()
+        {
+            return $"{ItemName}[{Type} | {Rarity}] : {ItemDescription}";
+        }
+
+        public static bool operator ==(ItemInstance a, ItemInstance b)
+        {
+            bool aIsNull = ReferenceEquals(a, null) || a.data == null;
+            bool bIsNull = ReferenceEquals(b, null) || b.data == null;
+
+            if (aIsNull && bIsNull) return true;
+            if (aIsNull || bIsNull) return false;
+
+            return ReferenceEquals(a, b);
+        }
+
+        public static bool operator !=(ItemInstance a, ItemInstance b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ItemInstance other)
+            {
+                return this == other;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            // ReferenceEquals(this, null) 은 GetHashCode 안에서는 보통 불리지 않지만 방어적으로 처리
+            return data != null ? data.GetHashCode() : base.GetHashCode();
+        }
     }
 
     [System.Serializable]

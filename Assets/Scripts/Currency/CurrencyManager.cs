@@ -96,6 +96,10 @@ namespace Magic.Inventory
         // 재화 변경 이벤트 (재화 타입, 변경된 보유량)
         public event Action<CurrencyType, int> OnCurrencyChanged;
 
+        // 파산 이벤트 및 한계치
+        public event Action OnBankruptcy;
+        public long bankruptcyThresholdCopper = 0; // 마이너스가 되는 즉시 파산
+
         private void Awake()
         {
             _money = new int[5] { 0, 0, 0, 0, 0 };
@@ -193,12 +197,13 @@ namespace Magic.Inventory
         /// <param name="type">소비할 재화 종류</param>
         /// <param name="amount">소비할 양</param>
         /// <param name="autoConvert">자동 화폐 변환 적용 여부 (예: 은화 결제 시 동화가 부족하면 금화를 깨거나 동화를 합쳐 지불)</param>
+        /// <param name="allowNegative">마이너스 자산을 허용할지 여부 (예: 위약금 차감 등)</param>
         /// <returns>소비 성공 여부</returns>
-        public bool SpendCurrency(CurrencyType type, int amount, bool autoConvert = true)
+        public bool SpendCurrency(CurrencyType type, int amount, bool autoConvert = true, bool allowNegative = false)
         {
             if (amount <= 0) return false;
 
-            if (!HasEnoughCurrency(type, amount, autoConvert))
+            if (!allowNegative && !HasEnoughCurrency(type, amount, autoConvert))
             {
                 Debug.LogWarning($"[CurrencyManager] 부족한 재화: {type} {amount} 필요 (보유: {GetCurrencyAmount(type)})");
                 return false;
@@ -246,6 +251,12 @@ namespace Magic.Inventory
             long totalCopper = GetTotalNormalCurrencyAsCopper();
             DistributeCopper(totalCopper);
             Debug.Log($"[CurrencyManager] Currency Compressed. Pt:{Platinum}, Au:{Gold}, Ag:{Silver}, Cu:{Copper}");
+            
+            if (totalCopper < -bankruptcyThresholdCopper)
+            {
+                Debug.LogError($"[CurrencyManager] 파산! 빚({-totalCopper} 동화)을 갚지 못해 파산했습니다.");
+                OnBankruptcy?.Invoke();
+            }
         }
 
         /// <summary>

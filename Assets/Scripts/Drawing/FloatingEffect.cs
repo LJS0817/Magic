@@ -7,6 +7,7 @@ namespace Magic.Drawing
     public class FloatingEffect : MonoBehaviour
     {
         [Header("Float Settings")]
+        public bool playInStart = false;
         public float floatAmount = 20f;       // 떠오르는 높이 (상하 움직임 증가)
         public float floatDuration = 4.5f;    // 한 번 떠오르는 데 걸리는 시간 (시간 늘림)
 
@@ -24,34 +25,32 @@ namespace Magic.Drawing
         private float randomTimeOffsetRot;
         private float randomDurationMult;
 
-        private void Start()
+        public bool IsPlaying { get; private set; }
+
+        private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
-            if (rectTransform != null)
-            {
-                startPos = rectTransform.anchoredPosition;
-                startRot = rectTransform.localRotation;
+            UpdateBasePosition();
+        }
 
-                // 오브젝트마다 다른 타이밍을 갖도록 랜덤 오프셋 및 속도 배수 설정
-                if (randomizeTiming)
-                {
-                    randomTimeOffsetFloat = Random.Range(0f, floatDuration * 2f);
-                    randomTimeOffsetRot = Random.Range(0f, rotationDuration * 2f);
-                    randomDurationMult = Random.Range(0.85f, 1.15f);
-                }
-                else
-                {
-                    randomDurationMult = 1f;
-                }
+        private void Start()
+        {
+            // 오브젝트마다 다른 타이밍을 갖도록 랜덤 오프셋 및 속도 배수 설정
+            CalculateRandomValues();
+            if (playInStart) StartFloating(true);
+        }
 
-                StartFloating(true);
-            }
+        void UpdateBasePosition()
+        {
+            startPos = rectTransform.anchoredPosition;
+            startRot = rectTransform.localRotation;
         }
 
         private void StartFloating(bool useRandomOffset = false)
         {
-            rectTransform.DOKill();
-            
+            if (IsPlaying) rectTransform.DOKill();
+            IsPlaying = true;
+
             float fDuration = floatDuration * randomDurationMult;
             float rDuration = rotationDuration * randomDurationMult;
 
@@ -74,6 +73,7 @@ namespace Magic.Drawing
 
         public void PauseFloating()
         {
+            IsPlaying = false;
             if (rectTransform != null)
             {
                 rectTransform.DOKill();
@@ -83,16 +83,9 @@ namespace Magic.Drawing
             }
         }
 
-        public void ResumeFloating()
+        public void StopFloating()
         {
-            if (rectTransform != null && gameObject.activeInHierarchy)
-            {
-                StartFloating(false);
-            }
-        }
-
-        private void OnDisable()
-        {
+            IsPlaying = false;
             if (rectTransform != null)
             {
                 rectTransform.DOKill();
@@ -100,14 +93,38 @@ namespace Magic.Drawing
                 rectTransform.localRotation = startRot;
             }
         }
-        
-        private void OnEnable()
+
+        public void ResumeFloating()
         {
-            // Start()가 실행되어 초기 좌표가 저장된 이후라면 다시 켤 때 애니메이션 재시작
-            if (rectTransform != null && startPos != Vector2.zero) 
+            if (rectTransform != null && !IsPlaying)
             {
-                StartFloating(true);
+                StartFloating(false);
             }
+        }
+
+        void CalculateRandomValues()
+        {
+            if (randomizeTiming)
+            {
+                randomTimeOffsetFloat = Random.Range(0f, floatDuration * 2f);
+                randomTimeOffsetRot = Random.Range(0f, rotationDuration * 2f);
+                randomDurationMult = Random.Range(0.85f, 1.15f);
+            }
+            else
+            {
+                randomDurationMult = 1f;
+            }
+
+        }
+
+        public void RestartFloatingEffect()
+        {
+            if (rectTransform == null || IsPlaying) return;
+
+            rectTransform.DOKill();
+
+            CalculateRandomValues();
+            StartFloating(true);
         }
     }
 }

@@ -120,11 +120,15 @@ namespace Magic.Drawing
         /// </summary>
         public void TrackMouse(Camera mainCamera)
         {
+            if (CurrentPen == null) return;
+            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null) return;
+            
             penVisual.position = GetMouseWorldPosition(mainCamera);
         }
 
         public void PlayIdleAnimation(bool smooth = false)
         {
+            if (CurrentPen == null) return;
             penVisual.DOKill();
             
             if (smooth)
@@ -145,13 +149,15 @@ namespace Magic.Drawing
 
         public void PlayDrawAnimation()
         {
+            if (CurrentPen == null) return;
             penVisual.DOKill();
             // 약간 눕혀서 그리는 느낌의 각도로 변경 (-35도, 속도 완화)
             penVisual.DOLocalRotate(new Vector3(0, 0, -35f), 0.25f).SetEase(Ease.OutQuad);
         }
 
-        public void GoToInkBottle(RectTransform inkBottle, Action onArrived, Action onComplete)
+        public void GoToInkBottle(RectTransform inkBottle, Action onArrived, Action onComplete, bool instant = false)
         {
+            if (CurrentPen == null) return;
             penVisual.DOKill();
             penVisual.localRotation = Quaternion.Euler(0, 0, 0);
             
@@ -159,44 +165,77 @@ namespace Magic.Drawing
             {
                 Debug.LogWarning("[PenController] 잉크병(inkBottle)이 할당되지 않았습니다.");
                 onArrived?.Invoke();
-                isAtInkBottle = true;
+                isAtInkBottle = false;
                 onComplete?.Invoke();
                 return;
             }
 
             targetInkBottle = inkBottle;
 
-            if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+            if (instant)
             {
-                Material mat = penImage.material;
-                mat.DOKill();
-                mat.DOFloat(1f, "_DissolveAmount", 0.5f).OnComplete(() => {
-                    
-                    onArrived?.Invoke();
-                    isAtInkBottle = true; 
-                    
-                    penVisual.position = targetInkBottle.position;
-                    penVisual.rotation = targetInkBottle.rotation;
-                    
-                    mat.DOFloat(0f, "_DissolveAmount", 0.5f).OnComplete(() => {
-                        onComplete?.Invoke();
-                    });
-                });
+                penVisual.position = targetInkBottle.position;
+                penVisual.rotation = targetInkBottle.rotation;
+                
+                if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+                {
+                    penImage.material.DOKill();
+                    penImage.material.SetFloat("_DissolveAmount", 0f);
+                }
+                
+                HandleInkBottleArrival(onArrived, onComplete);
             }
             else
             {
-                Debug.LogWarning("[PenController] 펜 이미지에 디졸브 머티리얼이 없어 즉시 이동합니다.");
-                onArrived?.Invoke();
-                isAtInkBottle = true;
-                penVisual.position = targetInkBottle.position;
-                penVisual.rotation = targetInkBottle.rotation;
-                onComplete?.Invoke();
+                // 디졸브로 순간 이동
+                if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
+                {
+                    Material mat = penImage.material;
+                    mat.DOKill();
+                    mat.DOFloat(1f, "_DissolveAmount", 0.5f).OnComplete(() => {
+                        penVisual.position = targetInkBottle.position;
+                        penVisual.rotation = targetInkBottle.rotation;
+                        HandleInkBottleArrival(onArrived, null);
+                        
+                        mat.DOFloat(0f, "_DissolveAmount", 0.5f).OnComplete(() => {
+                            onComplete?.Invoke();
+                        });
+                    });
+                }
+                else
+                {
+                    penVisual.position = targetInkBottle.position;
+                    penVisual.rotation = targetInkBottle.rotation;
+                    HandleInkBottleArrival(onArrived, onComplete);
+                }
             }
+        }
+
+        private void HandleInkBottleArrival(Action onArrived, Action onComplete)
+        {
+            // 잉크 장착 여부와 상관없이 무조건 잉크통 위치를 지속적으로 따라다니도록 설정
+            // (잉크통 쪽 FloatingEffect가 상시 돌아가면서 펜도 자연스럽게 같이 떠다님)
+            isAtInkBottle = true;
+            
+            onArrived?.Invoke();
+            onComplete?.Invoke();
         }
 
         public void ReturnToMouse(Camera mainCamera, Action onComplete)
         {
-            isAtInkBottle = false; 
+            if (CurrentPen == null)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+            
+            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            isAtInkBottle = false;
 
             if (penImage != null && penImage.material != null && penImage.material.HasProperty("_DissolveAmount"))
             {

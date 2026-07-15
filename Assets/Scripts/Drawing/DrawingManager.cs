@@ -56,7 +56,7 @@ namespace Magic.Drawing
             {
                 penController.GoToInkBottle(inkController.inkBottleVisual, null, () => {
                     isPenReady = true;
-                });
+                }, instant: true);
             }
             isOutsideArea = true;
 
@@ -72,6 +72,7 @@ namespace Magic.Drawing
             {
                 InventoryManager.Instance.OnInkEquipped += HandleInkEquipped;
                 InventoryManager.Instance.OnPenEquipped += HandlePenEquipped;
+                InventoryManager.Instance.OnScrollEquipped += HandleScrollEquipped;
             }
 
             if (manaSlider != null && PlayerDataManager.Instance != null)
@@ -82,17 +83,44 @@ namespace Magic.Drawing
 
         private void HandleInkEquipped(Item_Ink ink)
         {
-            if (penController != null && penController.CurrentPen != null && ink != null)
+            if (penController != null && penController.CurrentPen != null)
             {
-                if (inkController != null) inkController.TryRefillPen(penController.CurrentPen);
+                penController.GoToInkBottle(inkController.inkBottleVisual, null, () => {
+                    if (ink != null) 
+                    {
+                        inkController.TryRefillPen(penController.CurrentPen);
+                    }
+                }, true);
             }
         }
 
         private void HandlePenEquipped(Item_Pen pen)
         {
-            if (inkController != null && inkController.CurrentInk != null && pen != null)
+            if (penController != null && pen != null)
             {
-                inkController.TryRefillPen(pen);
+                penController.GoToInkBottle(inkController.inkBottleVisual, null, () => {
+                    if (inkController.CurrentInk != null)
+                    {
+                        inkController.TryRefillPen(pen);
+                    }
+                }, instant: true);
+            }
+        }
+
+        private void HandleScrollEquipped(Item_Scroll scroll)
+        {
+            // 스크롤이 장착 해제되었을 때
+            if (scroll == null)
+            {
+                if (isDrawing) EndStroke();
+                
+                // 마우스가 도화지 밖으로 나간 것과 동일하게 처리 (펜을 잉크통으로 복귀)
+                if (!isOutsideArea)
+                {
+                    isOutsideArea = true;
+                    if (scrollFloatingEffect != null) scrollFloatingEffect.ResumeFloating();
+                    RefillPen();
+                }
             }
         }
 
@@ -102,6 +130,7 @@ namespace Magic.Drawing
             {
                 InventoryManager.Instance.OnInkEquipped -= HandleInkEquipped;
                 InventoryManager.Instance.OnPenEquipped -= HandlePenEquipped;
+                InventoryManager.Instance.OnScrollEquipped -= HandleScrollEquipped;
             }
         }
 
@@ -113,6 +142,12 @@ namespace Magic.Drawing
         protected virtual void HandleDrawingInput()
         {
             if (IsDrawingBlocked)
+            {
+                if (isDrawing) EndStroke();
+                return;
+            }
+
+            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
             {
                 if (isDrawing) EndStroke();
                 return;

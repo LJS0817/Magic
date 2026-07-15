@@ -64,68 +64,96 @@ namespace Magic.Inventory
 
         private string askingPriceStr = "150";
         private string haggleMessage = "";
+        private string selectedOrderId = "";
 
         private void DrawSellTab()
         {
             var store = StoreManager.Instance;
-            if (store.currentOrder != null)
+            var inv = InventoryManager.Instance;
+
+            if (store.activeOrders != null && store.activeOrders.Count > 0)
             {
-                string elementText = store.currentOrder.requestedElement == Magic.Combat.SpellElement.None ? "무속성" : store.currentOrder.requestedElement.ToString();
-                GUILayout.Label($"<b>[ 손님: {store.currentOrder.customerName} ]</b>");
-                GUILayout.Label($"\"<i>{store.currentOrder.orderDescription}</i>\"");
-                GUILayout.Label($"<b>요구 사항:</b> [{elementText}] {store.currentOrder.requestedSpellName} 스크롤");
-                GUILayout.Label($"<b>제시 가격:</b> <color=gray>손님이 속으로 생각 중입니다...</color>");
-                
-                GUILayout.Space(10);
+                foreach (var kvp in store.activeOrders)
+                {
+                    var order = kvp.Value;
+                    string elementText = order.requestedElement == Magic.Combat.SpellElement.None ? "무속성" : order.requestedElement.ToString();
+                    
+                    GUILayout.BeginVertical("box");
+                    GUILayout.Label($"<b>[ 손님: {order.customerName} ({order.faction}) - 상태: {order.state} ]</b>");
+                    GUILayout.Label($"\"<i>{order.orderDescription}</i>\"");
+                    GUILayout.Label($"<b>요구 사항:</b> [{elementText}] {order.requestedSpellName} 스크롤");
+                    
+                    if (order.state == Magic.Store.OrderState.Received || order.state == Magic.Store.OrderState.Haggling)
+                    {
+                        GUILayout.Label($"<b>제시된 예산:</b> {order.claimedBudget} 동화 (진짜 예산: {order.trueBudget}, 블러핑: {order.isBluffing})");
+                        GUILayout.Label($"<b>인내심:</b> {order.patience}");
+                        
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("흥정가:", GUILayout.Width(45));
+                        askingPriceStr = GUILayout.TextField(askingPriceStr, GUILayout.Width(50));
+                        if (GUILayout.Button("가격 제시", GUILayout.Width(80)))
+                        {
+                            if (int.TryParse(askingPriceStr, out int price))
+                            {
+                                store.HaggleOrder(order.orderID, price);
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                    else if (order.state == Magic.Store.OrderState.Pending)
+                    {
+                        GUILayout.Label($"<b>타결 가격:</b> <color=orange>{order.agreedPrice} 동화</color>");
+                        GUILayout.Label("스크롤을 더블 클릭(여기서는 버튼 클릭)하여 배송하세요.");
+                        
+                        // 제출 가능 스크롤 목록
+                        int scrollCount = 0;
+                        List<ItemInstance> items = new List<ItemInstance>(inv.items);
+                        foreach (var item in items)
+                        {
+                            if (item is Item_Scroll scroll && !scroll.isEmpty)
+                            {
+                                scrollCount++;
+                                GUILayout.BeginHorizontal();
+                                string spellName = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
+                                string scrollElem = scroll.ScrollData != null && scroll.ScrollData.scrollElement != Magic.Combat.SpellElement.None ? scroll.ScrollData.scrollElement.ToString() : "무속성";
+                                
+                                GUILayout.Label($"- {item.ItemName} ([{scrollElem}] {spellName})");
+                                GUILayout.FlexibleSpace();
+                                
+                                if (GUILayout.Button("배송", GUILayout.Width(50)))
+                                {
+                                    bool success = store.DeliverOrder(order.orderID, item);
+                                    if (success) haggleMessage = $"<color=green>거래 성사! 배송 완료.</color>";
+                                    else haggleMessage = $"<color=red>거래 실패 또는 사기 적발!</color>";
+                                }
+                                GUILayout.EndHorizontal();
+                            }
+                        }
+                        if (scrollCount == 0) GUILayout.Label("- 배송할 수 있는 완성된 스크롤이 없습니다.");
+                    }
+
+                    // 채팅 이력 (최근 3개만 표시)
+                    if (order.chatHistory.Count > 0)
+                    {
+                        GUILayout.Label("<color=gray>--- 대화 로그 ---</color>");
+                        int startIdx = Mathf.Max(0, order.chatHistory.Count - 3);
+                        for (int i = startIdx; i < order.chatHistory.Count; i++)
+                        {
+                            GUILayout.Label($"<color=silver>{order.chatHistory[i]}</color>");
+                        }
+                    }
+
+                    GUILayout.EndVertical();
+                    GUILayout.Space(10);
+                }
             }
             else
             {
                 GUILayout.Label("현재 대기 중인 주문이 없습니다.");
-            }
-
-            GUILayout.Label("<b>[ 제출 가능한 스크롤 ]</b>");
-
-            var inv = InventoryManager.Instance;
-            int scrollCount = 0;
-            
-            List<ItemInstance> items = new List<ItemInstance>(inv.items);
-            foreach (var item in items)
-            {
-                if (item is Item_Scroll scroll && !scroll.isEmpty)
+                if (GUILayout.Button("새 손님 받기"))
                 {
-                    scrollCount++;
-                    GUILayout.BeginHorizontal();
-                    string spellName = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
-                    string scrollElem = scroll.ScrollData != null && scroll.ScrollData.scrollElement != Magic.Combat.SpellElement.None ? scroll.ScrollData.scrollElement.ToString() : "무속성";
-                    
-                    GUILayout.Label($"- {item.ItemName} ([{scrollElem}] {spellName})");
-                    GUILayout.FlexibleSpace();
-                    
-                    GUILayout.Label("제시가:", GUILayout.Width(45));
-                    askingPriceStr = GUILayout.TextField(askingPriceStr, GUILayout.Width(50));
-                    
-                    if (GUILayout.Button("제출", GUILayout.Width(50)))
-                    {
-                        if (int.TryParse(askingPriceStr, out int price))
-                        {
-                            bool success = store.FulfillOrder(item, price);
-                            if (success)
-                            {
-                                haggleMessage = $"<color=green>거래 성사! {price} Cu 획득!</color>";
-                            }
-                            else
-                            {
-                                haggleMessage = $"<color=red>거래 실패! 너무 비싸거나 요구 조건 불일치.</color>";
-                            }
-                        }
-                    }
-                    GUILayout.EndHorizontal();
+                    store.GenerateRandomOrder();
                 }
-            }
-
-            if (scrollCount == 0)
-            {
-                GUILayout.Label("제출할 수 있는 완성된 스크롤이 없습니다.");
             }
 
             if (!string.IsNullOrEmpty(haggleMessage))
