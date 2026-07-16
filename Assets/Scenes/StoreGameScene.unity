@@ -261,8 +261,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1.09, y: 2.07}
-  m_SizeDelta: {x: 515.99, y: 603.37}
+  m_AnchoredPosition: {x: -1.09, y: 2.0700002}
+  m_SizeDelta: {x: 468.57, y: 547.92}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &30292827
 CanvasRenderer:
@@ -5573,8 +5573,8 @@ MonoBehaviour:
   _inkContainer: {fileID: 1819499058}
   _inkBaseLayer: {fileID: 1962323034}
   _inkLiquidLayer: {fileID: 555924044}
-  _inkLabelLayer: {fileID: 1890890840}
-  _inkCapLayer: {fileID: 638163199}
+  _inkTopBackLayer: {fileID: 638163199}
+  _inkTopLayer: {fileID: 1890890840}
   _inkEmptyGo: {fileID: 0}
 --- !u!1 &1651020468
 GameObject:

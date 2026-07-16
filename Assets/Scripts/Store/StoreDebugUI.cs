@@ -73,9 +73,9 @@ namespace Magic.Inventory
 
             if (store.activeOrders != null && store.activeOrders.Count > 0)
             {
-                foreach (var kvp in store.activeOrders)
+                var currentOrders = new System.Collections.Generic.List<Magic.Store.CustomerOrder>(store.activeOrders.Values);
+                foreach (var order in currentOrders)
                 {
-                    var order = kvp.Value;
                     string elementText = order.requestedElement == Magic.Combat.SpellElement.None ? "무속성" : order.requestedElement.ToString();
                     
                     GUILayout.BeginVertical("box");

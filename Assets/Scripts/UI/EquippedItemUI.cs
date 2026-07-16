@@ -20,8 +20,8 @@ namespace Magic.UI
         [SerializeField] private CanvasGroup _inkContainer; // 잉크 전체 컨테이너
         [SerializeField] private Image _inkBaseLayer;
         [SerializeField] private Image _inkLiquidLayer;
-        [SerializeField] private Image _inkLabelLayer;
-        [SerializeField] private Image _inkCapLayer;
+        [SerializeField] private Image _inkTopBackLayer;
+        [SerializeField] private Image _inkTopLayer;
         [SerializeField] private GameObject _inkEmptyGo; // 잉크가 없을 때 보여줄 기본 UI (옵션)
         private FloatingEffect _inkFloatingEffect;
 
@@ -36,7 +36,6 @@ namespace Magic.UI
                 _scrollFloatingEffect = _scrollImage.GetComponent<FloatingEffect>();
                 _inkFloatingEffect = _inkContainer.GetComponent<FloatingEffect>();
 
-                Debug.Log(InventoryManager.Instance.EquippedScroll);
                 // 초기 상태 동기화
                 UpdateScroll(InventoryManager.Instance.EquippedScroll);
                 UpdatePen(InventoryManager.Instance.EquippedPen);
@@ -61,6 +60,7 @@ namespace Magic.UI
                 if (_scrollImage != null)
                 {
                     _scrollImage.sprite = scroll.ItemIcon;
+                    _scrollImage.gameObject.SetActive(true);
                     _scrollImage.enabled = true;
 
                     _scrollFloatingEffect.StopFloating();
@@ -101,33 +101,20 @@ namespace Magic.UI
             {
                 if (_inkContainer != null) _inkContainer.alpha = 1;
                 if (_inkEmptyGo != null) _inkEmptyGo.SetActive(false);
-
+                
                 var data = ink.InkData;
-
-                if (_inkBaseLayer != null)
-                {
-                    if (data.inkBaseSprite != null) _inkBaseLayer.sprite = data.inkBaseSprite;
-                    _inkBaseLayer.gameObject.SetActive(_inkBaseLayer.sprite != null);
-                }
-
+                
+                if (_inkBaseLayer != null) _inkBaseLayer.sprite = data.inkBaseSprite;
+                
                 if (_inkLiquidLayer != null)
                 {
                     if (data.inkLiquidSprite != null) _inkLiquidLayer.sprite = data.inkLiquidSprite;
-                    _inkLiquidLayer.color = data.inkColor;
-                    _inkLiquidLayer.gameObject.SetActive(_inkLiquidLayer.sprite != null);
+                    _inkLiquidLayer.color = data.inkLiquidColorAlpha;
                 }
-
-                if (_inkLabelLayer != null)
-                {
-                    if (data.inkLabelSprite != null) _inkLabelLayer.sprite = data.inkLabelSprite;
-                    _inkLabelLayer.gameObject.SetActive(_inkLabelLayer.sprite != null);
-                }
-
-                if (_inkCapLayer != null)
-                {
-                    if (data.inkCapSprite != null) _inkCapLayer.sprite = data.inkCapSprite;
-                    _inkCapLayer.gameObject.SetActive(_inkCapLayer.sprite != null);
-                }
+                
+                if (_inkTopBackLayer != null) if (data.inkTopBackSprite != null) _inkTopBackLayer.sprite = data.inkTopBackSprite;
+                
+                if (_inkTopLayer != null) if (data.inkTopSprite != null) _inkTopLayer.sprite = data.inkTopSprite;
             }
             else
             {
@@ -145,4 +132,3 @@ namespace Magic.UI
         }
     }
 }
-

@@ -16,12 +16,13 @@ MonoBehaviour:
   rarity: 0
   itemName: "\uD45C\uC900 \uB9C8\uBC95 \uC789\uD06C"
   itemDescription: "\uB9C8\uB3C4\uD559\uAD50\uC5D0\uC11C \uD45C\uC900\uC73C\uB85C \uC0AC\uC6A9\uD558\uB294 \uBB34\uB09C\uD55C \uC131\uB2A5\uC758 \uC789\uD06C\uC785\uB2C8\uB2E4."
-  itemIcon: {fileID: 0}
-  basePriceInCopper: 0
+  itemIcon: {fileID: -6591120442185306534, guid: 3f716fbfe63a59f4f8e2caf31dd4708d, type: 3}
+  basePriceInCopper: 100
   maxAmount: 100
   inkColor: {r: 0, g: 0, b: 0, a: 1}
   inkElement: 0
-  inkBaseSprite: {fileID: 0}
-  inkLiquidSprite: {fileID: 0}
-  inkLabelSprite: {fileID: 0}
-  inkCapSprite: {fileID: 0}
+  inkBaseSprite: {fileID: 7398246884796691448, guid: b495621c4b310744c921e41f4f97664a, type: 3}
+  inkLiquidSprite: {fileID: 1890485206872935878, guid: 60bbe445a733a3b428b9405f5ef1c8a8, type: 3}
+  inkLiquidColorAlpha: {r: 1, g: 1, b: 1, a: 0.95686275}
+  inkTopBackSprite: {fileID: 833204280, guid: b495621c4b310744c921e41f4f97664a, type: 3}
+  inkTopSprite: {fileID: -5007644148769890766, guid: b495621c4b310744c921e41f4f97664a, type: 3}

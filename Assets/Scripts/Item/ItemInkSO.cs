@@ -13,8 +13,9 @@ namespace Magic.Inventory
         [Header("Ink Parts (For Assembled Visual)")]
         public Sprite inkBaseSprite;
         public Sprite inkLiquidSprite;
-        public Sprite inkLabelSprite;
-        public Sprite inkCapSprite;
+        public Color inkLiquidColorAlpha = Color.white;
+        public Sprite inkTopBackSprite;
+        public Sprite inkTopSprite;
 
         private void OnEnable()
         {

@@ -47,6 +47,13 @@ namespace Magic.Drawing
         {
             if (newInk != null && inkAmountVisual != null)
             {
+                if (newInk.InkData != null && inkAmountImage != null)
+                {
+                    Color newColor = newInk.InkData.inkLiquidColorAlpha;
+                    inkAmountImage.color = newColor;
+                    intAmountVisualMaxAlpha = newColor.a;
+                }
+
                 float maxAmount = newInk.InkData != null ? newInk.InkData.maxAmount : 100f;
                 float targetRatio = maxAmount > 0f ? Mathf.Clamp01(newInk.currentAmount / maxAmount) : 0f;
                 float targetHeight = Mathf.Lerp(inkAmountVisualMinHeight, inkAmountVisualMaxHeight, targetRatio);
