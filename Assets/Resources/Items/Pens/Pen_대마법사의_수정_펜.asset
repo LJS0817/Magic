@@ -20,5 +20,5 @@ MonoBehaviour:
   basePriceInCopper: 0
   maxInkCapacity: 170
   inkConsumptionRate: 1.3
-  consumesMana: 0
+  consumesMana: 1
   penElement: 0

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Nova
   Type: 0
-  manaCost: 50
+  icon: {fileID: 0}
+  manaCost: 30
   Description: "\uC751\uCD95\uB41C \uB9C8\uB098\uB97C \uC0AC\uBC29\uC73C\uB85C \uD3ED\uBC1C\uC2DC\uCF1C \uC8FC\uBCC0\uC744 \uD729\uC4F8\uC5B4\uBC84\uB9BD\uB2C8\uB2E4."
   ActivationCondition: 
   ActivationHint: "\uB9C8\uB098 \uACB0\uC815\uC758 \uC911\uC2EC(\uC6D0) \uC8FC\uBCC0\uC73C\uB85C \uB0A0\uCE74\uB85C\uC6B4 \uD30C\uD3B8(\uC138\uBAA8) 3\uAC1C\uB97C \uB458\uB7EC\uC11C \uADF8\uB9AC\uC138\uC694."

@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: ManaRestore
   Type: 0
-  manaCost: 30
+  icon: {fileID: 0}
+  manaCost: 20
   Description: "\uC2EC\uC5F0\uC758 \uC9C0\uD61C\uC640 \uC5F0\uACB0\uD558\uC5EC \uACE0\uAC08\uB41C \uB9C8\uB825\uC744 \uAE09\uC18D\uB3C4\uB85C \uD68C\uBCF5\uD569\uB2C8\uB2E4."
   ActivationCondition: "\uBCC4 2\uAC1C (\uBCC4 \uC548\uC5D0 \uBCC4)"
   ActivationHint: "\uBE5B\uB098\uB294 \uBCC4\uBE5B \uC18D\uC5D0 \uB610 \uB2E4\uB978 \uC791\uC740 \uBCC4\uBE5B\uC744 \uC911\uCCA9\uC2DC\uCF1C \uADF8\uB9AC\uC138\uC694."

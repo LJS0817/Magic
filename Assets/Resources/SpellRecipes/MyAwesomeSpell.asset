@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: MyAwesomeSpell
   Type: 0
-  manaCost: 60
+  icon: {fileID: 0}
+  manaCost: 20
   Description: 
   ActivationCondition: 
   ActivationHint: 

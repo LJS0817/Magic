@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Quake
   Type: 0
-  manaCost: 40
+  icon: {fileID: 0}
+  manaCost: 60
   Description: "\uAC15\uB825\uD55C \uC9C0\uC9C4\uC744 \uC77C\uC73C\uCF1C \uC8FC\uBCC0 \uBC18\uACBD\uC758 \uBAA8\uB4E0 \uC801\uB4E4\uC744 \uB118\uC5B4\uB728\uB9AC\uACE0 \uD0C0\uACA9\uC744 \uC90D\uB2C8\uB2E4."
   ActivationCondition: "\uB124\uBAA8 2\uAC1C (\uB124\uBAA8 \uC548\uC5D0 \uB124\uBAA8)"
   ActivationHint: "\uB2E8\uB2E8\uD55C \uB300\uC9C0\uB97C \uC0C1\uC9D5\uD558\uB294 \uC0AC\uAC01\uD615 \uC548\uC5D0 \uC9C0\uC9C4\uC758 \uD30C\uB3D9(\uC0AC\uAC01\uD615)\uC744 \uC911\uCCA9\uD558\uC138\uC694."
