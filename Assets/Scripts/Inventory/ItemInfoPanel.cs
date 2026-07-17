@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Magic.Utility;
+using Magic.Store;
 
 namespace Magic.Inventory
 {
@@ -13,6 +14,7 @@ namespace Magic.Inventory
         [SerializeField] private TMP_Text _infoDescriptionText;
         [SerializeField] private TMP_Text _infoStateText;
         [SerializeField] private TMP_Text _clickInfoText;
+        [SerializeField] OrderContainerUI _orderContainerUI;
         RectTransform _rectTransform;
 
         private ItemInstance _currentItem;
@@ -87,9 +89,17 @@ namespace Magic.Inventory
             if (_clickInfoText != null)
             {
                 string actionText = "선택";
-                if (item is Item_Scroll || item is Item_Ink || item is Item_Pen)
+                if (_orderContainerUI.IsOpened)
                 {
-                    actionText = isEquipped ? "장착 해제" : "장착";
+                    if (item is Item_Scroll) actionText = "<color=orange>선택</color>";
+                    else actionText = "<color=gray>선택 불가</color>";
+                }
+                else
+                {
+                    if (item is Item_Scroll || item is Item_Ink || item is Item_Pen)
+                    {
+                        actionText = isEquipped ? "장착 해제" : "장착";
+                    }
                 }
                 _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
             }

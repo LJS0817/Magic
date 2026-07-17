@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Magic.Store;
 
 namespace Magic.Inventory
 {

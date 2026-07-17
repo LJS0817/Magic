@@ -177,6 +177,14 @@ namespace Magic.Inventory
         {
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
             
+            // 1. 주문 흥정이 타결되어 스크롤 선택 대기 중인 상태인지 확인
+            if (slot.Item is Item_Scroll selectedScroll)
+            {
+                Magic.Store.StoreManager.Instance.SelectItemForOrder(selectedScroll);
+                return;
+            }
+
+            // 2. 일반 장착 로직
             var inv = InventoryManager.Instance;
             if (slot.Item is Item_Scroll scroll) 
             {

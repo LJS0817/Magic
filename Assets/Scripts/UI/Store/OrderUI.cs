@@ -1,23 +1,23 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Magic.Store;
+using System;
 
-namespace Magic.UI.CustomerService
+namespace Magic.Store
 {
     [RequireComponent(typeof(RectTransform))]
     public class OrderUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
     {
         public CustomerOrder OrderData { get; private set; }
-        private CustomerServiceManager _manager;
+        private Action<OrderUI> _onClickCallback;
 
         private RectTransform _rectTransform;
         private Canvas _canvas;
         private RectTransform _parentRectTransform;
 
-        public void Initialize(CustomerOrder order, CustomerServiceManager manager, Canvas canvas)
+        public void Initialize(CustomerOrder order, Action<OrderUI> onClickCallback, Canvas canvas)
         {
             OrderData = order;
-            _manager = manager;
+            _onClickCallback = onClickCallback;
             _canvas = canvas;
             _rectTransform = GetComponent<RectTransform>();
             _parentRectTransform = _rectTransform.parent as RectTransform;
@@ -48,10 +48,7 @@ namespace Magic.UI.CustomerService
             // Don't register click if we were dragging
             if (eventData.dragging) return;
 
-            if (_manager != null)
-            {
-                _manager.OpenChatForOrder(this);
-            }
+            _onClickCallback?.Invoke(this);
         }
 
         private void ClampPosition()

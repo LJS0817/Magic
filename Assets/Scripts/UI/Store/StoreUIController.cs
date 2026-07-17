@@ -1,9 +1,8 @@
 using UnityEngine;
-using Magic.Store;
 
-namespace Magic.UI.CustomerService
+namespace Magic.Store
 {
-    public class CustomerServiceManager : MonoBehaviour
+    public class StoreUIController : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private RectTransform spawnArea;
@@ -49,7 +48,7 @@ namespace Magic.UI.CustomerService
             OrderUI orderUI = orderObj.GetComponent<OrderUI>();
             if (orderUI != null)
             {
-                orderUI.Initialize(newOrder, this, parentCanvas);
+                orderUI.Initialize(newOrder, OpenChatForOrder, parentCanvas);
             }
         }
 
@@ -78,6 +77,14 @@ namespace Magic.UI.CustomerService
                 // Bring ChatUI to front if it's on the same canvas level
                 chatUI.transform.SetAsLastSibling();
                 chatUI.OpenChat(orderUI);
+            }
+        }
+
+        public void SelectItem(Magic.Inventory.ItemInstance item)
+        {
+            if (chatUI != null)
+            {
+                chatUI.SelectItem(item);
             }
         }
     }

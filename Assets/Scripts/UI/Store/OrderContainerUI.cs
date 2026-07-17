@@ -1,7 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-namespace Magic.UI.CustomerService
+namespace Magic.Store
 {
     [RequireComponent(typeof(RectTransform))]
     public class OrderContainerUI : MonoBehaviour
@@ -19,6 +19,7 @@ namespace Magic.UI.CustomerService
         private Tween _currentTween;
 
         bool isOpen = false;
+        public bool IsOpened => isOpen;
 
         private void Awake()
         {

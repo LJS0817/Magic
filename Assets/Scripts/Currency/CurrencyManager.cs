@@ -292,11 +292,42 @@ namespace Magic.Inventory
 
             int newCopper = (int)(remaining / VALUE_COPPER);
 
-            // 프로퍼티를 통해 대입하여 변경 이벤트를 발생시킵니다.
             Platinum = newPlatinum;
             Gold = newGold;
             Silver = newSilver;
             Copper = newCopper;
+        }
+
+        /// <summary>
+        /// 동화 단위의 금액을 백금화, 금화, 은화, 동화 단위의 읽기 쉬운 문자열로 변환합니다.
+        /// </summary>
+        public static string FormatCurrency(long totalCopper)
+        {
+            if (totalCopper == 0) return "0 동화";
+
+            bool isNegative = totalCopper < 0;
+            long remaining = Math.Abs(totalCopper);
+
+            long pt = remaining / VALUE_PLATINUM;
+            remaining %= VALUE_PLATINUM;
+
+            long g = remaining / VALUE_GOLD;
+            remaining %= VALUE_GOLD;
+
+            long s = remaining / VALUE_SILVER;
+            remaining %= VALUE_SILVER;
+
+            long c = remaining / VALUE_COPPER;
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            if (isNegative) sb.Append("-");
+
+            if (pt > 0) sb.Append($"{pt} 백금화 ");
+            if (g > 0) sb.Append($"{g} 금화 ");
+            if (s > 0) sb.Append($"{s} 은화 ");
+            if (c > 0) sb.Append($"{c} 동화 ");
+
+            return sb.ToString().TrimEnd();
         }
     }
 }
