@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System;
 using Magic.Inventory;
+using Magic.Data;
 
 namespace Magic.Drawing
 {
@@ -10,11 +11,14 @@ namespace Magic.Drawing
     [RequireComponent(typeof(Image))]
     public class PenController : MonoBehaviour
     {
+        private PlayerDataManager playerDataManager;
         private RectTransform penVisual;
         private Image penImage;
 
         private bool isAtInkBottle = false;
         private RectTransform targetInkBottle;
+
+        public event Action<PlayerDataManager> OnResourceConsumed;
 
         public Item_Pen CurrentPen
         {
@@ -32,6 +36,7 @@ namespace Magic.Drawing
 
         private void Start()
         {
+            playerDataManager = PlayerDataManager.Instance;
             // 매터리얼 인스턴스를 생성하여 원본 에셋(Asset)이 변형되면서 발생하는 에디터 렉 방지
             if (penImage != null && penImage.material != null)
             {
@@ -57,22 +62,23 @@ namespace Magic.Drawing
         {
             Item_Pen pen = CurrentPen;
             if (pen == null) return;
-            if (pen.PenData != null && pen.PenData.consumesMana) return; 
+            // if (pen.PenData != null && pen.PenData.consumesMana) return; 
+            float rate = pen.PenData.inkConsumptionRate;
             
-            // --- Free Ink Chance 적용 ---
-            if (Magic.Upgrade.UpgradeManager.Instance != null)
+            if (pen.PenData.consumesMana)
             {
-                float freeChance = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.FreeInkChance);
-                // 1% chance per level -> e.g. 5 means 5% chance to skip consumption
-                if (UnityEngine.Random.value * 100f < freeChance)
+                if (playerDataManager != null)
                 {
-                    return; // 이번 프레임의 잉크 소모 무효화!
+                    playerDataManager.currentMana -= rate * Time.deltaTime;
+                    if (playerDataManager.currentMana < 0) 
+                        playerDataManager.currentMana = 0;
                 }
+            } else {
+                pen.currentInkCapacity -= rate * Time.deltaTime;
+                if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
             }
 
-            float rate = pen.PenData != null ? pen.PenData.inkConsumptionRate : 0f;
-            pen.currentInkCapacity -= rate * Time.deltaTime;
-            if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
+            OnResourceConsumed?.Invoke(playerDataManager);
         }
 
         private void Update()

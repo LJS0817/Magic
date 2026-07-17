@@ -92,6 +92,15 @@ namespace Magic.UI
                 if (_penEmptyGo != null) _penEmptyGo.SetActive(true);
             }
 
+            if (pen != null && pen.PenData != null && pen.PenData.consumesMana)
+            {
+                if (_inkContainer != null) _inkContainer.alpha = 0f;
+            }
+            else
+            {
+                if (_inkContainer != null && InventoryManager.Instance.EquippedInk != null) _inkContainer.alpha = 1f;
+            }
+
             UpdateInkFloatingState();
         }
 
@@ -99,7 +108,15 @@ namespace Magic.UI
         {
             if (ink != null)
             {
-                if (_inkContainer != null) _inkContainer.alpha = 1;
+                var currentPen = InventoryManager.Instance.EquippedPen;
+                if (currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana)
+                {
+                    if (_inkContainer != null) _inkContainer.alpha = 0f;
+                }
+                else
+                {
+                    if (_inkContainer != null) _inkContainer.alpha = 1f;
+                }
                 if (_inkEmptyGo != null) _inkEmptyGo.SetActive(false);
                 
                 var data = ink.InkData;

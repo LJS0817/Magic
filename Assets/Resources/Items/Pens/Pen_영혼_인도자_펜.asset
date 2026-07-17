@@ -16,7 +16,7 @@ MonoBehaviour:
   rarity: 3
   itemName: "\uC601\uD63C \uC778\uB3C4\uC790 \uD39C"
   itemDescription: "\uB9DD\uC790\uC758 \uD63C\uB839\uC744 \uC815\uD654\uD574 \uC789\uD06C\uC758 \uD750\uB984\uC73C\uB85C \uD658\uC0B0\uD558\uC5EC, \uC601\uD63C\uC758 \uAE30\uC6B4\uC744 \uB2F4\uC544 \uADF8\uB9BD\uB2C8\uB2E4."
-  itemIcon: {fileID: 0}
+  itemIcon: {fileID: 8787845490931733337, guid: fdc9ae1fb06ee6f4b841b5785620332e, type: 3}
   basePriceInCopper: 0
   maxInkCapacity: 160
   inkConsumptionRate: 1.2

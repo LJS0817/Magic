@@ -79,6 +79,13 @@ namespace Magic.Drawing
             {
                 manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
             }
+
+            penController.OnResourceConsumed += HandleResourceConsumed;
+        }
+
+        private void HandleResourceConsumed(PlayerDataManager pMan)
+        {
+            manaSlider.SetValue(pMan.currentMana, pMan.GetMaxMana());
         }
 
         private void HandleInkEquipped(Item_Ink ink)
@@ -131,6 +138,11 @@ namespace Magic.Drawing
                 InventoryManager.Instance.OnInkEquipped -= HandleInkEquipped;
                 InventoryManager.Instance.OnPenEquipped -= HandlePenEquipped;
                 InventoryManager.Instance.OnScrollEquipped -= HandleScrollEquipped;
+            }
+
+            if (penController != null)
+            {
+                penController.OnResourceConsumed -= HandleResourceConsumed;
             }
         }
 
@@ -305,7 +317,6 @@ namespace Magic.Drawing
                     Debug.LogWarning(warnMsg);
                     return;
                 }
-
                 penController.ConsumeResource();
             }
 
@@ -516,11 +527,7 @@ namespace Magic.Drawing
             isPenReady = false; 
             
             Item_Pen pen = penController != null ? penController.CurrentPen : null;
-            if (pen != null && pen.PenData != null && pen.PenData.consumesMana)
-            {
-                isPenReady = true;
-                return;
-            }
+
 
             isRefilling = true;
 
