@@ -16,6 +16,7 @@ namespace Magic.UI.Compendium
         [Header("Detail Panel")]
         public GameObject detailPanel;
         public Image detailIcon;
+        public Image detailSampleImage;
         public TMP_Text detailNameText;
         public TMP_Text detailTypeText;
         public TMP_Text detailManaText;
@@ -77,24 +78,14 @@ namespace Magic.UI.Compendium
             if (state == RecipeUnlockState.Unlocked)
             {
                 if (detailNameText != null) detailNameText.text = recipe.SpellName;
+                if (detailSampleImage != null) detailSampleImage.sprite = recipe.drawingSampleImage;
                 if (detailTypeText != null) detailTypeText.text = $"타입: {recipe.Type}";
                 if (detailManaText != null) detailManaText.text = $"마나 소모: {recipe.manaCost}";
                 if (detailDescText != null) detailDescText.text = recipe.Description;
                 if (detailConditionText != null) detailConditionText.text = $"조건: {recipe.ActivationCondition}";
                 if (detailHintText != null) detailHintText.text = $"힌트: {recipe.ActivationHint}";
                 
-                if (detailIcon != null)
-                {
-                    if (recipe.icon != null)
-                    {
-                        detailIcon.sprite = recipe.icon;
-                        detailIcon.color = Color.white;
-                    }
-                    else
-                    {
-                        detailIcon.color = Color.gray;
-                    }
-                }
+                if (detailIcon != null) detailIcon.sprite = recipe.icon;
 
                 if (detailShapesText != null)
                 {
@@ -118,10 +109,7 @@ namespace Magic.UI.Compendium
                 if (detailHintText != null) detailHintText.text = $"힌트: {recipe.ActivationHint}";
                 if (detailShapesText != null) detailShapesText.text = "필요 도형: ???";
                 
-                if (detailIcon != null)
-                {
-                    detailIcon.color = Color.black;
-                }
+                if (detailIcon != null) detailIcon.color = Color.black;
             }
         }
 

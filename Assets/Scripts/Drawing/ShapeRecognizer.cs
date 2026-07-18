@@ -58,12 +58,7 @@ namespace Magic.Drawing
             // Run $P Recognizer
             RecognizerResult result = PointCloudRecognizer.Classify(pointsList.ToArray(), templatesSnapshot);
 
-            // 별(Star) 모양은 특성상 인식률이 떨어지기 쉬우므로 점수 보정치(+0.5)를 부여합니다.
-            // 단, 원래 점수가 0.25 이하일 정도로 전혀 비슷하지 않다면 보정하지 않습니다.
-            if (result.Name == "Star" && result.Score > 0.25f)
-            {
-                result.Score = UnityEngine.Mathf.Clamp01(result.Score + 0.5f);
-            }
+
 
             if (result.Score < 0.5f)
             {
@@ -149,15 +144,14 @@ namespace Magic.Drawing
             trianglePts.Add(new Point(0, 1, 1)); // back to start
             templates.Add(new GestureTemplate("Triangle", trianglePts.ToArray()));
 
-            // Template 3: Star
-            List<Point> starPts = new List<Point>();
-            float a = Mathf.PI / 2; // start at top
-            for (int i = 0; i <= 5; i++) // 5 points to close the star
-            {
-                float angle = a + i * (4f * Mathf.PI / 5f);
-                starPts.Add(new Point(Mathf.Cos(angle), Mathf.Sin(angle), 1));
-            }
-            templates.Add(new GestureTemplate("Star", starPts.ToArray()));
+            // Template 3: Rhombus (마름모)
+            List<Point> rhombusPts = new List<Point>();
+            rhombusPts.Add(new Point(0, 1, 1));
+            rhombusPts.Add(new Point(1, 0, 1));
+            rhombusPts.Add(new Point(0, -1, 1));
+            rhombusPts.Add(new Point(-1, 0, 1));
+            rhombusPts.Add(new Point(0, 1, 1));
+            templates.Add(new GestureTemplate("Rhombus", rhombusPts.ToArray()));
             
             // Template 4: Square
             List<Point> squarePts = new List<Point>();

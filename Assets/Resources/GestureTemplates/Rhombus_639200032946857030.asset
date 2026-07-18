@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Rhombus_639200032946857030
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Rhombus
+  points:
+  - X: 0.036067605
+    Y: 0.4035265
+    StrokeID: 1
+  - X: -0.0007621646
+    Y: 0.38226864
+    StrokeID: 1
+  - X: -0.034893483
+    Y: 0.35465834
+    StrokeID: 1
+  - X: -0.07062918
+    Y: 0.32913288
+    StrokeID: 1
+  - X: -0.10737911
+    Y: 0.3051907
+    StrokeID: 1
+  - X: -0.14396527
+    Y: 0.28099295
+    StrokeID: 1
+  - X: -0.18092525
+    Y: 0.25729826
+    StrokeID: 1
+  - X: -0.21753398
+    Y: 0.23304442
+    StrokeID: 1
+  - X: -0.25467426
+    Y: 0.20961395
+    StrokeID: 1
+  - X: -0.2936768
+    Y: 0.18948051
+    StrokeID: 1
+  - X: -0.33126354
+    Y: 0.1668227
+    StrokeID: 1
+  - X: -0.37019145
+    Y: 0.14652619
+    StrokeID: 1
+  - X: -0.40832102
+    Y: 0.12473795
+    StrokeID: 1
+  - X: -0.4458915
+    Y: 0.10202125
+    StrokeID: 1
+  - X: -0.4829765
+    Y: 0.078522235
+    StrokeID: 1
+  - X: -0.5184119
+    Y: 0.052713484
+    StrokeID: 1
+  - X: -0.4914596
+    Y: 0.033892483
+    StrokeID: 1
+  - X: -0.4566816
+    Y: 0.0075585246
+    StrokeID: 1
+  - X: -0.4237019
+    Y: -0.021000266
+    StrokeID: 1
+  - X: -0.39201367
+    Y: -0.05104044
+    StrokeID: 1
+  - X: -0.36252946
+    Y: -0.08342633
+    StrokeID: 1
+  - X: -0.33095443
+    Y: -0.1137746
+    StrokeID: 1
+  - X: -0.30118623
+    Y: -0.14601758
+    StrokeID: 1
+  - X: -0.2708602
+    Y: -0.17775628
+    StrokeID: 1
+  - X: -0.24126387
+    Y: -0.210183
+    StrokeID: 1
+  - X: -0.21021074
+    Y: -0.2412361
+    StrokeID: 1
+  - X: -0.17915764
+    Y: -0.27228928
+    StrokeID: 1
+  - X: -0.14675155
+    Y: -0.30190748
+    StrokeID: 1
+  - X: -0.1149922
+    Y: -0.33221158
+    StrokeID: 1
+  - X: -0.083939075
+    Y: -0.3632647
+    StrokeID: 1
+  - X: -0.05288595
+    Y: -0.3943178
+    StrokeID: 1
+  - X: -0.020236075
+    Y: -0.42362243
+    StrokeID: 1
+  - X: 0.013270915
+    Y: -0.45198846
+    StrokeID: 1
+  - X: 0.04675597
+    Y: -0.48012945
+    StrokeID: 1
+  - X: 0.06961441
+    Y: -0.47173592
+    StrokeID: 1
+  - X: 0.09267962
+    Y: -0.4344195
+    StrokeID: 1
+  - X: 0.118454695
+    Y: -0.39888054
+    StrokeID: 1
+  - X: 0.1439358
+    Y: -0.36311865
+    StrokeID: 1
+  - X: 0.16948521
+    Y: -0.32740223
+    StrokeID: 1
+  - X: 0.19559985
+    Y: -0.29210013
+    StrokeID: 1
+  - X: 0.22217155
+    Y: -0.25715402
+    StrokeID: 1
+  - X: 0.24653167
+    Y: -0.22061396
+    StrokeID: 1
+  - X: 0.27101064
+    Y: -0.18415797
+    StrokeID: 1
+  - X: 0.29756868
+    Y: -0.14919272
+    StrokeID: 1
+  - X: 0.32477129
+    Y: -0.114878744
+    StrokeID: 1
+  - X: 0.3481437
+    Y: -0.077763885
+    StrokeID: 1
+  - X: 0.3736691
+    Y: -0.0420281
+    StrokeID: 1
+  - X: 0.40116125
+    Y: -0.0078106225
+    StrokeID: 1
+  - X: 0.4285953
+    Y: 0.026481718
+    StrokeID: 1
+  - X: 0.45881474
+    Y: 0.058281034
+    StrokeID: 1
+  - X: 0.48158813
+    Y: 0.08930448
+    StrokeID: 1
+  - X: 0.4515124
+    Y: 0.11730775
+    StrokeID: 1
+  - X: 0.42014402
+    Y: 0.14674172
+    StrokeID: 1
+  - X: 0.38585812
+    Y: 0.17406735
+    StrokeID: 1
+  - X: 0.3507256
+    Y: 0.2004169
+    StrokeID: 1
+  - X: 0.31590962
+    Y: 0.22717503
+    StrokeID: 1
+  - X: 0.28210306
+    Y: 0.25508144
+    StrokeID: 1
+  - X: 0.24736726
+    Y: 0.2810466
+    StrokeID: 1
+  - X: 0.2107839
+    Y: 0.3042716
+    StrokeID: 1
+  - X: 0.17346698
+    Y: 0.32634088
+    StrokeID: 1
+  - X: 0.1395545
+    Y: 0.35178307
+    StrokeID: 1
+  - X: 0.102115035
+    Y: 0.3714237
+    StrokeID: 1
+  - X: 0.07633448
+    Y: 0.39720425
+    StrokeID: 1
+  - X: 0.044553936
+    Y: 0.4204987
+    StrokeID: 1

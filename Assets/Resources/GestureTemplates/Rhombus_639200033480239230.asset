@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Rhombus_639200033480239230
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Rhombus
+  points:
+  - X: -0.031147003
+    Y: 0.51393706
+    StrokeID: 1
+  - X: -0.04446447
+    Y: 0.47999507
+    StrokeID: 1
+  - X: -0.060521543
+    Y: 0.44802767
+    StrokeID: 1
+  - X: -0.08290164
+    Y: 0.41712916
+    StrokeID: 1
+  - X: -0.09914181
+    Y: 0.38271725
+    StrokeID: 1
+  - X: -0.11729248
+    Y: 0.348953
+    StrokeID: 1
+  - X: -0.1397995
+    Y: 0.31791824
+    StrokeID: 1
+  - X: -0.15968548
+    Y: 0.28509253
+    StrokeID: 1
+  - X: -0.17943579
+    Y: 0.2521755
+    StrokeID: 1
+  - X: -0.19356254
+    Y: 0.216672
+    StrokeID: 1
+  - X: -0.20977351
+    Y: 0.18212718
+    StrokeID: 1
+  - X: -0.2284259
+    Y: 0.14860743
+    StrokeID: 1
+  - X: -0.24559328
+    Y: 0.114272594
+    StrokeID: 1
+  - X: -0.26276076
+    Y: 0.079937816
+    StrokeID: 1
+  - X: -0.2836253
+    Y: 0.0487808
+    StrokeID: 1
+  - X: -0.30212578
+    Y: 0.015821397
+    StrokeID: 1
+  - X: -0.3150508
+    Y: -0.01840341
+    StrokeID: 1
+  - X: -0.29823655
+    Y: -0.044660956
+    StrokeID: 1
+  - X: -0.2753387
+    Y: -0.07486561
+    StrokeID: 1
+  - X: -0.2481947
+    Y: -0.10200974
+    StrokeID: 1
+  - X: -0.2210623
+    Y: -0.12916398
+    StrokeID: 1
+  - X: -0.19802983
+    Y: -0.15987399
+    StrokeID: 1
+  - X: -0.17517011
+    Y: -0.19070625
+    StrokeID: 1
+  - X: -0.1494786
+    Y: -0.21824867
+    StrokeID: 1
+  - X: -0.12527601
+    Y: -0.24727999
+    StrokeID: 1
+  - X: -0.10398249
+    Y: -0.2792204
+    StrokeID: 1
+  - X: -0.07953906
+    Y: -0.30857846
+    StrokeID: 1
+  - X: -0.05824554
+    Y: -0.34051883
+    StrokeID: 1
+  - X: -0.03252399
+    Y: -0.3688291
+    StrokeID: 1
+  - X: -0.009626269
+    Y: -0.3990338
+    StrokeID: 1
+  - X: 0.01327157
+    Y: -0.42923844
+    StrokeID: 1
+  - X: 0.040415585
+    Y: -0.45638257
+    StrokeID: 1
+  - X: 0.06239286
+    Y: -0.48566678
+    StrokeID: 1
+  - X: 0.078457475
+    Y: -0.48606294
+    StrokeID: 1
+  - X: 0.078457475
+    Y: -0.4476754
+    StrokeID: 1
+  - X: 0.0910804
+    Y: -0.41171888
+    StrokeID: 1
+  - X: 0.10533705
+    Y: -0.37607694
+    StrokeID: 1
+  - X: 0.11782512
+    Y: -0.33978713
+    StrokeID: 1
+  - X: 0.13313928
+    Y: -0.30468458
+    StrokeID: 1
+  - X: 0.1503067
+    Y: -0.27034974
+    StrokeID: 1
+  - X: 0.16792953
+    Y: -0.23629636
+    StrokeID: 1
+  - X: 0.19074312
+    Y: -0.20543143
+    StrokeID: 1
+  - X: 0.20801255
+    Y: -0.17152292
+    StrokeID: 1
+  - X: 0.22870544
+    Y: -0.13958162
+    StrokeID: 1
+  - X: 0.25584957
+    Y: -0.112437576
+    StrokeID: 1
+  - X: 0.2789782
+    Y: -0.08200163
+    StrokeID: 1
+  - X: 0.30187604
+    Y: -0.05179718
+    StrokeID: 1
+  - X: 0.3268946
+    Y: -0.023772746
+    StrokeID: 1
+  - X: 0.3182923
+    Y: 0.011051565
+    StrokeID: 1
+  - X: 0.29114833
+    Y: 0.03819579
+    StrokeID: 1
+  - X: 0.2657825
+    Y: 0.06688213
+    StrokeID: 1
+  - X: 0.24077305
+    Y: 0.09587753
+    StrokeID: 1
+  - X: 0.21405569
+    Y: 0.12340361
+    StrokeID: 1
+  - X: 0.19007531
+    Y: 0.15337926
+    StrokeID: 1
+  - X: 0.1685561
+    Y: 0.18515462
+    StrokeID: 1
+  - X: 0.14408314
+    Y: 0.2144885
+    StrokeID: 1
+  - X: 0.117751
+    Y: 0.24233675
+    StrokeID: 1
+  - X: 0.094718486
+    Y: 0.27304673
+    StrokeID: 1
+  - X: 0.07047716
+    Y: 0.3027084
+    StrokeID: 1
+  - X: 0.045333087
+    Y: 0.33158702
+    StrokeID: 1
+  - X: 0.023230374
+    Y: 0.36295485
+    StrokeID: 1
+  - X: -0.003026545
+    Y: 0.39082628
+    StrokeID: 1
+  - X: -0.027843952
+    Y: 0.41964734
+    StrokeID: 1
+  - X: -0.053068012
+    Y: 0.44817448
+    StrokeID: 1

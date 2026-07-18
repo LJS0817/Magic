@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
+  m_Name: 12_MagicSpear
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
+  SpellName: Magic Spear
+  Type: 0
+  icon: {fileID: 0}
+  manaCost: 30
+  Description: "\uB300\uAE30 \uC911\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC \uB0A0\uCE74\uB85C\uC6B4 \uCC3D\uC744 \uC3D8\uC544\uB0C5\uB2C8\uB2E4."
+  ActivationCondition: "\uB9C8\uB984\uBAA8 3\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
+  ActivationHint: "\uB0A0\uCE74\uB85C\uC6B4 \uB9C8\uB825(\uB9C8\uB984\uBAA8) 3\uAC1C\uB97C \uB098\uB780\uD788 \uC5EE\uC5B4 \uCC3D\uC744 \uC644\uC131\uD558\uC138\uC694."
+  RequiredShapes:
+  - Rhombus
+  - Rhombus
+  - Rhombus
+  SpatialRules:
+  - RuleType: 2
+    TargetIndices: 000000000100000002000000i

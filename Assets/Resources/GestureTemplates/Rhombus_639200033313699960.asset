@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Rhombus_639200033313699960
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Rhombus
+  points:
+  - X: -0.02397132
+    Y: 0.25232938
+    StrokeID: 1
+  - X: -0.059525937
+    Y: 0.23976323
+    StrokeID: 1
+  - X: -0.09123647
+    Y: 0.21847501
+    StrokeID: 1
+  - X: -0.121100605
+    Y: 0.19541201
+    StrokeID: 1
+  - X: -0.15493205
+    Y: 0.17777482
+    StrokeID: 1
+  - X: -0.18549639
+    Y: 0.1548514
+    StrokeID: 1
+  - X: -0.21606097
+    Y: 0.13192827
+    StrokeID: 1
+  - X: -0.24443066
+    Y: 0.10647443
+    StrokeID: 1
+  - X: -0.27701914
+    Y: 0.086826146
+    StrokeID: 1
+  - X: -0.30791104
+    Y: 0.06443268
+    StrokeID: 1
+  - X: -0.33847553
+    Y: 0.04150945
+    StrokeID: 1
+  - X: -0.36968338
+    Y: 0.019495606
+    StrokeID: 1
+  - X: -0.4002478
+    Y: -0.003427714
+    StrokeID: 1
+  - X: -0.43348166
+    Y: -0.022031814
+    StrokeID: 1
+  - X: -0.46661398
+    Y: -0.04090956
+    StrokeID: 1
+  - X: -0.4963875
+    Y: -0.06416948
+    StrokeID: 1
+  - X: -0.47950566
+    Y: -0.076751515
+    StrokeID: 1
+  - X: -0.4432992
+    Y: -0.086784035
+    StrokeID: 1
+  - X: -0.40903038
+    Y: -0.1036364
+    StrokeID: 1
+  - X: -0.37203616
+    Y: -0.113093495
+    StrokeID: 1
+  - X: -0.33620298
+    Y: -0.12616855
+    StrokeID: 1
+  - X: -0.30104154
+    Y: -0.140587
+    StrokeID: 1
+  - X: -0.2651484
+    Y: -0.15347667
+    StrokeID: 1
+  - X: -0.22917446
+    Y: -0.16572204
+    StrokeID: 1
+  - X: -0.19326401
+    Y: -0.1781086
+    StrokeID: 1
+  - X: -0.15780288
+    Y: -0.19170998
+    StrokeID: 1
+  - X: -0.12264037
+    Y: -0.20584972
+    StrokeID: 1
+  - X: -0.09202129
+    Y: -0.22656006
+    StrokeID: 1
+  - X: -0.06301516
+    Y: -0.2487693
+    StrokeID: 1
+  - X: -0.033285648
+    Y: -0.27201903
+    StrokeID: 1
+  - X: -0.002688557
+    Y: -0.29239056
+    StrokeID: 1
+  - X: 0.025020212
+    Y: -0.27371404
+    StrokeID: 1
+  - X: 0.053876787
+    Y: -0.24894458
+    StrokeID: 1
+  - X: 0.08273628
+    Y: -0.22394854
+    StrokeID: 1
+  - X: 0.111863405
+    Y: -0.19922593
+    StrokeID: 1
+  - X: 0.14172688
+    Y: -0.17549162
+    StrokeID: 1
+  - X: 0.17351577
+    Y: -0.15429899
+    StrokeID: 1
+  - X: 0.20327136
+    Y: -0.13042223
+    StrokeID: 1
+  - X: 0.23308542
+    Y: -0.10658784
+    StrokeID: 1
+  - X: 0.2644528
+    Y: -0.084815696
+    StrokeID: 1
+  - X: 0.2976245
+    Y: -0.065860495
+    StrokeID: 1
+  - X: 0.33016387
+    Y: -0.045878112
+    StrokeID: 1
+  - X: 0.36319765
+    Y: -0.028142989
+    StrokeID: 1
+  - X: 0.3972821
+    Y: -0.011895806
+    StrokeID: 1
+  - X: 0.43245175
+    Y: 0.001747787
+    StrokeID: 1
+  - X: 0.4686025
+    Y: 0.011877775
+    StrokeID: 1
+  - X: 0.5036124
+    Y: 0.022599936
+    StrokeID: 1
+  - X: 0.48916617
+    Y: 0.04072705
+    StrokeID: 1
+  - X: 0.45468268
+    Y: 0.05470714
+    StrokeID: 1
+  - X: 0.42065588
+    Y: 0.07130766
+    StrokeID: 1
+  - X: 0.386687
+    Y: 0.08876377
+    StrokeID: 1
+  - X: 0.35168555
+    Y: 0.1040616
+    StrokeID: 1
+  - X: 0.31912562
+    Y: 0.123830885
+    StrokeID: 1
+  - X: 0.28562728
+    Y: 0.14207792
+    StrokeID: 1
+  - X: 0.24971679
+    Y: 0.15446445
+    StrokeID: 1
+  - X: 0.2145358
+    Y: 0.16911471
+    StrokeID: 1
+  - X: 0.17829087
+    Y: 0.18119633
+    StrokeID: 1
+  - X: 0.14155325
+    Y: 0.19158614
+    StrokeID: 1
+  - X: 0.10651323
+    Y: 0.2065767
+    StrokeID: 1
+  - X: 0.0712212
+    Y: 0.21891847
+    StrokeID: 1
+  - X: 0.035233885
+    Y: 0.23005542
+    StrokeID: 1
+  - X: 0.0006495714
+    Y: 0.24119237
+    StrokeID: 1
+  - X: -0.032583535
+    Y: 0.2538512
+    StrokeID: 1
+  - X: -0.068519086
+    Y: 0.26346633
+    StrokeID: 1

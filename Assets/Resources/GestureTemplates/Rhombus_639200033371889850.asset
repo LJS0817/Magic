@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Rhombus_639200033371889850
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Rhombus
+  points:
+  - X: -0.12835215
+    Y: 0.4907105
+    StrokeID: 1
+  - X: -0.12835215
+    Y: 0.45125264
+    StrokeID: 1
+  - X: -0.13626985
+    Y: 0.4133196
+    StrokeID: 1
+  - X: -0.15407339
+    Y: 0.378246
+    StrokeID: 1
+  - X: -0.17158602
+    Y: 0.34302813
+    StrokeID: 1
+  - X: -0.18912694
+    Y: 0.3078243
+    StrokeID: 1
+  - X: -0.20824035
+    Y: 0.2733376
+    StrokeID: 1
+  - X: -0.22588646
+    Y: 0.2380454
+    StrokeID: 1
+  - X: -0.24353248
+    Y: 0.20275325
+    StrokeID: 1
+  - X: -0.26541686
+    Y: 0.16992062
+    StrokeID: 1
+  - X: -0.27888468
+    Y: 0.1333651
+    StrokeID: 1
+  - X: -0.29912183
+    Y: 0.10079306
+    StrokeID: 1
+  - X: -0.31559572
+    Y: 0.065826416
+    StrokeID: 1
+  - X: -0.32993945
+    Y: 0.03103739
+    StrokeID: 1
+  - X: -0.30790544
+    Y: 0.00070631504
+    StrokeID: 1
+  - X: -0.28438208
+    Y: -0.030803323
+    StrokeID: 1
+  - X: -0.2613395
+    Y: -0.062794626
+    StrokeID: 1
+  - X: -0.2408427
+    Y: -0.09650549
+    StrokeID: 1
+  - X: -0.21895543
+    Y: -0.12933642
+    StrokeID: 1
+  - X: -0.19483739
+    Y: -0.16053617
+    StrokeID: 1
+  - X: -0.17296839
+    Y: -0.19328064
+    StrokeID: 1
+  - X: -0.15016529
+    Y: -0.22537565
+    StrokeID: 1
+  - X: -0.12728648
+    Y: -0.25741798
+    StrokeID: 1
+  - X: -0.10549325
+    Y: -0.2902152
+    StrokeID: 1
+  - X: -0.08084421
+    Y: -0.32102662
+    StrokeID: 1
+  - X: -0.05619502
+    Y: -0.351838
+    StrokeID: 1
+  - X: -0.031545877
+    Y: -0.3826494
+    StrokeID: 1
+  - X: -0.010541648
+    Y: -0.41599515
+    StrokeID: 1
+  - X: 0.012371749
+    Y: -0.44807333
+    StrokeID: 1
+  - X: 0.03878817
+    Y: -0.4771297
+    StrokeID: 1
+  - X: 0.05883625
+    Y: -0.5092895
+    StrokeID: 1
+  - X: 0.05883625
+    Y: -0.48148552
+    StrokeID: 1
+  - X: 0.060268372
+    Y: -0.4423657
+    StrokeID: 1
+  - X: 0.0807969
+    Y: -0.40874982
+    StrokeID: 1
+  - X: 0.104471266
+    Y: -0.3771833
+    StrokeID: 1
+  - X: 0.128146
+    Y: -0.345617
+    StrokeID: 1
+  - X: 0.15088156
+    Y: -0.31341928
+    StrokeID: 1
+  - X: 0.17061314
+    Y: -0.27927193
+    StrokeID: 1
+  - X: 0.19066128
+    Y: -0.24546432
+    StrokeID: 1
+  - X: 0.20889273
+    Y: -0.21104601
+    StrokeID: 1
+  - X: 0.22885945
+    Y: -0.17717853
+    StrokeID: 1
+  - X: 0.25179794
+    Y: -0.14570078
+    StrokeID: 1
+  - X: 0.2770814
+    Y: -0.117862254
+    StrokeID: 1
+  - X: 0.30164668
+    Y: -0.08722681
+    StrokeID: 1
+  - X: 0.32117978
+    Y: -0.05329463
+    StrokeID: 1
+  - X: 0.34489676
+    Y: -0.022378027
+    StrokeID: 1
+  - X: 0.36121663
+    Y: 0.010319889
+    StrokeID: 1
+  - X: 0.33399191
+    Y: 0.03556615
+    StrokeID: 1
+  - X: 0.30711028
+    Y: 0.06430262
+    StrokeID: 1
+  - X: 0.28214625
+    Y: 0.09461123
+    StrokeID: 1
+  - X: 0.25424537
+    Y: 0.1225121
+    StrokeID: 1
+  - X: 0.22823498
+    Y: 0.15205264
+    StrokeID: 1
+  - X: 0.2022992
+    Y: 0.18165791
+    StrokeID: 1
+  - X: 0.17439821
+    Y: 0.20955867
+    StrokeID: 1
+  - X: 0.1464974
+    Y: 0.23745966
+    StrokeID: 1
+  - X: 0.11859658
+    Y: 0.26536065
+    StrokeID: 1
+  - X: 0.09069562
+    Y: 0.2932616
+    StrokeID: 1
+  - X: 0.062794626
+    Y: 0.3211624
+    StrokeID: 1
+  - X: 0.031878173
+    Y: 0.34487945
+    StrokeID: 1
+  - X: 0.003977269
+    Y: 0.37278032
+    StrokeID: 1
+  - X: -0.023923755
+    Y: 0.4006812
+    StrokeID: 1
+  - X: -0.05182469
+    Y: 0.42858207
+    StrokeID: 1
+  - X: -0.07972556
+    Y: 0.45648307
+    StrokeID: 1
+  - X: -0.11395234
+    Y: 0.46911192
+    StrokeID: 1

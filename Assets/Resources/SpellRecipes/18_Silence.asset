@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
+  m_Name: 18_Silence
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
+  SpellName: Silence
+  Type: 2
+  icon: {fileID: 0}
+  manaCost: 45
+  Description: "\uC9C0\uC815\uB41C \uC601\uC5ED\uC758 \uB9C8\uB098 \uD750\uB984\uC744 \uCC28\uB2E8\uD558\uC5EC \uB9C8\uBC95\uC744 \uBD09\uC778\uD569\uB2C8\uB2E4."
+  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC138\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00 \uC138\uBAA8\uB97C \uB458\uB7EC\uC308)"
+  ActivationHint: "\uBD09\uC778\uC758 \uAD6C\uC5ED(\uB124\uBAA8)\uC73C\uB85C \uC2DC\uC804\uC790\uC758 \uD798(\uC138\uBAA8)\uC744 \uAC10\uC2F8\uC138\uC694."
+  RequiredShapes:
+  - Square
+  - Triangle
+  SpatialRules:
+  - RuleType: 1
+    TargetIndices: 0000000001000000i

@@ -1,0 +1,208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e3840a5c26ca464bbcc50ecab37948a, type: 3}
+  m_Name: Rhombus_639200033572617690
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.GestureTemplateAsset
+  shapeName: Rhombus
+  points:
+  - X: -0.05779767
+    Y: 0.49542624
+    StrokeID: 1
+  - X: -0.081798434
+    Y: 0.46341443
+    StrokeID: 1
+  - X: -0.104878515
+    Y: 0.4288112
+    StrokeID: 1
+  - X: -0.13528597
+    Y: 0.40103972
+    StrokeID: 1
+  - X: -0.16094361
+    Y: 0.36824626
+    StrokeID: 1
+  - X: -0.18596387
+    Y: 0.33523256
+    StrokeID: 1
+  - X: -0.20634066
+    Y: 0.29859465
+    StrokeID: 1
+  - X: -0.22957045
+    Y: 0.26372588
+    StrokeID: 1
+  - X: -0.25151354
+    Y: 0.22816747
+    StrokeID: 1
+  - X: -0.2744404
+    Y: 0.1932171
+    StrokeID: 1
+  - X: -0.2951581
+    Y: 0.15690136
+    StrokeID: 1
+  - X: -0.3177123
+    Y: 0.12157768
+    StrokeID: 1
+  - X: -0.34394985
+    Y: 0.08910185
+    StrokeID: 1
+  - X: -0.36921313
+    Y: 0.05582726
+    StrokeID: 1
+  - X: -0.39440447
+    Y: 0.022500753
+    StrokeID: 1
+  - X: -0.4103037
+    Y: -0.014272183
+    StrokeID: 1
+  - X: -0.38375762
+    Y: -0.03584379
+    StrokeID: 1
+  - X: -0.354092
+    Y: -0.06550932
+    StrokeID: 1
+  - X: -0.32772636
+    Y: -0.098036885
+    StrokeID: 1
+  - X: -0.29905128
+    Y: -0.1285615
+    StrokeID: 1
+  - X: -0.2693858
+    Y: -0.15822712
+    StrokeID: 1
+  - X: -0.23972024
+    Y: -0.1878927
+    StrokeID: 1
+  - X: -0.21005462
+    Y: -0.21755823
+    StrokeID: 1
+  - X: -0.17754932
+    Y: -0.24394953
+    StrokeID: 1
+  - X: -0.14700237
+    Y: -0.27259886
+    StrokeID: 1
+  - X: -0.11733687
+    Y: -0.30226445
+    StrokeID: 1
+  - X: -0.084228456
+    Y: -0.32796034
+    StrokeID: 1
+  - X: -0.05067551
+    Y: -0.35290265
+    StrokeID: 1
+  - X: -0.021009952
+    Y: -0.38256824
+    StrokeID: 1
+  - X: 0.014775783
+    Y: -0.4023312
+    StrokeID: 1
+  - X: 0.044441342
+    Y: -0.4319968
+    StrokeID: 1
+  - X: 0.07746264
+    Y: -0.4570064
+    StrokeID: 1
+  - X: 0.1126169
+    Y: -0.47905684
+    StrokeID: 1
+  - X: 0.14248937
+    Y: -0.5045737
+    StrokeID: 1
+  - X: 0.14248937
+    Y: -0.46262026
+    StrokeID: 1
+  - X: 0.14248937
+    Y: -0.4206668
+    StrokeID: 1
+  - X: 0.1481036
+    Y: -0.37940454
+    StrokeID: 1
+  - X: 0.1648426
+    Y: -0.3411318
+    StrokeID: 1
+  - X: 0.18115151
+    Y: -0.3027079
+    StrokeID: 1
+  - X: 0.20219141
+    Y: -0.26643395
+    StrokeID: 1
+  - X: 0.22191042
+    Y: -0.22943494
+    StrokeID: 1
+  - X: 0.24285883
+    Y: -0.19311073
+    StrokeID: 1
+  - X: 0.26266992
+    Y: -0.15616223
+    StrokeID: 1
+  - X: 0.28468996
+    Y: -0.120462835
+    StrokeID: 1
+  - X: 0.30539322
+    Y: -0.08406505
+    StrokeID: 1
+  - X: 0.3300444
+    Y: -0.050785273
+    StrokeID: 1
+  - X: 0.34798318
+    Y: -0.020114422
+    StrokeID: 1
+  - X: 0.3741262
+    Y: 0.006725371
+    StrokeID: 1
+  - X: 0.39084554
+    Y: 0.041345417
+    StrokeID: 1
+  - X: 0.367334
+    Y: 0.0702945
+    StrokeID: 1
+  - X: 0.33405942
+    Y: 0.09555775
+    StrokeID: 1
+  - X: 0.3043937
+    Y: 0.12522322
+    StrokeID: 1
+  - X: 0.2747283
+    Y: 0.15488893
+    StrokeID: 1
+  - X: 0.24804747
+    Y: 0.187226
+    StrokeID: 1
+  - X: 0.21962464
+    Y: 0.21800393
+    StrokeID: 1
+  - X: 0.18995917
+    Y: 0.24766958
+    StrokeID: 1
+  - X: 0.16029352
+    Y: 0.2773351
+    StrokeID: 1
+  - X: 0.13062793
+    Y: 0.30700064
+    StrokeID: 1
+  - X: 0.10096234
+    Y: 0.3366661
+    StrokeID: 1
+  - X: 0.07129687
+    Y: 0.36633176
+    StrokeID: 1
+  - X: 0.037910223
+    Y: 0.39170688
+    StrokeID: 1
+  - X: 0.008244634
+    Y: 0.42137247
+    StrokeID: 1
+  - X: -0.022396058
+    Y: 0.44968516
+    StrokeID: 1
+  - X: -0.05779767
+    Y: 0.47139192
+    StrokeID: 1
