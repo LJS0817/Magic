@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using Magic.UI;
 
 namespace Magic.Store
 {
@@ -9,10 +10,16 @@ namespace Magic.Store
         [Header("Animation Settings")]
         [SerializeField] private Vector2 openPosition = Vector2.zero;
         [SerializeField] private float animationDuration = 0.4f;
+        [SerializeField] GameObject clickBlock;
+        [SerializeField] RectTransform arrowImage;
         [Tooltip("Ease.OutBack provides a single bounce (overshoot) effect.")]
         [SerializeField] private Ease openEase = Ease.OutBack;
         [SerializeField] private float bounceOvershoot = 1.5f; // Control the strength of the 1-time bounce
         [SerializeField] private Ease closeEase = Ease.InBack;
+
+        [SerializeField]
+        ChatUI chatUI;
+        [SerializeField] WindowController _wController;
 
         private RectTransform _rectTransform;
         private Vector2 _closedPosition;
@@ -28,8 +35,15 @@ namespace Magic.Store
             openPosition = _closedPosition + openPosition; // Adjust open position relative to closed position
         }
 
+        void Update() {
+            if(Input.GetKeyDown(KeyCode.A)) {
+                ToggleUI();
+            }
+        }
+
         public void ToggleUI()
         {
+            chatUI.CloseChat();
             if (isOpen) Close();
             else Open();
             isOpen = !isOpen;
@@ -38,15 +52,39 @@ namespace Magic.Store
         public void Open()
         {
             _currentTween?.Kill();
-            _currentTween = _rectTransform.DOAnchorPos(openPosition, animationDuration).SetEase(openEase, bounceOvershoot);
+            _currentTween = _rectTransform.DOAnchorPos(openPosition, animationDuration)
+                .SetEase(openEase, bounceOvershoot)
+                .OnComplete(() => 
+                {
+                    clickBlock.SetActive(false);
+                });
+
+            arrowImage.DOKill();
+            arrowImage.DOScaleX(1f, animationDuration).SetEase(openEase, bounceOvershoot);
+
+            if (StoreManager.Instance != null) StoreManager.Instance.IsOrderContainerOpen = true;
+            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
+            _wController.HideDrawingArea();
         }
 
         public void Close()
         {
+            clickBlock.SetActive(true);
             _currentTween?.Kill();
 
             // Animate to closed position
             _currentTween = _rectTransform.DOAnchorPos(_closedPosition, animationDuration).SetEase(closeEase);
+
+            arrowImage.DOKill();
+            arrowImage.DOScaleX(-1f, animationDuration).SetEase(closeEase);
+
+            if (StoreManager.Instance != null) 
+            {
+                StoreManager.Instance.IsOrderContainerOpen = false;
+                StoreManager.Instance.SelectedOrderItem = null;
+            }
+            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
+            _wController.ShowDrawingArea();
         }
     }
 }

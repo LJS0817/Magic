@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Magic.Combat;
 using Magic.Upgrade;
 using Magic.Inventory;
+using System;
 
 namespace Magic.Store
 {
@@ -22,6 +23,12 @@ namespace Magic.Store
                 Destroy(gameObject);
             }
         }
+
+        public Action<string> OnOrderCompleted;
+        public Action<string> OnOrderFailed;
+
+        public bool IsOrderContainerOpen { get; set; }
+        public Magic.Inventory.ItemInstance SelectedOrderItem { get; set; }
 
         [Header("Customer Orders")]
         public Dictionary<string, CustomerOrder> activeOrders = new Dictionary<string, CustomerOrder>();
@@ -61,7 +68,7 @@ namespace Magic.Store
                         case SpellElement.Earth: elementText = "대지 속성"; break;
                     }
                 }
-                string desc = $"최근 몬스터가 너무 많아서... 혹시 <color=#00FFFF>[{elementText}] {randomRecipe.SpellName}</color> 마법이 담긴 스크롤이 있습니까?";
+                string desc = $"최근 몬스터가 너무 많아서... 혹시 <color=#37a689>[{elementText}] {randomRecipe.SpellName}</color> 마법이 담긴 스크롤이 있습니까?";
                 
                 // Base reward calculation based on recipe mana cost and element
                 int baseVal = Mathf.RoundToInt(randomRecipe.manaCost * 5f);
@@ -139,8 +146,7 @@ namespace Magic.Store
             {
                 order.agreedPrice = askingPrice;
                 order.state = OrderState.Pending;
-                order.chatHistory.Add($"손님: 좋습니다. 스크롤을 전송해 주십시오.");
-                order.chatHistory.Add($"손님: 좋습니다. 스크롤을 전송해 주십시오.\n<color=orange>*주의* 다른 속성이나 마법을 배송하면 사기로 간주되어 거래액의 두 배인 {CurrencyManager.FormatCurrency(askingPrice * 2)}의 위약금을 뭅니다.\n우측 인벤토리에서 스크롤을 더블 클릭하여 배송해주세요.</color>");
+                order.chatHistory.Add($"손님: 좋습니다. 스크롤을 전송해 주십시오.\n<color=#fd7225>*주의* 다른 속성이나 마법을 배송하면 사기로 간주되어 거래액의 두 배인 {CurrencyManager.FormatCurrency(askingPrice * 2)}의 위약금을 뭅니다.\n우측 인벤토리에서 스크롤을 더블 클릭하여 배송해주세요.</color>");
                 Debug.Log($"[Store] 주문 {orderId} 흥정 성공! 타결 가격: {askingPrice}");
                 return true;
             }
@@ -310,12 +316,13 @@ namespace Magic.Store
             }
         }
 
-        public void SelectItemForOrder(Magic.Inventory.ItemInstance item)
+        public bool SelectItemForOrder(Magic.Inventory.ItemInstance item)
         {
             if (_controller != null)
             {
-                _controller.SelectItem(item);
+                return _controller.SelectItem(item);
             }
+            return false;
         }
     }
 }

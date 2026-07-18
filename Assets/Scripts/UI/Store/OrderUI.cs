@@ -23,6 +23,14 @@ namespace Magic.Store
             _parentRectTransform = _rectTransform.parent as RectTransform;
         }
 
+        private void Update()
+        {
+            if (OrderData != null && (OrderData.state == OrderState.Completed || OrderData.state == OrderState.Failed))
+            {
+                Destroy(gameObject);
+            }
+        }
+
         public void OnBeginDrag(PointerEventData eventData)
         {
             // Bring to front while dragging

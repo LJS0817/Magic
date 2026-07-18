@@ -178,9 +178,14 @@ namespace Magic.Inventory
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
             
             // 1. 주문 흥정이 타결되어 스크롤 선택 대기 중인 상태인지 확인
-            if (slot.Item is Item_Scroll selectedScroll)
+            if (Magic.Store.StoreManager.Instance != null && Magic.Store.StoreManager.Instance.IsOrderContainerOpen)
             {
-                Magic.Store.StoreManager.Instance.SelectItemForOrder(selectedScroll);
+                if (slot.Item is Item_Scroll selectedScroll)
+                {
+                    Magic.Store.StoreManager.Instance.SelectItemForOrder(selectedScroll);
+                }
+                
+                // 상점 창이 열려있는 동안에는 일반 장착/장착 해제 로직을 원천 차단합니다.
                 return;
             }
 
@@ -320,12 +325,15 @@ namespace Magic.Inventory
         private bool IsItemEquipped(ItemInstance item)
         {
             if (item == null) return false;
-            var inv = InventoryManager.Instance;
-            if (inv == null) return false;
-            
-            if (item is Item_Scroll scroll) return inv.EquippedScroll == scroll;
-            if (item is Item_Ink ink) return inv.EquippedInk == ink;
-            if (item is Item_Pen pen) return inv.EquippedPen == pen;
+
+            if (Magic.Store.StoreManager.Instance != null && Magic.Store.StoreManager.Instance.IsOrderContainerOpen)
+            {
+                return Magic.Store.StoreManager.Instance.SelectedOrderItem == item;
+            }
+
+            if (item is Item_Scroll scroll) return InventoryManager.Instance.EquippedScroll == scroll;
+            if (item is Item_Ink ink) return InventoryManager.Instance.EquippedInk == ink;
+            if (item is Item_Pen pen) return InventoryManager.Instance.EquippedPen == pen;
             
             return false;
         }

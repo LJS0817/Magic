@@ -80,12 +80,13 @@ namespace Magic.Store
             }
         }
 
-        public void SelectItem(Magic.Inventory.ItemInstance item)
+        public bool SelectItem(Magic.Inventory.ItemInstance item)
         {
             if (chatUI != null)
             {
-                chatUI.SelectItem(item);
+                return chatUI.SelectItem(item);
             }
+            return false;
         }
     }
 }

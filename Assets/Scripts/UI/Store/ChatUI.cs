@@ -79,9 +79,10 @@ namespace Magic.Store
                     string deal = data.chatHistory[historyIndex];
                     historyIndex++;
                     
+                    string guestResponse = "";
                     if (historyIndex < data.chatHistory.Count)
                     {
-                        // 손님의 응답 텍스트는 UI에 표시하지 않지만, chatHistory 인덱스는 건너뜁니다.
+                        guestResponse = data.chatHistory[historyIndex];
                         historyIndex++;
                     }
                     
@@ -94,10 +95,25 @@ namespace Magic.Store
 
                     haggleTexts[haggleIndex].Show(deal, isRejected);
                     haggleIndex++;
+
+                    // 마지막 응답이고, 거래가 어떤 식으로든 종료(혹은 대기) 상태라면 resultText에 손님의 마지막 대사를 표시
+                    if (historyIndex >= data.chatHistory.Count && 
+                       (data.state == OrderState.Pending || data.state == OrderState.Completed || data.state == OrderState.Failed))
+                    {
+                        if (resultText != null)
+                        {
+                            resultText.text = guestResponse;
+                            resultText.gameObject.SetActive(true);
+                        }
+                    }
                 }
                 else
                 {
-                    resultText.text = data.chatHistory[historyIndex];
+                    if (resultText != null)
+                    {
+                        resultText.text = data.chatHistory[historyIndex];
+                        resultText.gameObject.SetActive(true);
+                    }
                     historyIndex++;
                 }
             }
@@ -118,30 +134,53 @@ namespace Magic.Store
 
             _currentOrderUI = null;
             _selectedItem = null;
+            if (StoreManager.Instance != null) StoreManager.Instance.SelectedOrderItem = null;
             if (itemText != null) itemText.gameObject.SetActive(false);
+            
+            if (Magic.Inventory.InventoryManager.Instance != null)
+                Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
         }
 
-        public void SelectItem(Magic.Inventory.ItemInstance item)
+        public bool SelectItem(Magic.Inventory.ItemInstance item)
         {
-            if (_currentOrderUI.OrderData == null || item == null) return;
+            if (_currentOrderUI == null || _currentOrderUI.OrderData == null || item == null) return false;
             if(_currentOrderUI.OrderData.state != OrderState.Pending && _currentOrderUI.OrderData.state != OrderState.Haggling)
             {
                 itemText.gameObject.SetActive(false);
-                return;
+                return false;
             }
 
             if (item is Magic.Inventory.Item_Scroll scroll)
             {
-                _selectedItem = scroll;
-                string grade = scroll.Rarity.ToString();
-                string spell = (scroll.ScrollData != null && scroll.ScrollData.spellName != "") ? scroll.ScrollData.spellName : "알 수 없는 마법";
-                if (itemText != null)
+                if (_selectedItem == scroll)
                 {
-                    itemText.text = $"[선택됨] {item.ItemName}\n마법: {spell}\n등급: {grade}";
-                    itemText.gameObject.SetActive(true);
+                    // 이미 선택된 아이템을 더블클릭하면 선택 해제
+                    _selectedItem = null;
+                    if (StoreManager.Instance != null) StoreManager.Instance.SelectedOrderItem = null;
+                    if (itemText != null) itemText.gameObject.SetActive(false);
                 }
+                else
+                {
+                    // 새로운 아이템 선택
+                    _selectedItem = scroll;
+                    if (StoreManager.Instance != null) StoreManager.Instance.SelectedOrderItem = scroll;
+                    
+                    string grade = scroll.Rarity.ToString();
+                    string spell = (scroll.ScrollData != null && scroll.ScrollData.spellName != "") ? scroll.ScrollData.spellName : "알 수 없는 마법";
+                    if (itemText != null)
+                    {
+                        itemText.text = $"[선택됨] {item.ItemName}\n마법: {spell}\n등급: {grade}";
+                        itemText.gameObject.SetActive(true);
+                    }
+                }
+                LayoutRebuilder.ForceRebuildLayoutImmediate(contentLayoutRect);
+                
+                if (Magic.Inventory.InventoryManager.Instance != null) 
+                    Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
+                    
+                return true;
             }
-            LayoutRebuilder.ForceRebuildLayoutImmediate(contentLayoutRect);
+            return false;
         }
 
         public void OnDeliverButtonClicked()
@@ -230,17 +269,20 @@ namespace Magic.Store
                 {
                     bool isRejected = (data.state != OrderState.Pending && data.state != OrderState.Completed);
                     haggleTexts[haggleIndex].Show(data.chatHistory[beforeCount], isRejected);
+
+                    // 성공했다면(Pending 또는 Completed), 손님의 응답이 최종 응답이므로 resultText에 띄움
+                    if (!isRejected)
+                    {
+                        resultText.text = data.chatHistory[beforeCount + 1];
+                        resultText.gameObject.SetActive(true);
+                    }
                 }
-                // 흥정이 3번 연속 실패해 3번째 문장(인내심 한계)이 추가된 경우 처리
+                // 흥정이 3번 연속 실패해 3번째 문장(인내심 한계)이 추가된 경우 처리 (완전 실패)
                 if (data.chatHistory.Count >= beforeCount + 3)
                 {
                     resultText.text = data.chatHistory[beforeCount + 2];
                     resultText.gameObject.SetActive(true);
                 }
-            }
-            else
-            {
-                haggleTexts[haggleIndex].Show("<color=red>잘못된 금액입니다.</color>", true);
             }
             LayoutRebuilder.ForceRebuildLayoutImmediate(contentLayoutRect);
         }
