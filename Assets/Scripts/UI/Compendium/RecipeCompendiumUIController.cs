@@ -7,11 +7,9 @@ using System.Collections.Generic;
 
 namespace Magic.UI.Compendium
 {
-    public class RecipeCompendiumUIController : MonoBehaviour
+    public class RecipeCompendiumUIController : Magic.UI.PagedUIController<RecipeEntryUI>
     {
-        [Header("Containers")]
-        public RectTransform listContainer;
-        public GameObject entryPrefab;
+        
 
         [Header("Detail Panel")]
         public GameObject detailPanel;
@@ -25,48 +23,49 @@ namespace Magic.UI.Compendium
         public TMP_Text detailHintText;
         public TMP_Text detailShapesText;
 
-        private List<RecipeEntryUI> spawnedEntries = new List<RecipeEntryUI>();
-
         private void Start()
         {
             if (detailPanel != null)
                 detailPanel.SetActive(false);
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
-            RefreshList();
+            base.OnEnable();
         }
 
-        public void RefreshList()
-        {
-            // Clear existing
-            foreach (var entry in spawnedEntries)
-            {
-                if (entry != null) Destroy(entry.gameObject);
-            }
-            spawnedEntries.Clear();
+        private List<SpellRecipeAsset> _visibleRecipes = new List<SpellRecipeAsset>();
 
+        public override void RefreshList()
+        {
             var database = DrawingDatabase.Instance;
             if (database == null || database.recipes == null) return;
 
+            _visibleRecipes.Clear();
             foreach (var recipe in database.recipes)
             {
                 RecipeUnlockState state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
-                
-                // 완전히 숨김 조건 (A안 반영)
-                if (state == RecipeUnlockState.Locked) continue;
-
-                if (entryPrefab != null && listContainer != null)
+                if (state != RecipeUnlockState.Locked)
                 {
-                    GameObject go = Instantiate(entryPrefab, listContainer);
-                    RecipeEntryUI entryUI = go.GetComponent<RecipeEntryUI>();
-                    if (entryUI != null)
-                    {
-                        entryUI.Setup(recipe, state, this);
-                        spawnedEntries.Add(entryUI);
-                    }
+                    _visibleRecipes.Add(recipe);
                 }
+            }
+
+            base.RefreshList();
+        }
+
+        protected override int GetTotalCapacity()
+        {
+            return _visibleRecipes.Count;
+        }
+
+        protected override void UpdateSlot(RecipeEntryUI slot, int dataIndex)
+        {
+            if (dataIndex < _visibleRecipes.Count)
+            {
+                var recipe = _visibleRecipes[dataIndex];
+                RecipeUnlockState state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
+                slot.Setup(recipe, state, this);
             }
         }
 

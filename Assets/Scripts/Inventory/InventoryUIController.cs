@@ -5,11 +5,9 @@ using TMPro;
 
 namespace Magic.Inventory
 {
-    public class InventoryUIController : MonoBehaviour
+    public class InventoryUIController : Magic.UI.PagedUIController<InventorySlot>
     {
-        [Header("Slot Settings")]
-        [SerializeField] private Transform _slotContainer;
-        [SerializeField] private GameObject _slotPrefab;
+        
         [SerializeField] private List<Sprite> _slotBackgrounds;
         [SerializeField] private Sprite _emptySlotIcon;
 
@@ -17,22 +15,15 @@ namespace Magic.Inventory
         [SerializeField] private ItemInfoPanel _infoPanel;
         [SerializeField] private RectTransform _inventoryPanel;
 
-        [Header("Pagination")]
-        [SerializeField] private int _slotsPerPage = 20;
-        [SerializeField] private Button _prevPageButton;
-        [SerializeField] private Button _nextPageButton;
-        [SerializeField] private TMP_Text _pageText;
+        
 
-        private List<InventorySlot> _slotPool = new List<InventorySlot>();
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
-        private int _currentPage = 0;
         private ItemInstance _selectedItem;
         private InventorySlot _hoveredSlot;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (_prevPageButton != null) _prevPageButton.onClick.AddListener(OnPrevPage);
-            if (_nextPageButton != null) _nextPageButton.onClick.AddListener(OnNextPage);
+            base.Awake();
         }
 
         private void Start()
@@ -40,37 +31,37 @@ namespace Magic.Inventory
             if (_infoPanel != null)
                 _infoPanel.Close();
             
-            InventoryManager.Instance.OnInventoryChanged += RefreshInventory;
+            InventoryManager.Instance.OnInventoryChanged += RefreshList;
             InventoryManager.Instance.OnScrollEquipped += OnScrollEquipped;
             InventoryManager.Instance.OnInkEquipped += OnInkEquipped;
             InventoryManager.Instance.OnPenEquipped += OnPenEquipped;
             
             // 처음에 인벤토리에 있는 아이템들을 UI에 반영
-            RefreshInventory();
+            RefreshList();
         }
 
-        private void OnScrollEquipped(Item_Scroll item) => RefreshInventory();
-        private void OnInkEquipped(Item_Ink item) => RefreshInventory();
-        private void OnPenEquipped(Item_Pen item) => RefreshInventory();
+        private void OnScrollEquipped(Item_Scroll item) => RefreshList();
+        private void OnInkEquipped(Item_Ink item) => RefreshList();
+        private void OnPenEquipped(Item_Pen item) => RefreshList();
 
         private void OnDestroy()
         {
             if (InventoryManager.Instance != null)
             {
-                InventoryManager.Instance.OnInventoryChanged -= RefreshInventory;
+                InventoryManager.Instance.OnInventoryChanged -= RefreshList;
                 InventoryManager.Instance.OnScrollEquipped -= OnScrollEquipped;
                 InventoryManager.Instance.OnInkEquipped -= OnInkEquipped;
                 InventoryManager.Instance.OnPenEquipped -= OnPenEquipped;
             }
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             // UI 창이 켜질 때마다 제일 첫 페이지로 가고 싶다면 _currentPage = 0; 추가 가능
-            RefreshInventory();
+            RefreshList();
         }
 
-        public void RefreshInventory()
+        public override void RefreshList()
         {
             if (InventoryManager.Instance == null) return;
 
@@ -84,88 +75,33 @@ namespace Magic.Inventory
             }
             foreach (var key in keysToRemove) _itemBackgroundMap.Remove(key);
 
-            int maxCapacity = InventoryManager.Instance.GetMaxCapacity();
-
-            // 전체 페이지 계산 및 현재 페이지 유효성 검사 (아이템 수가 아니라 '최대 슬롯 개수' 기준)
-            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)maxCapacity / _slotsPerPage));
-            if (_currentPage >= totalPages) _currentPage = totalPages - 1;
-            if (_currentPage < 0) _currentPage = 0;
-
-            int startIndex = _currentPage * _slotsPerPage;
-            int endIndex = Mathf.Min(startIndex + _slotsPerPage, maxCapacity); // 한 페이지에 그릴 최대 인덱스는 maxCapacity를 넘지 않음
-            int displayCount = endIndex - startIndex; // 이번 페이지에 실제로 Instantiate해서 띄워야 할 슬롯의 개수
-
-            // 현재 페이지의 슬롯들을 활성화하고, 아이템이 있으면 데이터를, 없으면 빈 칸을 전달
-            for (int i = 0; i < displayCount; i++)
-            {
-                InventorySlot slot = GetOrCreateSlot(i);
-                slot.gameObject.SetActive(true);
-                slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked, OnSlotRightClicked);
-
-                int itemIndex = startIndex + i;
-                if (itemIndex < items.Count)
-                {
-                    ItemInstance currentItem = items[itemIndex];
-                    bool isEquipped = IsItemEquipped(currentItem);
-                    slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, isEquipped);
-                }
-                else
-                {
-                    // 언락된 빈 슬롯
-                    slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
-                }
-            }
-
-            // 남는 슬롯들은 비활성화
-            for (int i = displayCount; i < _slotPool.Count; i++)
-            {
-                _slotPool[i].gameObject.SetActive(false);
-            }
-
-            // 페이지 UI 업데이트
-            if (_pageText != null) _pageText.text = $"{_currentPage + 1} / {totalPages}";
-            if (_prevPageButton != null) _prevPageButton.interactable = _currentPage > 0;
-            if (_nextPageButton != null) _nextPageButton.interactable = _currentPage < totalPages - 1;
+            base.RefreshList();
         }
 
-        private void OnPrevPage()
+        protected override int GetTotalCapacity()
         {
-            if (_currentPage > 0)
-            {
-                _currentPage--;
-                RefreshInventory();
-            }
+            if (InventoryManager.Instance == null) return 0;
+            return InventoryManager.Instance.GetMaxCapacity();
         }
 
-        private void OnNextPage()
+        protected override void UpdateSlot(InventorySlot slot, int dataIndex)
         {
             if (InventoryManager.Instance == null) return;
-            int maxCapacity = InventoryManager.Instance.GetMaxCapacity();
-            int totalPages = Mathf.Max(1, Mathf.CeilToInt((float)maxCapacity / _slotsPerPage));
-            
-            if (_currentPage < totalPages - 1)
+            var items = InventoryManager.Instance.items;
+
+            slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked, OnSlotRightClicked);
+
+            if (dataIndex < items.Count)
             {
-                _currentPage++;
-                RefreshInventory();
+                ItemInstance currentItem = items[dataIndex];
+                bool isEquipped = IsItemEquipped(currentItem);
+                slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, isEquipped);
+            }
+            else
+            {
+                slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
             }
         }
-
-        private InventorySlot GetOrCreateSlot(int index)
-        {
-            // 인덱스에 해당하는 슬롯이 이미 풀에 있으면 반환
-            if (index < _slotPool.Count)
-            {
-                return _slotPool[index];
-            }
-
-            // 부족하면 새로 생성 후 풀에 추가
-            GameObject slotObj = Instantiate(_slotPrefab, _slotContainer);
-            InventorySlot slot = slotObj.GetComponent<InventorySlot>();
-            _slotPool.Add(slot);
-            
-            return slot;
-        }
-
         private void OnSlotClicked(InventorySlot slot)
         {
             if (slot == null || slot.Item == null) return;
