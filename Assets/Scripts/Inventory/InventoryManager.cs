@@ -15,10 +15,16 @@ namespace Magic.Inventory
 
         public List<ItemInstance> items => _player.items;
         public event System.Action OnInventoryChanged;
+        public event System.Action OnLoadoutChanged;
 
         public void NotifyInventoryChanged()
         {
             OnInventoryChanged?.Invoke();
+        }
+
+        public void NotifyLoadoutChanged()
+        {
+            OnLoadoutChanged?.Invoke();
         }
 
         public void SortInventory()
@@ -116,17 +122,23 @@ namespace Magic.Inventory
             if (!combatLoadout.Contains(item) && items.Contains(item))
             {
                 combatLoadout.Add(item);
+                NotifyLoadoutChanged();
             }
         }
 
         public void RemoveFromLoadout(ItemInstance item)
         {
-            combatLoadout.Remove(item);
+            if (combatLoadout.Contains(item))
+            {
+                combatLoadout.Remove(item);
+                NotifyLoadoutChanged();
+            }
         }
 
         public void ClearLoadout()
         {
             combatLoadout.Clear();
+            NotifyLoadoutChanged();
         }
 
         [Header("Inventory Capacity")]
@@ -159,6 +171,7 @@ namespace Magic.Inventory
             if (combatLoadout.Contains(item))
             {
                 combatLoadout.Remove(item);
+                NotifyLoadoutChanged();
             }
 
             // 만약 현재 장착 중인 아이템이 지워졌다면 다음 아이템으로 자동 장착

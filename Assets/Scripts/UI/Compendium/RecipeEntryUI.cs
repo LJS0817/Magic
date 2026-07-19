@@ -3,46 +3,43 @@ using UnityEngine.UI;
 using TMPro;
 using Magic.Drawing;
 using Magic.Data;
+using UnityEngine.EventSystems;
 
 namespace Magic.UI.Compendium
 {
-    public class RecipeEntryUI : MonoBehaviour
+    public class RecipeEntryUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [Header("UI References")]
         public Image iconImage;
-        public TMP_Text nameText;
-        public Button button;
+        public GameObject selectObj;
 
-        private SpellRecipeAsset recipeData;
-        private RecipeUnlockState unlockState;
+        public SpellRecipeAsset RecipeData { get; private set; }
+        public RecipeUnlockState UnlockState { get; private set; }
+
         private RecipeCompendiumUIController controller;
+        private System.Action<RecipeEntryUI> onHoverEnter;
+        private System.Action<RecipeEntryUI> onHoverExit;
 
-        public void Setup(SpellRecipeAsset recipe, RecipeUnlockState state, RecipeCompendiumUIController ctrl)
+        public void Setup(SpellRecipeAsset recipe, RecipeUnlockState state, RecipeCompendiumUIController ctrl, System.Action<RecipeEntryUI> onEnter = null, System.Action<RecipeEntryUI> onExit = null)
         {
-            recipeData = recipe;
-            unlockState = state;
+            RecipeData = recipe;
+            UnlockState = state;
             controller = ctrl;
-
-            if (button != null)
-            {
-                button.onClick.RemoveAllListeners();
-                button.onClick.AddListener(OnClick);
-            }
+            onHoverEnter = onEnter;
+            onHoverExit = onExit;
 
             RefreshVisuals();
         }
 
         private void RefreshVisuals()
         {
-            if (unlockState == RecipeUnlockState.Unlocked)
+            if (UnlockState == RecipeUnlockState.Unlocked)
             {
-                if (nameText != null) nameText.text = recipeData.SpellName;
-                
                 if (iconImage != null)
                 {
-                    if (recipeData.icon != null)
+                    if (RecipeData.icon != null)
                     {
-                        iconImage.sprite = recipeData.icon;
+                        iconImage.sprite = RecipeData.icon;
                         iconImage.color = Color.white;
                     }
                     else
@@ -52,19 +49,30 @@ namespace Magic.UI.Compendium
                     }
                 }
             }
-            else if (unlockState == RecipeUnlockState.Hinted)
+            else if (UnlockState == RecipeUnlockState.Hinted)
             {
-                if (nameText != null) nameText.text = "???";
                 if (iconImage != null) iconImage.color = Color.black; // Silhouette or hidden
             }
         }
 
-        private void OnClick()
+        public void OnPointerClick(PointerEventData eventData)
         {
-            if (controller != null && recipeData != null)
-            {
-                controller.SelectRecipe(recipeData, unlockState);
-            }
+            controller.SelectRecipe(this, RecipeData, UnlockState);
+        }
+
+        public void SetSelected(bool isSelected)
+        {
+            if (selectObj != null) selectObj.SetActive(isSelected);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            onHoverEnter?.Invoke(this);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            onHoverExit?.Invoke(this);
         }
     }
 }

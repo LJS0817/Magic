@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 
 namespace Magic.Inventory
 {
@@ -14,8 +12,6 @@ namespace Magic.Inventory
         [Header("Info Panel")]
         [SerializeField] private ItemInfoPanel _infoPanel;
         [SerializeField] private RectTransform _inventoryPanel;
-
-        
 
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
         private ItemInstance _selectedItem;
@@ -173,68 +169,7 @@ namespace Magic.Inventory
             {
                 _infoPanel.Open();
                 _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
-
-                RectTransform infoRect = _infoPanel.GetComponent<RectTransform>();
-                RectTransform slotRect = slot.GetComponent<RectTransform>();
-
-                if (infoRect != null && slotRect != null && _inventoryPanel != null)
-                {
-                    // UI 크기 갱신 (ContentSizeFitter 적용 시 정확한 크기 측정)
-                    UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(infoRect);
-
-                    Vector3[] slotCorners = new Vector3[4];
-                    slotRect.GetWorldCorners(slotCorners);
-                    Vector3 bottomCenter = (slotCorners[0] + slotCorners[3]) / 2f;
-                    Vector3 topCenter = (slotCorners[1] + slotCorners[2]) / 2f;
-                    
-                    Vector3[] invCorners = new Vector3[4];
-                    _inventoryPanel.GetWorldCorners(invCorners);
-                    
-                    // 인벤토리 상단에서 75% 지점 (하위 25%)을 기준으로 삼음 (반 + 반의 반)
-                    float thresholdY = Mathf.Lerp(invCorners[2].y, invCorners[0].y, 0.75f);
-
-                    // 슬롯이 해당 기준치보다 아래쪽에 있다면 패널을 슬롯 위(Top)로 표시
-                    bool showAbove = slotRect.position.y < thresholdY;
-                    
-                    Vector3[] initialPanelCorners = new Vector3[4];
-                    
-                    if (showAbove)
-                    {
-                        // 패널의 Bottom-Center를 슬롯의 Top-Center에 맞춤
-                        infoRect.position = topCenter;
-                        infoRect.GetWorldCorners(initialPanelCorners);
-                        Vector3 panelBottomCenter = (initialPanelCorners[0] + initialPanelCorners[3]) / 2f;
-                        Vector3 pivotToBottomShift = infoRect.position - panelBottomCenter;
-                        
-                        infoRect.position = topCenter + pivotToBottomShift;
-                        infoRect.anchoredPosition += new Vector2(0, 5f);
-                    }
-                    else
-                    {
-                        // 패널의 Top-Center를 슬롯의 하단(Bottom-Center)에 맞춤
-                        infoRect.position = bottomCenter;
-                        infoRect.GetWorldCorners(initialPanelCorners);
-                        Vector3 panelTopCenter = (initialPanelCorners[1] + initialPanelCorners[2]) / 2f;
-                        Vector3 pivotToTopShift = infoRect.position - panelTopCenter;
-                        
-                        infoRect.position = bottomCenter + pivotToTopShift;
-                        infoRect.anchoredPosition += new Vector2(0, -5f);
-                    }
-                    
-                    Vector3[] panelCorners = new Vector3[4];
-                    infoRect.GetWorldCorners(panelCorners);
-                    
-                    Vector3 offset = Vector3.zero;
-
-                    // 좌/우 (Width) 보정 (월드 좌표 차이로 구함)
-                    if (panelCorners[0].x < invCorners[0].x)
-                        offset.x = invCorners[0].x - panelCorners[0].x;
-                    else if (panelCorners[2].x > invCorners[2].x)
-                        offset.x = invCorners[2].x - panelCorners[2].x;
-                        
-                    // 가로 보정치 적용
-                    infoRect.position += offset;
-                }
+                _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
             }
         }
 

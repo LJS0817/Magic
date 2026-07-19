@@ -17,36 +17,15 @@ namespace Magic.Store
         [SerializeField] private float bounceOvershoot = 1.5f; // Control the strength of the 1-time bounce
         [SerializeField] private Ease closeEase = Ease.InBack;
 
-        [SerializeField]
-        ChatUI chatUI;
-        [SerializeField] WindowController _wController;
-
         private RectTransform _rectTransform;
         private Vector2 _closedPosition;
         private Tween _currentTween;
-
-        bool isOpen = false;
-        public bool IsOpened => isOpen;
 
         private void Awake()
         {
             _rectTransform = GetComponent<RectTransform>();
             _closedPosition = _rectTransform.anchoredPosition;
             openPosition = _closedPosition + openPosition; // Adjust open position relative to closed position
-        }
-
-        void Update() {
-            if(Input.GetKeyDown(KeyCode.A)) {
-                ToggleUI();
-            }
-        }
-
-        public void ToggleUI()
-        {
-            chatUI.CloseChat();
-            if (isOpen) Close();
-            else Open();
-            isOpen = !isOpen;
         }
 
         public void Open()
@@ -61,10 +40,6 @@ namespace Magic.Store
 
             arrowImage.DOKill();
             arrowImage.DOScaleX(1f, animationDuration).SetEase(openEase, bounceOvershoot);
-
-            if (StoreManager.Instance != null) StoreManager.Instance.IsOrderContainerOpen = true;
-            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
-            _wController.HideDrawingArea();
         }
 
         public void Close()
@@ -77,14 +52,6 @@ namespace Magic.Store
 
             arrowImage.DOKill();
             arrowImage.DOScaleX(-1f, animationDuration).SetEase(closeEase);
-
-            if (StoreManager.Instance != null) 
-            {
-                StoreManager.Instance.IsOrderContainerOpen = false;
-                StoreManager.Instance.SelectedOrderItem = null;
-            }
-            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
-            _wController.ShowDrawingArea();
         }
     }
 }

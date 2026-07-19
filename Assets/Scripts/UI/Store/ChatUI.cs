@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Assuming TextMeshPro is used for UI text
-using System.Collections.Generic;
+using TMPro;
 
 namespace Magic.Store
 {
@@ -13,6 +12,7 @@ namespace Magic.Store
         [SerializeField] private HaggleChatUI[] haggleTexts; // Size 3
         [SerializeField] private TMP_Text resultText;
         [SerializeField] private TMP_Text itemText;
+        [SerializeField] private Button _submitButton;
 
         [Header("Layout Rebuild")]
         [SerializeField] private RectTransform contentLayoutRect;
@@ -220,7 +220,7 @@ namespace Magic.Store
 
         public void OnSubmitHaggleClicked()
         {
-            if (_currentOrderUI == null) return;
+            if (_currentOrderUI == null || resultText.gameObject.activeInHierarchy) return;
 
             CustomerOrder data = _currentOrderUI.OrderData;
             

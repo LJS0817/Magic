@@ -36,6 +36,7 @@ namespace Magic.Store
         private string[] customerNames = { "마을 청년", "지친 용병", "마법 학도", "수상한 상인", "지나가는 행인" };
 
         [SerializeField] StoreUIController _controller;
+        public bool IsOpened => _controller.IsOpened;
 
         private void Start()
         {

@@ -184,6 +184,21 @@ namespace Magic.Combat
             }
         }
 
+        public void CastSpellFromScroll(Item_Scroll scroll)
+        {
+            if (scroll == null || scroll.isEmpty || scroll.ScrollData == null) return;
+            
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.EquippedScroll = scroll;
+            }
+            
+            OnSpellMatched(scroll.ScrollData.spellName, scroll.ScrollData.accuracyScore);
+            
+            scroll.isEmpty = true;
+            scroll.ScrollData.spellName = "";
+        }
+
         protected override void OnSpellMatched(string matchedSpell, float averageScore)
         {
             if (matchedSpell.Contains("실패") || matchedSpell.Contains("아무것도"))

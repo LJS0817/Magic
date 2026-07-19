@@ -3,16 +3,17 @@ using UnityEngine.UI;
 using TMPro;
 using Magic.Drawing;
 using Magic.Data;
+using Magic.Inventory;
 using System.Collections.Generic;
 
 namespace Magic.UI.Compendium
 {
-    public class RecipeCompendiumUIController : Magic.UI.PagedUIController<RecipeEntryUI>
+    public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     {
-        
-
+        [SerializeField] ItemInfoPanel itemInfoPanel;
+        [SerializeField] CanvasGroup recipeListGroup;
         [Header("Detail Panel")]
-        public GameObject detailPanel;
+        public CanvasGroup detailPanel;
         public Image detailIcon;
         public Image detailSampleImage;
         public TMP_Text detailNameText;
@@ -23,10 +24,13 @@ namespace Magic.UI.Compendium
         public TMP_Text detailHintText;
         public TMP_Text detailShapesText;
 
+        bool isOpened = false;
+        public bool IsOpened => isOpened;
+
         private void Start()
         {
-            if (detailPanel != null)
-                detailPanel.SetActive(false);
+            Close();
+            if (!recipeListGroup.gameObject.activeInHierarchy) recipeListGroup.gameObject.SetActive(true);
         }
 
         protected override void OnEnable()
@@ -35,6 +39,7 @@ namespace Magic.UI.Compendium
         }
 
         private List<SpellRecipeAsset> _visibleRecipes = new List<SpellRecipeAsset>();
+        private RecipeEntryUI currentSelectedSlot;
 
         public override void RefreshList()
         {
@@ -44,7 +49,9 @@ namespace Magic.UI.Compendium
             _visibleRecipes.Clear();
             foreach (var recipe in database.recipes)
             {
+                PlayerDataManager.Instance.UnlockRecipe(recipe.SpellName);
                 RecipeUnlockState state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
+                Debug.Log(recipe.SpellName + "     " + state);
                 if (state != RecipeUnlockState.Locked)
                 {
                     _visibleRecipes.Add(recipe);
@@ -65,14 +72,38 @@ namespace Magic.UI.Compendium
             {
                 var recipe = _visibleRecipes[dataIndex];
                 RecipeUnlockState state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
-                slot.Setup(recipe, state, this);
+                slot.Setup(recipe, state, this, OnSlotHoverEnter, OnSlotHoverExit);
             }
         }
 
-        public void SelectRecipe(SpellRecipeAsset recipe, RecipeUnlockState state)
+        private void OnSlotHoverEnter(RecipeEntryUI slot)
         {
-            if (detailPanel != null)
-                detailPanel.SetActive(true);
+            if (itemInfoPanel != null && slot.UnlockState != RecipeUnlockState.Locked)
+            {
+                itemInfoPanel.Open();
+                string name = slot.UnlockState == RecipeUnlockState.Unlocked ? slot.RecipeData.SpellName : "???";
+                itemInfoPanel.SetupRecipeInfo(name);
+                itemInfoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _slotContainer.GetComponent<RectTransform>());
+            }
+        }
+
+        private void OnSlotHoverExit(RecipeEntryUI slot)
+        {
+            if (itemInfoPanel != null)
+            {
+                itemInfoPanel.Close();
+            }
+        }
+
+        public void SelectRecipe(RecipeEntryUI slot, SpellRecipeAsset recipe, RecipeUnlockState state)
+        {
+            if (currentSelectedSlot != null)
+                currentSelectedSlot.SetSelected(false);
+
+            currentSelectedSlot = slot;
+
+            if (currentSelectedSlot != null)
+                currentSelectedSlot.SetSelected(true);
 
             if (state == RecipeUnlockState.Unlocked)
             {
@@ -114,15 +145,42 @@ namespace Magic.UI.Compendium
 
         public void Close()
         {
-            gameObject.SetActive(false);
-            Magic.Drawing.DrawingManager.IsDrawingBlocked = false;
+            if (currentSelectedSlot != null)
+            {
+                currentSelectedSlot.SetSelected(false);
+                currentSelectedSlot = null;
+            }
+
+            detailPanel.alpha = 0f;
+            detailPanel.blocksRaycasts = false;
+            detailPanel.interactable = false;
+
+            recipeListGroup.alpha = 0f;
+            recipeListGroup.blocksRaycasts = false;
+            recipeListGroup.interactable = false;
+            isOpened = false;
+            DrawingManager.IsDrawingBlocked = false;
         }
 
         public void Open()
         {
-            gameObject.SetActive(true);
-            Magic.Drawing.DrawingManager.IsDrawingBlocked = true;
+            detailPanel.alpha = 1f;
+            detailPanel.blocksRaycasts = true;
+            detailPanel.interactable = true;
+
+            recipeListGroup.alpha = 1f;
+            recipeListGroup.blocksRaycasts = true;
+            recipeListGroup.interactable = true;
+
+            DrawingManager.IsDrawingBlocked = true;
+            isOpened = true;
             RefreshList();
+        }
+
+        public void ToggleWindow()
+        {
+            if (isOpened) Close();
+            else Open();
         }
     }
 }

@@ -1,3 +1,4 @@
+using Magic.UI;
 using UnityEngine;
 
 namespace Magic.Store
@@ -8,11 +9,16 @@ namespace Magic.Store
         [SerializeField] private RectTransform spawnArea;
         [SerializeField] private GameObject orderPrefab;
         [SerializeField] private ChatUI chatUI;
+        [SerializeField] private OrderContainerUI orderContainer;
         [SerializeField] private Canvas parentCanvas;
+        [SerializeField] WindowController _wController;
 
         [Header("Spawn Settings")]
         [SerializeField] private float minRotationZ = -15f;
         [SerializeField] private float maxRotationZ = 15f;
+
+        bool isOpen = false;
+        public bool IsOpened => isOpen;
 
         private void Start()
         {
@@ -78,6 +84,43 @@ namespace Magic.Store
                 chatUI.transform.SetAsLastSibling();
                 chatUI.OpenChat(orderUI);
             }
+        }
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                ToggleUI();
+            }
+        }
+
+        public void ToggleUI()
+        {
+            chatUI.CloseChat();
+            if (isOpen) Close();
+            else Open();
+            isOpen = !isOpen;
+        }
+
+        public void Open()
+        {
+            orderContainer.Open();
+
+            if (StoreManager.Instance != null) StoreManager.Instance.IsOrderContainerOpen = true;
+            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
+            _wController.HideDrawingArea();
+        }
+
+        public void Close()
+        {
+            orderContainer.Close();
+
+            if (StoreManager.Instance != null)
+            {
+                StoreManager.Instance.IsOrderContainerOpen = false;
+                StoreManager.Instance.SelectedOrderItem = null;
+            }
+            if (Magic.Inventory.InventoryManager.Instance != null) Magic.Inventory.InventoryManager.Instance.NotifyInventoryChanged();
+            _wController.ShowDrawingArea();
         }
 
         public bool SelectItem(Magic.Inventory.ItemInstance item)
