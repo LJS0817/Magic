@@ -29,16 +29,26 @@ namespace Magic.UI
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.OnLoadoutChanged += RefreshList;
+                InventoryManager.Instance.OnScrollEquipped += OnScrollEquipped;
+                InventoryManager.Instance.OnInkEquipped += OnInkEquipped;
+                InventoryManager.Instance.OnPenEquipped += OnPenEquipped;
             }
 
             RefreshList();
         }
+
+        private void OnScrollEquipped(Item_Scroll item) => RefreshList();
+        private void OnInkEquipped(Item_Ink item) => RefreshList();
+        private void OnPenEquipped(Item_Pen item) => RefreshList();
 
         private void OnDestroy()
         {
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.OnLoadoutChanged -= RefreshList;
+                InventoryManager.Instance.OnScrollEquipped -= OnScrollEquipped;
+                InventoryManager.Instance.OnInkEquipped -= OnInkEquipped;
+                InventoryManager.Instance.OnPenEquipped -= OnPenEquipped;
             }
         }
 
@@ -82,7 +92,8 @@ namespace Magic.UI
             if (dataIndex < loadout.Count)
             {
                 ItemInstance currentItem = loadout[dataIndex];
-                slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, false);
+                bool isEquipped = IsItemEquipped(currentItem);
+                slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, isEquipped);
             }
             else
             {
@@ -99,40 +110,48 @@ namespace Magic.UI
         {
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
-            // 더블 클릭 시 로드아웃에서 해제
-            InventoryManager.Instance.RemoveFromLoadout(slot.Item);
-            
-            if (_infoPanel != null) _infoPanel.Close();
+            var inv = InventoryManager.Instance;
+            if (slot.Item is Item_Scroll scroll) 
+            {
+                if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
+                else inv.EquippedScroll = scroll;
+            }
+            else if (slot.Item is Item_Ink ink)
+            {
+                if (inv.EquippedInk == ink) inv.EquippedInk = null;
+                else inv.EquippedInk = ink;
+            }
+            else if (slot.Item is Item_Pen pen)
+            {
+                if (inv.EquippedPen == pen) inv.EquippedPen = null;
+                else inv.EquippedPen = pen;
+            }
+
+            if (_infoPanel != null && _hoveredSlot == slot)
+            {
+                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+            }
         }
 
         private void OnSlotRightClicked(InventorySlot slot)
         {
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
-            // 전투 중인지 확인
-            var combatManager = FindAnyObjectByType<Magic.Combat.CombatManager>();
-            if (combatManager != null && combatManager.CurrentState != Magic.Combat.CombatState.BattleEnd)
+            // 스크롤 아이템인 경우 '사용' (전투 중 완성된 마법 발사)
+            if (slot.Item is Item_Scroll scroll && !scroll.isEmpty && scroll.ScrollData != null)
             {
-                if (slot.Item is Item_Scroll scroll && !scroll.isEmpty && scroll.ScrollData != null)
+                var combatManager = FindAnyObjectByType<Magic.Combat.CombatManager>();
+                if (combatManager != null && combatManager.CurrentState != Magic.Combat.CombatState.BattleEnd)
                 {
-                    // 전투 중 완성된 스크롤 마법 발사
                     var drawingManager = FindAnyObjectByType<Magic.Combat.CombatDrawingManager>();
                     if (drawingManager != null)
                     {
                         drawingManager.CastSpellFromScroll(scroll);
-                        return; // 마법 사용 후 로드아웃에서 해제하지 않음
                     }
                 }
             }
-
-            // 우클릭 시 로드아웃에서 해제
-            InventoryManager.Instance.RemoveFromLoadout(slot.Item);
             
-            if (_hoveredSlot == slot)
-            {
-                _hoveredSlot = null;
-                if (_infoPanel != null) _infoPanel.Close();
-            }
+            // 잉크나 펜 등 다른 아이템은 우클릭 기능(로드아웃 해제 등)을 사용하지 않음
         }
 
         private void OnSlotPointerEnter(InventorySlot slot)
@@ -144,7 +163,7 @@ namespace Magic.UI
             if (_infoPanel != null)
             {
                 _infoPanel.Open();
-                _infoPanel.Setup(slot.Item, false);
+                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
                 if (_inventoryPanel != null)
                     _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
             }
@@ -167,6 +186,15 @@ namespace Magic.UI
             {
                 _infoPanel.Close();
             }
+        }
+
+        private bool IsItemEquipped(ItemInstance item)
+        {
+            if (item == null) return false;
+            if (item is Item_Scroll scroll) return InventoryManager.Instance.EquippedScroll == scroll;
+            if (item is Item_Ink ink) return InventoryManager.Instance.EquippedInk == ink;
+            if (item is Item_Pen pen) return InventoryManager.Instance.EquippedPen == pen;
+            return false;
         }
 
         private Sprite GetSlotBackground(ItemInstance item)

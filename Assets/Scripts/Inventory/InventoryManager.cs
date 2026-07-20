@@ -104,17 +104,9 @@ namespace Magic.Inventory
 
         public List<ItemInstance> combatLoadout => _player.combatLoadout;
 
-        private void Awake()
+        public void InitInstance()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            Instance = this;
         }
 
         public void AddToLoadout(ItemInstance item)

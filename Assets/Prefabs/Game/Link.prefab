@@ -1,0 +1,211 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5353073888065776566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8426419578095604559}
+  - component: {fileID: 1515349400720738957}
+  - component: {fileID: 2680021099013104767}
+  - component: {fileID: 6108609537667045365}
+  - component: {fileID: 6011283225125306800}
+  - component: {fileID: 3275176627404238196}
+  m_Layer: 0
+  m_Name: Link
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8426419578095604559
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1515349400720738957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b479edb22c9d044a0ca44a6ef147aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.InventoryManager
+  itemDatabase: {fileID: 11400000, guid: 17ee5cedda1f15d4cbf2f77c78bfab1c, type: 2}
+  _player: {fileID: 6108609537667045365}
+  baseInventoryCapacity: 20
+--- !u!114 &2680021099013104767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0991f4ed2dfd8704bbd1883c70c52279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.DrawingDatabase
+  recipes:
+  - {fileID: 11400000, guid: c6f14620743f74955a7e45798e40f936, type: 2}
+  - {fileID: 11400000, guid: 0217c1884ac0d466fb5b52ea8036079d, type: 2}
+  - {fileID: 11400000, guid: 25954863020924353a766bfcd909fcb5, type: 2}
+  - {fileID: 11400000, guid: 98a30f6dbc5bf4c26aad79c1357c7cf8, type: 2}
+  - {fileID: 11400000, guid: a9f73e89aaee6434db423982d8d5d499, type: 2}
+  - {fileID: 11400000, guid: ac40d14ac568d4f9085532d4e8dd22eb, type: 2}
+  - {fileID: 11400000, guid: 46dcb65edd14d4e7ea546c722dc5fd27, type: 2}
+  - {fileID: 11400000, guid: 9e64e5eca74c04980860c29f736db5b7, type: 2}
+  - {fileID: 11400000, guid: 2a34e354feef84686af9f3858a701a68, type: 2}
+  - {fileID: 11400000, guid: 6e5458c207b5e445cb13f2047ed847f9, type: 2}
+  - {fileID: 11400000, guid: 37186abf92e5ce249b6510e273b12edf, type: 2}
+  - {fileID: 11400000, guid: a4513d9d0d3ed4813a322f5a1f89e7d0, type: 2}
+  - {fileID: 11400000, guid: d2579109f89f4443fb0f226ff87030a6, type: 2}
+  - {fileID: 11400000, guid: 6d9d168837c5b4ebaa255b12ae007835, type: 2}
+  - {fileID: 11400000, guid: 5481a4217888841cdbc4a9c6801b78bf, type: 2}
+  - {fileID: 11400000, guid: b182ceacff38d4b5f84a9367ea438e58, type: 2}
+  - {fileID: 11400000, guid: 3913788b737094707b243198506880c0, type: 2}
+  - {fileID: 11400000, guid: 7ba65cb5ba47c4df0b273487f84662f2, type: 2}
+  - {fileID: 11400000, guid: 697d705e272fb4027aed3d1cae2a45c4, type: 2}
+  - {fileID: 11400000, guid: 4ecb956ac27854fa0ade065668169142, type: 2}
+  - {fileID: 11400000, guid: 390aa2340e76a454d894e1de65f4002e, type: 2}
+  - {fileID: 11400000, guid: 4fedf6bdc29c4440390ec0240645e4d8, type: 2}
+  - {fileID: 11400000, guid: 3f160d44815ca4a8ab00211bccb8a9ff, type: 2}
+  - {fileID: 11400000, guid: dc6e3f21b2e7d48b883cb188be0cc10b, type: 2}
+  - {fileID: 11400000, guid: 0348e982ce66640589db522b227ad69a, type: 2}
+  linePrefab: {fileID: 7985386607996301196, guid: 5002eba7847db55438491506c667b0c1, type: 3}
+--- !u!114 &6108609537667045365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 827c998dc5db3584fb2eb1adab0dee93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Data.PlayerDataManager
+  baseMaxHealth: 100
+  currentHealth: 100
+  baseMaxMana: 100
+  currentMana: 100
+  equippedScroll:
+    data: {fileID: 0}
+    acquisitionId: 0
+    isEmpty: 0
+    currentDurability: 0
+  equippedInk:
+    data: {fileID: 0}
+    acquisitionId: 0
+    currentAmount: 0
+  equippedPen:
+    data: {fileID: 0}
+    acquisitionId: 0
+    currentInkCapacity: 0
+--- !u!114 &6011283225125306800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c5e648bdf840d547b16e4825d594a1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Upgrade.UpgradeManager
+  allNodes:
+  - {fileID: 11400000, guid: 8b4527d09fe45084c9aaa0bce20bc84c, type: 2}
+  - {fileID: 11400000, guid: 9d08911e02abfa6419ae460dfd6c2b63, type: 2}
+  - {fileID: 11400000, guid: e2e959f00526a664ab6f78371de2d8e4, type: 2}
+  - {fileID: 11400000, guid: aad10fbc7b9e0e1448ee519ed1d3988d, type: 2}
+  - {fileID: 11400000, guid: 877fbdd8a85becd4e93168d862bb8460, type: 2}
+  - {fileID: 11400000, guid: e3a548939e8b6264bb5c566bc052d488, type: 2}
+  - {fileID: 11400000, guid: 3adfb47e2b9453c4ba99e5e805fed62f, type: 2}
+  - {fileID: 11400000, guid: acdb0bc5d92abd24aa7c67ccafc7d78f, type: 2}
+  - {fileID: 11400000, guid: c32c65dc6b30ecb43818ba888a6dc42e, type: 2}
+  - {fileID: 11400000, guid: 6593e2ef807e7ee4c9812850a5937b78, type: 2}
+  - {fileID: 11400000, guid: 57c5d6f18274a484b991eacd329b8266, type: 2}
+  - {fileID: 11400000, guid: fecbc81786e02264c8daef8bf3fa34ce, type: 2}
+  - {fileID: 11400000, guid: 1f56889707f700f4f93edd2479f1099a, type: 2}
+  - {fileID: 11400000, guid: 64847f364d09a084bbdac387db184dfb, type: 2}
+  - {fileID: 11400000, guid: a5bf6be546339bd4a998436b1831f0b6, type: 2}
+  - {fileID: 11400000, guid: 8a6f281635676d44da18a94554ff52ca, type: 2}
+  - {fileID: 11400000, guid: 6c95ca490c49c3948afaa0d026c6d27b, type: 2}
+  - {fileID: 11400000, guid: bb92e6e03a0decf46928d4ff9225b0fb, type: 2}
+  - {fileID: 11400000, guid: 9c2fe0a9766e1ba40bf1741d38dd95d0, type: 2}
+  - {fileID: 11400000, guid: f9bd4c3c21bf42c4b91fbd8f23473abc, type: 2}
+  - {fileID: 11400000, guid: 8a4464cb4a2a701428ca419ac0c75d0f, type: 2}
+  - {fileID: 11400000, guid: d13b5a9e95269ef48bc7125cbb8e5c20, type: 2}
+  - {fileID: 11400000, guid: ec92c220e9ed32a48ac289ed04458893, type: 2}
+  - {fileID: 11400000, guid: 042d34d359b7e6e408a0014d1aa83f93, type: 2}
+  - {fileID: 11400000, guid: e300286726ed2b749ae171e24c922138, type: 2}
+  - {fileID: 11400000, guid: 72eeb37279802af4d948340fa85ef70e, type: 2}
+  - {fileID: 11400000, guid: 888ee6ef8ae325b45a8723092fca1142, type: 2}
+  - {fileID: 11400000, guid: 15f3a1e9496ab18499375f5a733bbd52, type: 2}
+  - {fileID: 11400000, guid: 6beb65d3bf914774ea438800b7afecd5, type: 2}
+  - {fileID: 11400000, guid: 6fbda987e23ffb645a204127916a9987, type: 2}
+  - {fileID: 11400000, guid: b5e5fd2c287ba824683e1c6a79932a34, type: 2}
+  - {fileID: 11400000, guid: 816cfa4d880d5b443be5a726a66e0bcd, type: 2}
+  - {fileID: 11400000, guid: 8fb1c4b2d45053d44ad01d83e331bef7, type: 2}
+  - {fileID: 11400000, guid: ab4194bd222a5cf4791b344a1a4be2d9, type: 2}
+  - {fileID: 11400000, guid: eeebacb07e8425c4eb46ba347a7fd07b, type: 2}
+  - {fileID: 11400000, guid: 59c41b4db3524c746a65e0353fec66f6, type: 2}
+  - {fileID: 11400000, guid: ae80894a8bf5b574e843706782663346, type: 2}
+  - {fileID: 11400000, guid: 7a490f554c6012d4ca1936eb163c7220, type: 2}
+  - {fileID: 11400000, guid: e7650e00b076cc345a1a695b0328caf2, type: 2}
+  - {fileID: 11400000, guid: 1f52229f3ebe4cd48a321f2e1bdda576, type: 2}
+  - {fileID: 11400000, guid: 86f8be4d916122f438fef7fa8cbcc70a, type: 2}
+  - {fileID: 11400000, guid: e5f0e3139ddadbb41924eb887ed352b0, type: 2}
+  - {fileID: 11400000, guid: 8b5987267b12b524d9546385fb07496e, type: 2}
+  - {fileID: 11400000, guid: 61b59c59938b9f24cba0943312825226, type: 2}
+  - {fileID: 11400000, guid: 69cd497339b7f2e41bb013235eb0a2f5, type: 2}
+  - {fileID: 11400000, guid: 9d27b5c33d4d7684582c2625ff20e2aa, type: 2}
+  - {fileID: 11400000, guid: 996b84eae2e619c4a8eb1a12a7b644ec, type: 2}
+  - {fileID: 11400000, guid: 848c765866abb1e489f12e7986767d86, type: 2}
+  - {fileID: 11400000, guid: 326fa47596cb4a0438917a87b346f1dc, type: 2}
+  - {fileID: 11400000, guid: fed358b366ebf7e4b83f0c726c0387b7, type: 2}
+  - {fileID: 11400000, guid: 397130b31524afa4d90a9dbbc5bac438, type: 2}
+  - {fileID: 11400000, guid: f3e567d45a912a94daa5b9774f32f27f, type: 2}
+  - {fileID: 11400000, guid: d1ee8b603267eb24b92062ac3ed37317, type: 2}
+  - {fileID: 11400000, guid: db42eef0c88511f40b4752f113c29d1d, type: 2}
+  - {fileID: 11400000, guid: b4a31b0f169bb6840817603ef8211865, type: 2}
+  - {fileID: 11400000, guid: 3460a86100eab694f90e5d3d07635dcb, type: 2}
+  - {fileID: 11400000, guid: c6fc8bea4dafd16429e41099cf45b932, type: 2}
+  - {fileID: 11400000, guid: 940803e5a6c70a643a55de6dd4d45783, type: 2}
+  - {fileID: 11400000, guid: 30c1fcc75c29e164c8bb07452579b573, type: 2}
+  - {fileID: 11400000, guid: dbbe60c8ad9a0534fbcd7f2f5aba4d7f, type: 2}
+  unlockedNodeIDs: []
+--- !u!114 &3275176627404238196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abf1ba4c002354444add49def4ad73e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Common.LinkManager
+  _db: {fileID: 2680021099013104767}
+  _upgrade: {fileID: 6011283225125306800}
+  _data: {fileID: 6108609537667045365}
+  _inventory: {fileID: 1515349400720738957}

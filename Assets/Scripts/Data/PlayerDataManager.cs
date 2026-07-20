@@ -90,17 +90,11 @@ namespace Magic.Data
         public Item_Ink equippedInk;
         public Item_Pen equippedPen;
 
-        private void Awake()
+        public void InitInstance()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            Instance = this;
         }
+
+        public bool IsInit => Instance != null;
     }
 }

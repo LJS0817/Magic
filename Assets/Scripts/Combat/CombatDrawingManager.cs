@@ -20,8 +20,6 @@ namespace Magic.Combat
         [Header("Combat References")]
         public PlayerController player;
 
-
-
         [Header("Chanting System")]
         public List<ChantRecipe> chantRecipes = new List<ChantRecipe>();
         public List<KeyCode> currentChantInput = new List<KeyCode>();
@@ -92,21 +90,7 @@ namespace Magic.Combat
                 parryUIAlpha = 1f;
             }
 
-            // 잉크/스크롤 전환 (숫자키 등 단축키를 쓰거나 UI 클릭)
-            // 임시로 마우스 휠로 스크롤 전환
-            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-            if (scrollWheel != 0f)
-            {
-                if (InventoryManager.Instance != null)
-                    InventoryManager.Instance.CycleScroll(scrollWheel > 0f ? -1 : 1);
-                ClearDrawing();
-            }
-
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-            {
-                if (InventoryManager.Instance != null)
-                    InventoryManager.Instance.CycleInk(1);
-            }
+            // 잉크/스크롤 장착 및 전환은 이제 LoadoutUI에서 더블클릭으로 처리합니다.
 
             // 캔버스 영역 계산 (가로 전체, 세로 절반, 중앙 배치)
             float canvasWidth = Screen.width;
@@ -143,13 +127,33 @@ namespace Magic.Combat
                         Vector2 mousePosGUI = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
                         if (scrollCanvasRect.Contains(mousePosGUI))
                         {
+                            if (isOutsideArea)
+                            {
+                                isOutsideArea = false;
+                                ReturnPenToMouse();
+                            }
+
+                            if (penController != null && !isRefilling)
+                            {
+                                penController.TrackMouse(mainCamera);
+                            }
+
                             if (Input.GetMouseButtonDown(0)) StartStroke();
                             else if (Input.GetMouseButton(0)) UpdateStroke();
                             else if (Input.GetMouseButtonUp(0)) EndStroke();
                         }
-                        else if (Input.GetMouseButtonUp(0) && isDrawing)
+                        else
                         {
-                            EndStroke();
+                            if (!isOutsideArea)
+                            {
+                                isOutsideArea = true;
+                                RefillPen();
+                            }
+
+                            if (Input.GetMouseButtonUp(0) && isDrawing)
+                            {
+                                EndStroke();
+                            }
                         }
                     }
                 }
@@ -461,125 +465,5 @@ namespace Magic.Combat
             }
         }
 
-
-
-        protected override void OnGUI()
-        {
-            if (CombatManager.Instance == null) return;
-
-            // 부모의 판별 표시 시스템(OnGUI) 상속 호출
-            base.OnGUI();
-
-            GUI.color = Color.white;
-            GUIStyle style = new GUIStyle(GUI.skin.label);
-            style.fontSize = 20;
-            style.alignment = TextAnchor.MiddleLeft;
-
-            // 1. 상단 정보 (턴, 게이지, 시간)
-            string turnInfo = CombatManager.Instance.CurrentState.ToString();
-            float pATB = CombatManager.Instance.currentPlayerATB;
-            float eATB = CombatManager.Instance.currentEnemyATB;
-            float pTime = CombatManager.Instance.currentPlayerTurnTimer;
-            float eTime = CombatManager.Instance.currentParryTimer;
-
-            GUI.Label(new Rect(20, 20, 400, 30), $"State: {turnInfo}", style);
-            GUI.Label(new Rect(20, 50, 400, 30), $"Player ATB: {pATB:F0} | Enemy ATB: {eATB:F0}", style);
-            
-            if (CombatManager.Instance.CurrentState == CombatState.PlayerTurn)
-                GUI.Label(new Rect(20, 80, 400, 30), $"<color=green>Time Left: {pTime:F1}s</color>", style);
-            
-            if (CombatManager.Instance.IsParryWindowOpen)
-            {
-                Color oldColor = GUI.color;
-                GUI.color = new Color(1f, 1f, 1f, parryUIAlpha);
-                GUI.Label(new Rect(20, 80, 400, 30), $"<color=yellow>Parry Window: {eTime:F1}s!</color>", style);
-                GUI.color = oldColor;
-            }
-
-            if (isChantingPhase)
-            {
-                Vector2 center = new Vector2(20 + 200, 110 + 15);
-                GUIUtility.ScaleAroundPivot(new Vector2(chantUIScale, chantUIScale), center);
-                GUI.Label(new Rect(20, 110, 400, 30), $"<color=magenta>CHANTING PHASE: {currentChantTimer:F1}s</color>", style);
-                GUIUtility.ScaleAroundPivot(new Vector2(1f / chantUIScale, 1f / chantUIScale), center); // Reset scale
-            }
-
-            // 2. 중앙 그리기 캔버스 (화면 세로의 1/2)
-            GUI.color = new Color(0.8f, 0.9f, 1f, 0.3f);
-            GUI.DrawTexture(scrollCanvasRect, Texture2D.whiteTexture);
-            GUI.color = Color.black;
-            GUI.Label(new Rect(scrollCanvasRect.x + 10, scrollCanvasRect.y + 10, 300, 30), "[그리기 영역] 스페이스바로 마법 발동");
-            GUI.color = Color.white;
-
-            // 3. 좌측: 잉크 (세로 리스트)
-            Item_Ink equippedInk = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedInk : null;
-            var loadout = InventoryManager.Instance != null ? InventoryManager.Instance.combatLoadout : new List<ItemInstance>();
-
-            float leftX = 20f;
-            float bottomYStart = Screen.height - 200f;
-            GUI.Label(new Rect(leftX, bottomYStart, 200, 30), "--- Ink ---", style);
-            int inkCount = 0;
-            for (int i = 0; i < loadout.Count; i++)
-            {
-                if (loadout[i] is Item_Ink ink)
-                {
-                    string prefix = ink == equippedInk ? "<color=cyan>▶ </color>" : "  ";
-                    GUI.Label(new Rect(leftX, bottomYStart + 30 + (inkCount * 30), 200, 30), $"{prefix}{ink.ItemName}", style);
-                    inkCount++;
-                }
-            }
-
-            // 4. 하단 중앙: 활성화된 스크롤 및 영창 상태
-            Item_Scroll activeScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
-            if (activeScroll != null)
-            {
-                GUIStyle centerStyle = new GUIStyle(GUI.skin.label);
-                centerStyle.fontSize = 24;
-                centerStyle.alignment = TextAnchor.MiddleCenter;
-                
-                Rect bottomCenter = new Rect(0, Screen.height - 80, Screen.width, 70);
-                GUI.color = new Color(0, 0, 0, 0.6f);
-                GUI.DrawTexture(bottomCenter, Texture2D.whiteTexture);
-                GUI.color = Color.white;
-                
-                string spell = activeScroll.ScrollData != null ? activeScroll.ScrollData.spellName : "Unknown";
-                string scrollName = activeScroll.isEmpty ? activeScroll.ItemName : spell;
-                string chantStr = "";
-                foreach (var k in currentChantInput) chantStr += $"[{k}] ";
-                
-                string elementStr = currentElement == SpellElement.None ? "" : $"<color=orange> (속성: {currentElement})</color>";
-
-                if (isChantingPhase)
-                {
-                    Vector2 center = new Vector2(Screen.width / 2f, Screen.height - 60f);
-                    GUIUtility.ScaleAroundPivot(new Vector2(chantUIScale, chantUIScale), center);
-                    GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"<color=magenta>영창을 입력하세요!</color> {chantStr}{elementStr}", centerStyle);
-                    GUIUtility.ScaleAroundPivot(new Vector2(1f / chantUIScale, 1f / chantUIScale), center); // Reset
-                }
-                else
-                {
-                    GUI.Label(new Rect(0, Screen.height - 75, Screen.width, 30), $"영창: {chantStr}{elementStr}", centerStyle);
-                }
-                
-                GUI.Label(new Rect(0, Screen.height - 40, Screen.width, 30), $"[Active Scroll] {scrollName} (내구도: {activeScroll.currentDurability})", centerStyle);
-            }
-
-            // 5. 우측: 스크롤 인벤토리 (그리드 형태)
-            Item_Scroll equippedScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
-            float rightX = Screen.width - 250f;
-            GUI.Label(new Rect(rightX, bottomYStart, 200, 30), "--- Scrolls ---", style);
-            int scrollCount = 0;
-            for (int i = 0; i < loadout.Count; i++)
-            {
-                if (loadout[i] is Item_Scroll scroll)
-                {
-                    string prefix = scroll == equippedScroll ? "<color=yellow>▶ </color>" : "  ";
-                    string spell = scroll.ScrollData != null ? scroll.ScrollData.spellName : "Unknown";
-                    string scrollName = scroll.isEmpty ? scroll.ItemName : spell;
-                    GUI.Label(new Rect(rightX, bottomYStart + 30 + (scrollCount * 30), 200, 30), $"{prefix}{scrollName}", style);
-                    scrollCount++;
-                }
-            }
-        }
     }
 }

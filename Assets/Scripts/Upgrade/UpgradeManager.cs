@@ -19,17 +19,10 @@ namespace Magic.Upgrade
 
         public event System.Action OnUpgradeUnlocked;
 
-        private void Awake()
+
+        public void InitInstance()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            Instance = this;
         }
 
         public bool IsNodeUnlocked(UpgradeNodeSO node)
