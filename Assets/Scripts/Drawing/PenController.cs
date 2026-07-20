@@ -20,13 +20,20 @@ namespace Magic.Drawing
 
         public event Action<PlayerDataManager> OnResourceConsumed;
 
-        public Item_Pen CurrentPen
+        public ItemInstance forcedTool;
+
+        public ItemInstance CurrentTool
         {
             get
             {
-                return InventoryManager.Instance != null ? InventoryManager.Instance.EquippedPen : null;
+                if (forcedTool != null) return forcedTool;
+                if (InventoryManager.Instance == null) return null;
+                return InventoryManager.Instance.EquippedPen;
             }
         }
+
+        [Obsolete("Use CurrentTool instead")]
+        public Item_Pen CurrentPen => CurrentTool as Item_Pen;
 
         private void Awake()
         {
@@ -52,30 +59,41 @@ namespace Magic.Drawing
 
         public bool CanDraw()
         {
-            Item_Pen pen = CurrentPen;
-            if (pen == null) return false;
-            if (pen.PenData != null && pen.PenData.consumesMana) return true;
-            return pen.currentInkCapacity > 0f;
+            ItemInstance tool = CurrentTool;
+            if (tool == null) return false;
+            
+            if (tool is Item_Wand) return true;
+            
+            if (tool is Item_Pen pen)
+            {
+                if (pen.PenData != null && pen.PenData.consumesMana) return true;
+                return pen.currentInkCapacity > 0f;
+            }
+            return false;
         }
 
         public void ConsumeResource()
         {
-            Item_Pen pen = CurrentPen;
-            if (pen == null) return;
-            // if (pen.PenData != null && pen.PenData.consumesMana) return; 
-            float rate = pen.PenData.inkConsumptionRate;
+            ItemInstance tool = CurrentTool;
+            if (tool == null) return;
+            if (tool is Item_Wand) return;
             
-            if (pen.PenData.consumesMana)
+            if (tool is Item_Pen pen)
             {
-                if (playerDataManager != null)
+                float rate = pen.PenData.inkConsumptionRate;
+                
+                if (pen.PenData.consumesMana)
                 {
-                    playerDataManager.currentMana -= rate * Time.deltaTime;
-                    if (playerDataManager.currentMana < 0) 
-                        playerDataManager.currentMana = 0;
+                    if (playerDataManager != null)
+                    {
+                        playerDataManager.currentMana -= rate * Time.deltaTime;
+                        if (playerDataManager.currentMana < 0) 
+                            playerDataManager.currentMana = 0;
+                    }
+                } else {
+                    pen.currentInkCapacity -= rate * Time.deltaTime;
+                    if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
                 }
-            } else {
-                pen.currentInkCapacity -= rate * Time.deltaTime;
-                if (pen.currentInkCapacity < 0) pen.currentInkCapacity = 0;
             }
 
             OnResourceConsumed?.Invoke(playerDataManager);
@@ -126,15 +144,19 @@ namespace Magic.Drawing
         /// </summary>
         public void TrackMouse(Camera mainCamera)
         {
-            if (CurrentPen == null) return;
-            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null) return;
+            if (CurrentTool == null) return;
+            
+            if (CurrentTool is Item_Pen)
+            {
+                if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null) return;
+            }
             
             penVisual.position = GetMouseWorldPosition(mainCamera);
         }
 
         public void PlayIdleAnimation(bool smooth = false)
         {
-            if (CurrentPen == null) return;
+            if (CurrentTool == null) return;
             penVisual.DOKill();
             
             if (smooth)
@@ -155,7 +177,7 @@ namespace Magic.Drawing
 
         public void PlayDrawAnimation()
         {
-            if (CurrentPen == null) return;
+            if (CurrentTool == null) return;
             penVisual.DOKill();
             // 약간 눕혀서 그리는 느낌의 각도로 변경 (-35도, 속도 완화)
             penVisual.DOLocalRotate(new Vector3(0, 0, -35f), 0.25f).SetEase(Ease.OutQuad);
@@ -163,7 +185,7 @@ namespace Magic.Drawing
 
         public void GoToInkBottle(RectTransform inkBottle, Action onArrived, Action onComplete, bool instant = false)
         {
-            if (CurrentPen == null) return;
+            if (CurrentTool == null) return;
             penVisual.DOKill();
             penVisual.localRotation = Quaternion.Euler(0, 0, 0);
             
@@ -229,16 +251,19 @@ namespace Magic.Drawing
 
         public void ReturnToMouse(Camera mainCamera, Action onComplete)
         {
-            if (CurrentPen == null)
+            if (CurrentTool == null)
             {
                 onComplete?.Invoke();
                 return;
             }
             
-            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
+            if (CurrentTool is Item_Pen)
             {
-                onComplete?.Invoke();
-                return;
+                if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
+                {
+                    onComplete?.Invoke();
+                    return;
+                }
             }
 
             isAtInkBottle = false;

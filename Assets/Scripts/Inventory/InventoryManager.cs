@@ -71,6 +71,7 @@ namespace Magic.Inventory
         public event System.Action<Item_Scroll> OnScrollEquipped;
         public event System.Action<Item_Ink> OnInkEquipped;
         public event System.Action<Item_Pen> OnPenEquipped;
+        public event System.Action<Item_Wand> OnWandEquipped;
 
         public Item_Scroll EquippedScroll
         {
@@ -99,6 +100,16 @@ namespace Magic.Inventory
             {
                 _player.equippedPen = value;
                 OnPenEquipped?.Invoke(value);
+            }
+        }
+
+        public Item_Wand EquippedWand
+        {
+            get => _player.equippedWand;
+            set
+            {
+                _player.equippedWand = value;
+                OnWandEquipped?.Invoke(value);
             }
         }
 
@@ -170,11 +181,13 @@ namespace Magic.Inventory
             if (EquippedScroll == item) EquippedScroll = CycleItem<Item_Scroll>(null, 1);
             if (EquippedInk == item) EquippedInk = CycleItem<Item_Ink>(null, 1);
             if (EquippedPen == item) EquippedPen = CycleItem<Item_Pen>(null, 1);
+            if (EquippedWand == item) EquippedWand = CycleItem<Item_Wand>(null, 1);
         }
 
         public void CycleScroll(int dir) { EquippedScroll = CycleItem(EquippedScroll, dir); }
         public void CycleInk(int dir) { EquippedInk = CycleItem(EquippedInk, dir); }
         public void CyclePen(int dir) { EquippedPen = CycleItem(EquippedPen, dir); }
+        public void CycleWand(int dir) { EquippedWand = CycleItem(EquippedWand, dir); }
 
         private T CycleItem<T>(T currentItem, int dir) where T : ItemInstance
         {

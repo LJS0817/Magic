@@ -26,6 +26,12 @@ namespace Magic.Editor
             public ScrollDef(string n, int md, float a, string g, string d) { name = n; maxDurability = md; accuracyScore = a; grade = g; description = d; }
         }
 
+        private struct WandDef
+        {
+            public string name; public float manaCostMultiplier; public string grade; public string description;
+            public WandDef(string n, float m, string g, string d) { name = n; manaCostMultiplier = m; grade = g; description = d; }
+        }
+
         private static readonly PenDef[] PenDefs = new PenDef[]
         {
             // 일반 등급 5개
@@ -82,6 +88,16 @@ namespace Magic.Editor
             new ScrollDef("영원의 두루마리", 50, 1.5f, "전설", "절대 찢어지지 않을 것 같은 신비한 소재의 두루마리입니다.")
         };
 
+        private static readonly WandDef[] WandDefs = new WandDef[]
+        {
+            new WandDef("갈라진 재물나무 지팡이", 1.2f, "하급", "손잡이가 닳고 나무가 갈라져 마력 전도율이 다소 떨어지는 견습용 지팡이입니다."),
+            new WandDef("단풍나무 학도 지팡이", 1.0f, "일반", "가볍고 견고한 단풍나무로 제작되어 마도학교 학도들이 주로 사용하는 표준 지팡이입니다."),
+            new WandDef("은도금 호두나무 지팡이", 0.9f, "고급", "단단한 호두나무 표면에 은선을 입혀 마나의 방출을 한결 매끄럽게 다듬은 고급 지팡이입니다."),
+            new WandDef("창공의 비룡 뼈 지팡이", 0.8f, "희귀", "바람을 가르는 비룡의 뼈를 가공해 만들어, 속성 마법의 위력을 크게 증폭시켜 줍니다."),
+            new WandDef("심연의 흑단목 지팡이", 0.6f, "영웅", "빛조차 스며들지 않는 칠흑 같은 흑단목으로 벼려내어, 막대한 마력을 폭발적으로 쏟아낼 수 있습니다."),
+            new WandDef("초월자의 이그드라실 가지", 0.4f, "전설", "신화 속 세계수에서 떨어져 나온 신성한 가지로, 마력을 주입하는 즉시 기적을 실체화하는 전설의 지팡이입니다.")
+        };
+
         [MenuItem("Magic/Tools/Generate Item Database")]
         public static void GenerateDatabase()
         {
@@ -90,6 +106,7 @@ namespace Magic.Editor
             CreateFolderIfNotExists(rootPath, "Pens");
             CreateFolderIfNotExists(rootPath, "Inks");
             CreateFolderIfNotExists(rootPath, "Scrolls");
+            CreateFolderIfNotExists(rootPath, "Wands");
 
             string dbPath = rootPath + "/ItemDatabase.asset";
             ItemDatabase db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
@@ -103,6 +120,7 @@ namespace Magic.Editor
             db.pens.Clear();
             db.inks.Clear();
             db.scrolls.Clear();
+            db.wands.Clear();
 
             // Generate Pens
             foreach (var def in PenDefs)
@@ -153,6 +171,21 @@ namespace Magic.Editor
                 db.scrolls.Add(asset);
             }
 
+            // Generate Wands
+            foreach (var def in WandDefs)
+            {
+                string assetPath = $"{rootPath}/Wands/Wand_{def.name.Replace(" ", "_")}.asset";
+                ItemWandSO asset = GetOrCreateAsset<ItemWandSO>(assetPath);
+                
+                asset.itemName = def.name;
+                asset.defaultManaCostMultiplier = def.manaCostMultiplier;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+                
+                EditorUtility.SetDirty(asset);
+                db.wands.Add(asset);
+            }
+
             if (isNewDb)
             {
                 AssetDatabase.CreateAsset(db, dbPath);
@@ -165,7 +198,7 @@ namespace Magic.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\nDB 위치: {dbPath}");
+            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\nDB 위치: {dbPath}");
         }
 
         private static T GetOrCreateAsset<T>(string path) where T : ScriptableObject

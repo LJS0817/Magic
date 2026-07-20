@@ -10,13 +10,14 @@ namespace Magic.Inventory
         public List<ItemPenSO> pens = new List<ItemPenSO>();
         public List<ItemInkSO> inks = new List<ItemInkSO>();
         public List<ItemScrollSO> scrolls = new List<ItemScrollSO>();
+        public List<ItemWandSO> wands = new List<ItemWandSO>();
 
         private Dictionary<string, ItemDataSO> _itemCache;
         private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
 
         public void InitializeCache()
         {
-            if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count)) return;
+            if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count)) return;
 
             _itemCache = new Dictionary<string, ItemDataSO>();
             _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
@@ -43,6 +44,12 @@ namespace Magic.Inventory
             {
                 if (scroll != null && !_itemCache.ContainsKey(scroll.itemName))
                     _itemCache.Add(scroll.itemName, scroll);
+            }
+
+            foreach (var wand in wands)
+            {
+                if (wand != null && !_itemCache.ContainsKey(wand.itemName))
+                    _itemCache.Add(wand.itemName, wand);
             }
         }
 
@@ -83,6 +90,12 @@ namespace Magic.Inventory
         {
             var scrollData = GetItemData<ItemScrollSO>(itemName);
             return scrollData != null ? new Item_Scroll(scrollData) : null;
+        }
+
+        public Item_Wand CreateWandInstance(string itemName)
+        {
+            var wandData = GetItemData<ItemWandSO>(itemName);
+            return wandData != null ? new Item_Wand(wandData) : null;
         }
     }
 }

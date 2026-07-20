@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Magic.Inventory
 {
-    public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook }
+    public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand }
 
     [System.Serializable]
     public abstract class ItemInstance
@@ -154,6 +154,16 @@ namespace Magic.Inventory
             {
                 Magic.Data.PlayerDataManager.Instance.UnlockRecipe(RecipeBookData.targetSpellName);
             }
+        }
+    }
+
+    [System.Serializable]
+    public class Item_Wand : ItemInstance
+    {
+        public ItemWandSO WandData => data as ItemWandSO;
+
+        public Item_Wand(ItemWandSO wandData) : base(wandData)
+        {
         }
     }
 }

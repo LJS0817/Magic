@@ -89,6 +89,7 @@ namespace Magic.Data
         public Item_Scroll equippedScroll;
         public Item_Ink equippedInk;
         public Item_Pen equippedPen;
+        public Item_Wand equippedWand;
 
         public void InitInstance()
         {

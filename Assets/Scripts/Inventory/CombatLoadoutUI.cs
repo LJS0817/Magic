@@ -52,7 +52,16 @@ namespace Magic.Inventory
             allItemsScroll = GUILayout.BeginScrollView(allItemsScroll);
             foreach (var item in allItems)
             {
-                bool isInLoadout = loadout.Contains(item);
+                if (item is Item_Scroll scroll)
+                {
+                    if (scroll.isEmpty) continue;
+                }
+                else if (!(item is Item_Wand))
+                {
+                    continue;
+                }
+
+                bool isInLoadout = loadout.Contains(item) || InventoryManager.Instance.EquippedWand == item;
                 GUI.enabled = !isInLoadout; // 이미 장착 중이면 비활성화
 
                 GUILayout.BeginHorizontal();
@@ -61,7 +70,15 @@ namespace Magic.Inventory
 
                 if (GUILayout.Button("장착", GUILayout.Width(60)))
                 {
-                    InventoryManager.Instance.AddToLoadout(item);
+                    if (item is Item_Wand wand)
+                    {
+                        InventoryManager.Instance.EquippedWand = wand;
+                        InventoryManager.Instance.NotifyLoadoutChanged();
+                    }
+                    else
+                    {
+                        InventoryManager.Instance.AddToLoadout(item);
+                    }
                 }
                 GUILayout.EndHorizontal();
                 
@@ -78,6 +95,19 @@ namespace Magic.Inventory
             
             loadoutScroll = GUILayout.BeginScrollView(loadoutScroll);
             
+            var equippedWand = InventoryManager.Instance.EquippedWand;
+            if (equippedWand != null)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"- {GetDisplayName(equippedWand)} [지팡이]");
+                if (GUILayout.Button("해제", GUILayout.Width(60)))
+                {
+                    InventoryManager.Instance.EquippedWand = null;
+                    InventoryManager.Instance.NotifyLoadoutChanged();
+                }
+                GUILayout.EndHorizontal();
+            }
+
             // 리스트에서 삭제할 때 오류 방지를 위해 복사본 순회 또는 역순 순회
             List<ItemInstance> loadoutCopy = new List<ItemInstance>(loadout);
             foreach (var item in loadoutCopy)

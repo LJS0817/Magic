@@ -158,7 +158,7 @@ namespace Magic.Combat
             }
         }
 
-        public void EvaluateParryClash(string spellName, SpellType spellType, SpellElement playerElement)
+        public void EvaluateParryClash(string spellName, SpellType spellType, List<SpellElement> playerElements)
         {
             if (!IsParryWindowOpen) return;
             IsParryWindowOpen = false;
@@ -172,20 +172,38 @@ namespace Magic.Combat
             }
 
             SpellElement enemyElement = enemy.currentAttackElement;
-            bool isAdvantage = CheckAdvantage(playerElement, enemyElement);
+            bool isAdvantage = false;
+            SpellElement successfulElement = SpellElement.None;
+            
+            foreach (var el in playerElements)
+            {
+                if (CheckAdvantage(el, enemyElement))
+                {
+                    isAdvantage = true;
+                    successfulElement = el;
+                    break;
+                }
+            }
 
             if (isAdvantage)
             {
                 // 패링 성공! 상성 우위
-                Debug.Log($"<color=lime>[Combat] 패링 성공! {playerElement} 속성이 적의 {enemyElement} 속성을 파훼했습니다!</color>");
+                Debug.Log($"<color=lime>[Combat] 패링 성공! {successfulElement} 속성이 적의 {enemyElement} 속성을 파훼했습니다!</color>");
                 enemy.OnParried();
-                enemy.TakeDamage(30f, playerElement); // 카운터 데미지
+                
+                // 적용된 모든 속성으로 피해를 입힘
+                foreach (var el in playerElements)
+                {
+                    enemy.TakeDamage(30f, el); // 카운터 데미지
+                }
+                
                 EndEnemyTurn();
             }
             else
             {
+                string elementsString = string.Join(", ", playerElements);
                 // 상성 열위 또는 무속성 -> 크로스 카운터 (적은 데미지 안입고 유저만 피해 입음 - 수정된 룰 적용)
-                Debug.Log($"<color=red>[Combat] 패링 실패! 상성({playerElement} vs {enemyElement})이 불리하여 마법이 상쇄되었습니다!</color>");
+                Debug.Log($"<color=red>[Combat] 패링 실패! 상성({elementsString} vs {enemyElement})이 불리하여 마법이 상쇄되었습니다!</color>");
                 enemy.ExecuteAttack(1f); // 유저 피해 100%
                 // 적 데미지 생략
                 EndEnemyTurn();

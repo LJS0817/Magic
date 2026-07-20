@@ -85,6 +85,7 @@ namespace Magic.Drawing
 
         private void HandleResourceConsumed(PlayerDataManager pMan)
         {
+            if (manaSlider == null) return;
             manaSlider.SetValue(pMan.currentMana, pMan.GetMaxMana());
         }
 
@@ -254,19 +255,23 @@ namespace Magic.Drawing
                 return; 
             }
 
-            Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
-            if (currentScroll == null || !currentScroll.isEmpty)
+            ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
+            
+            // 지팡이가 아니라면(펜이라면) 빈 스크롤이 장착되어 있어야 함
+            if (!(currentTool is Item_Wand))
             {
-                return;
+                Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+                if (currentScroll == null || !currentScroll.isEmpty)
+                {
+                    return;
+                }
             }
 
-            // 펜 확인
-            Item_Pen currentPen = penController != null ? penController.CurrentPen : null;
             if (penController == null || !penController.CanDraw())
             {
-                string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana 
+                string warnMsg = currentTool != null && currentTool is Item_Pen pen && pen.PenData != null && pen.PenData.consumesMana 
                     ? "[그리기 실패] 마력이 부족하여 마나 펜을 사용할 수 없습니다." 
-                    : "[그리기 실패] 펜을 선택하지 않았거나 펜에 잉크가 없습니다. (스크롤 밖으로 나가서 충전하세요)";
+                    : "[그리기 실패] 그릴 도구를 선택하지 않았거나 잉크가 없습니다. (스크롤 밖으로 나가서 충전하세요)";
                 Debug.LogWarning(warnMsg);
                 return;
             }
@@ -277,11 +282,15 @@ namespace Magic.Drawing
             GameObject lineObj = Instantiate(drawingDatabase.linePrefab, drawingArea);
             currentLine = lineObj.GetComponent<DrawingLine>();
 
-            // 장착된 잉크의 색상으로 선 색상 변경
+            // 지팡이는 시안색, 펜은 장착된 잉크의 색상으로 선 색상 변경
             Color lineColor = Color.black;
-            if (inkController != null && penController != null)
+            if (currentTool is Item_Wand)
             {
-                lineColor = inkController.GetLineColor(penController.CurrentPen);
+                lineColor = Color.cyan;
+            }
+            else if (inkController != null && penController != null)
+            {
+                lineColor = inkController.GetLineColor(currentTool as Item_Pen);
             }
             currentLine.SetColor(lineColor);
 
@@ -307,13 +316,13 @@ namespace Magic.Drawing
 
             if (ShouldConsumeInk() && penController != null)
             {
-                Item_Pen currentPen = penController.CurrentPen;
                 if (!penController.CanDraw())
                 {
                     EndStroke();
-                    string warnMsg = currentPen != null && currentPen.PenData != null && currentPen.PenData.consumesMana
+                    ItemInstance currentTool = penController.CurrentTool;
+                    string warnMsg = currentTool != null && currentTool is Item_Pen pen && pen.PenData != null && pen.PenData.consumesMana
                         ? "[그리기] 플레이어 마력이 바닥나 그릴 수 없습니다!"
-                        : "[그리기] 펜의 잉크가 바닥났습니다! 스크롤 밖으로 나가 잉크를 충전하세요.";
+                        : "[그리기] 그릴 도구의 자원이 바닥났습니다! 스크롤 밖으로 나가 충전하세요.";
                     Debug.LogWarning(warnMsg);
                     return;
                 }

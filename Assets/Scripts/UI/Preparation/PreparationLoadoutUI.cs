@@ -1,0 +1,174 @@
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+using Magic.Inventory;
+using UnityEngine.SceneManagement;
+
+namespace Magic.UI
+{
+    public class PreparationLoadoutUI : PagedUIController<InventorySlot>
+    {
+        [Header("Loadout Setup")]
+        [SerializeField] private List<Sprite> _slotBackgrounds;
+        [SerializeField] private Sprite _emptySlotIcon;
+        [SerializeField] private ItemInfoPanel _infoPanel;
+        [SerializeField] private RectTransform _inventoryPanel;
+        [SerializeField] private int _loadoutCapacity = 20;
+        [SerializeField] private InventorySlot _wandSlot;
+
+        private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
+        private InventorySlot _hoveredSlot;
+
+        protected override void Awake()
+        {
+            base.Awake();
+        }
+
+        private void Start()
+        {
+            if (_infoPanel != null) _infoPanel.Close();
+
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.OnLoadoutChanged += RefreshList;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.OnLoadoutChanged -= RefreshList;
+            }
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            RefreshList();
+        }
+
+        public override void RefreshList()
+        {
+            if (InventoryManager.Instance == null) return;
+
+            var loadout = InventoryManager.Instance.combatLoadout;
+            List<ItemInstance> keysToRemove = new List<ItemInstance>();
+            foreach (var key in _itemBackgroundMap.Keys)
+            {
+                if (!loadout.Contains(key)) keysToRemove.Add(key);
+            }
+            foreach (var key in keysToRemove) _itemBackgroundMap.Remove(key);
+
+            UpdateWandSlot();
+
+            base.RefreshList();
+        }
+
+        private void UpdateWandSlot()
+        {
+            if (_wandSlot == null || InventoryManager.Instance == null) return;
+            var wand = InventoryManager.Instance.EquippedWand;
+            _wandSlot.Initialize(OnWandSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnWandSlotDoubleClicked, null);
+
+            if (wand != null)
+            {
+                _wandSlot.SetInfo(wand, GetSlotBackground(wand), _emptySlotIcon, true);
+            }
+            else
+            {
+                _wandSlot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
+            }
+        }
+
+        private void OnWandSlotClicked(InventorySlot slot) { }
+
+        private void OnWandSlotDoubleClicked(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
+            InventoryManager.Instance.EquippedWand = null;
+            InventoryManager.Instance.NotifyLoadoutChanged();
+
+            if (_infoPanel != null && _hoveredSlot == slot)
+            {
+                _infoPanel.Close();
+            }
+        }
+
+        protected override int GetTotalCapacity()
+        {
+            if (InventoryManager.Instance == null) return _loadoutCapacity;
+            return Mathf.Max(_loadoutCapacity, InventoryManager.Instance.combatLoadout.Count);
+        }
+
+        protected override void UpdateSlot(InventorySlot slot, int dataIndex)
+        {
+            if (InventoryManager.Instance == null) return;
+            var loadout = InventoryManager.Instance.combatLoadout;
+
+            slot.Initialize(OnSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnSlotDoubleClicked, null);
+
+            if (dataIndex < loadout.Count)
+            {
+                ItemInstance currentItem = loadout[dataIndex];
+                // 로드아웃에 있는 아이템은 "장착됨" 상태이므로 시각적 표시
+                slot.SetInfo(currentItem, GetSlotBackground(currentItem), _emptySlotIcon, true);
+            }
+            else
+            {
+                slot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
+            }
+        }
+
+        private void OnSlotClicked(InventorySlot slot) { }
+
+        private void OnSlotDoubleClicked(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
+
+            var inv = InventoryManager.Instance;
+            inv.RemoveFromLoadout(slot.Item);
+
+            if (_infoPanel != null && _hoveredSlot == slot)
+            {
+                _infoPanel.Close(); // 삭제 시 정보 패널 닫기
+            }
+        }
+
+        private void OnSlotPointerEnter(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null) return;
+            _hoveredSlot = slot;
+
+            if (_infoPanel != null)
+            {
+                _infoPanel.Open();
+                _infoPanel.Setup(slot.Item, true, true);
+                if (_inventoryPanel != null) _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
+            }
+        }
+
+        private void OnSlotPointerExit(InventorySlot slot)
+        {
+            if (_hoveredSlot == slot) _hoveredSlot = null;
+            StartCoroutine(CheckAndClosePanel());
+        }
+
+        private System.Collections.IEnumerator CheckAndClosePanel()
+        {
+            yield return null;
+            if (_infoPanel != null && _hoveredSlot == null) _infoPanel.Close();
+        }
+
+        private Sprite GetSlotBackground(ItemInstance item)
+        {
+            if (_slotBackgrounds == null || _slotBackgrounds.Count == 0) return null;
+            if (item == null) return _slotBackgrounds[0];
+            if (_itemBackgroundMap.TryGetValue(item, out Sprite bg)) return bg;
+            
+            Sprite newBg = _slotBackgrounds[Random.Range(0, _slotBackgrounds.Count)];
+            _itemBackgroundMap[item] = newBg;
+            return newBg;
+        }
+    }
+}

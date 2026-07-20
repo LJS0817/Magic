@@ -39,7 +39,7 @@ namespace Magic.Inventory
             _canvasGroup.alpha = 0f;
         }
 
-        public void Setup(ItemInstance item, bool isEquipped = false)
+        public void Setup(ItemInstance item, bool isEquipped = false, bool showEquipTextForWand = false)
         {
             _currentItem = item;
 
@@ -101,20 +101,28 @@ namespace Magic.Inventory
             if (_clickInfoText != null)
             {
                 _clickInfoText.gameObject.SetActive(true);
-                string actionText = "선택";
-                if (StoreManager.Instance.IsOpened)
+                
+                if (item is Item_Wand && !showEquipTextForWand)
                 {
-                    if (item is Item_Scroll) actionText = "<color=orange>선택</color>";
-                    else actionText = "<color=gray>선택 불가</color>";
+                    _clickInfoText.text = "우클릭 : 버리기";
                 }
                 else
                 {
-                    if (item is Item_Scroll || item is Item_Ink || item is Item_Pen)
+                    string actionText = "선택";
+                    if (StoreManager.Instance != null && StoreManager.Instance.IsOpened)
                     {
-                        actionText = isEquipped ? "장착 해제" : "장착";
+                        if (item is Item_Scroll) actionText = "<color=orange>선택</color>";
+                        else actionText = "<color=gray>선택 불가</color>";
                     }
+                    else
+                    {
+                        if (item is Item_Scroll || item is Item_Ink || item is Item_Pen || item is Item_Wand)
+                        {
+                            actionText = isEquipped ? "장착 해제" : "장착";
+                        }
+                    }
+                    _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
                 }
-                _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
             }
 
             // 텍스트 내용 변경 후 즉시 크기를 반영하기 위한 강제 갱신

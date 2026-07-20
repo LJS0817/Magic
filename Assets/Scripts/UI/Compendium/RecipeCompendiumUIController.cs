@@ -30,7 +30,6 @@ namespace Magic.UI.Compendium
         private void Start()
         {
             Close();
-            if (!recipeListGroup.gameObject.activeInHierarchy) recipeListGroup.gameObject.SetActive(true);
         }
 
         protected override void OnEnable()

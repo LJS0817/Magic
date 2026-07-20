@@ -138,6 +138,11 @@ namespace Magic.Inventory
                 if (inv.EquippedPen == pen) inv.EquippedPen = null;
                 else inv.EquippedPen = pen;
             }
+            else if (slot.Item is Item_Wand)
+            {
+                Debug.LogWarning("[인벤토리] 지팡이는 전투 로드아웃 화면(Combat Preparation)에서만 장착할 수 있습니다!");
+                return;
+            }
             
             // 장착 상태가 바뀌었으므로 툴팁 정보 갱신
             if (_infoPanel != null && _hoveredSlot == slot)
