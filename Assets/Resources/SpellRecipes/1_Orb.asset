@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Orb
   Type: 0
-  icon: {fileID: 0}
+  icon: {fileID: 2671615675137220761, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 50
-  Description: "\uAC00\uC7A5 \uAE30\uCD08\uC801\uC778 \uB9C8\uBC95 \uAD6C\uCCB4. \uB300\uAE30\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC \uC801\uC5D0\uAC8C \uB0A0\uB824\uBCF4\uB0C5\uB2C8\uB2E4."
+  Description: "\uAC00\uC7A5 \uAE30\uCD08\uC801\uC778 \uB9C8\uBC95 \uAD6C\uCCB4.
+    \uB300\uAE30\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC \uC801\uC5D0\uAC8C
+    \uB0A0\uB824\uBCF4\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 1\uAC1C"
-  ActivationHint: "\uB465\uADFC \uAD6C\uCCB4\uB97C \uD615\uC0C1\uD654\uD558\uC5EC \uB2E8\uC21C\uD55C \uC6D0\uC744 \uADF8\uB9AC\uC138\uC694."
+  ActivationHint: "\uB465\uADFC \uAD6C\uCCB4\uB97C \uD615\uC0C1\uD654\uD558\uC5EC
+    \uB2E8\uC21C\uD55C \uC6D0\uC744 \uADF8\uB9AC\uC138\uC694."
   RequiredShapes:
   - Circle
   SpatialRules: []

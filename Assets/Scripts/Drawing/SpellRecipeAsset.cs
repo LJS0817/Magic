@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Magic.Combat;
 
 namespace Magic.Drawing
 {
@@ -31,6 +32,10 @@ namespace Magic.Drawing
         public SpellType Type = SpellType.Attack;
         public Sprite icon;
         
+        [Header("Status Effect (Utility Only)")]
+        public StatusEffectType statusEffect = StatusEffectType.None;
+        public float statusEffectDuration = 0f;
+
         [Tooltip("유저가 보고 따라 그릴 마법진의 완성 표본 도안 이미지")]
         public Sprite drawingSampleImage;
         

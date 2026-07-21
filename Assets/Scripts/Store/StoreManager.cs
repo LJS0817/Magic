@@ -16,11 +16,6 @@ namespace Magic.Store
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
             }
         }
 
@@ -310,6 +305,8 @@ namespace Magic.Store
                     return new Item_Ink(itemData as ItemInkSO);
                 case ItemType.Pen:
                     return new Item_Pen(itemData as ItemPenSO);
+                case ItemType.Wand:
+                    return new Item_Wand(itemData as ItemWandSO);
                 case ItemType.Material:
                     return new Item_Material(itemData);
                 default:

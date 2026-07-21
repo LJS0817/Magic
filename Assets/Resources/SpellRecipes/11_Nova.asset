@@ -14,11 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Nova
   Type: 0
-  icon: {fileID: 0}
+  icon: {fileID: -6043565256065595379, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 30
-  Description: "\uC751\uCD95\uB41C \uB9C8\uB098\uB97C \uC0AC\uBC29\uC73C\uB85C \uD3ED\uBC1C\uC2DC\uCF1C \uC8FC\uBCC0\uC744 \uD729\uC4F8\uC5B4\uBC84\uB9BD\uB2C8\uB2E4."
-  ActivationCondition: "\uC6D0 1\uAC1C, \uC138\uBAA8 3\uAC1C (\uC6D0\uC774 \uC911\uC2EC, \uC138\uBAA8\uAC00 \uBC16\uC744 \uB458\uB7EC\uC308)"
-  ActivationHint: "\uB9C8\uB098 \uACB0\uC815\uC758 \uC911\uC2EC(\uC6D0) \uC8FC\uBCC0\uC73C\uB85C \uB0A0\uCE74\uB85C\uC6B4 \uD30C\uD3B8(\uC138\uBAA8) 3\uAC1C\uB97C \uB458\uB7EC\uC11C \uADF8\uB9AC\uC138\uC694."
+  Description: "\uC751\uCD95\uB41C \uB9C8\uB098\uB97C \uC0AC\uBC29\uC73C\uB85C \uD3ED\uBC1C\uC2DC\uCF1C
+    \uC8FC\uBCC0\uC744 \uD729\uC4F8\uC5B4\uBC84\uB9BD\uB2C8\uB2E4."
+  ActivationCondition: "\uC6D0 1\uAC1C, \uC138\uBAA8 3\uAC1C (\uC6D0\uC774 \uC911\uC2EC,
+    \uC138\uBAA8\uAC00 \uBC16\uC744 \uB458\uB7EC\uC308)"
+  ActivationHint: "\uB9C8\uB098 \uACB0\uC815\uC758 \uC911\uC2EC(\uC6D0) \uC8FC\uBCC0\uC73C\uB85C
+    \uB0A0\uCE74\uB85C\uC6B4 \uD30C\uD3B8(\uC138\uBAA8) 3\uAC1C\uB97C \uB458\uB7EC\uC11C
+    \uADF8\uB9AC\uC138\uC694."
   RequiredShapes:
   - Circle
   - Triangle
@@ -26,4 +31,4 @@ MonoBehaviour:
   - Triangle
   SpatialRules:
   - RuleType: 1
-    TargetIndices: 00000000010000000200000003000000i
+    TargetIndices: 00000000010000000200000003000000

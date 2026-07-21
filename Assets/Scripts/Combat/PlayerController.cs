@@ -1,5 +1,6 @@
 using UnityEngine;
 using Magic.Data;
+using UnityEngine.SceneManagement;
 
 namespace Magic.Combat
 {
@@ -42,6 +43,11 @@ namespace Magic.Combat
         private void Die()
         {
             Debug.Log("<color=gray>[Player] Defeated!</color>");
+        }
+
+        public void Change()
+        {
+            SceneManager.LoadScene("StoreGameScene");
         }
     }
 }

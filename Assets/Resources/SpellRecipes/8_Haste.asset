@@ -14,14 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Haste
   Type: 2
-  icon: {fileID: 0}
+  icon: {fileID: -5204468731763641464, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 40
-  Description: "\uB300\uC0C1\uC758 \uC2DC\uAC04 \uD750\uB984\uC744 \uAC00\uC18D\uC2DC\uCF1C \uC6C0\uC9C1\uC784\uC744 \uBBFC\uCCA9\uD558\uAC8C \uB9CC\uB4ED\uB2C8\uB2E4."
-  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC138\uBAA8 1\uAC1C (\uB124\uBAA8 \uC548\uC5D0 \uC138\uBAA8)"
-  ActivationHint: "\uC548\uC815\uC801\uC778 \uACF5\uAC04(\uB124\uBAA8)\uC5D0 \uAC00\uC18D\uC758 \uD798(\uC138\uBAA8)\uC744 \uBD88\uC5B4\uB123\uC73C\uC138\uC694."
+  Description: "\uB300\uC0C1\uC758 \uC2DC\uAC04 \uD750\uB984\uC744 \uAC00\uC18D\uC2DC\uCF1C
+    \uC6C0\uC9C1\uC784\uC744 \uBBFC\uCCA9\uD558\uAC8C \uB9CC\uB4ED\uB2C8\uB2E4."
+  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC138\uBAA8 1\uAC1C (\uB124\uBAA8
+    \uC548\uC5D0 \uC138\uBAA8)"
+  ActivationHint: "\uC548\uC815\uC801\uC778 \uACF5\uAC04(\uB124\uBAA8)\uC5D0 \uAC00\uC18D\uC758
+    \uD798(\uC138\uBAA8)\uC744 \uBD88\uC5B4\uB123\uC73C\uC138\uC694."
   RequiredShapes:
   - Square
   - Triangle
   SpatialRules:
   - RuleType: 0
-    TargetIndices: 0100000000000000i
+    TargetIndices: 0100000000000000

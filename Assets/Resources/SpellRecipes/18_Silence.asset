@@ -14,14 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Silence
   Type: 2
-  icon: {fileID: 0}
+  icon: {fileID: 4938901441281918934, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 45
-  Description: "\uC9C0\uC815\uB41C \uC601\uC5ED\uC758 \uB9C8\uB098 \uD750\uB984\uC744 \uCC28\uB2E8\uD558\uC5EC \uB9C8\uBC95\uC744 \uBD09\uC778\uD569\uB2C8\uB2E4."
-  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC138\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00 \uC138\uBAA8\uB97C \uB458\uB7EC\uC308)"
-  ActivationHint: "\uBD09\uC778\uC758 \uAD6C\uC5ED(\uB124\uBAA8)\uC73C\uB85C \uC2DC\uC804\uC790\uC758 \uD798(\uC138\uBAA8)\uC744 \uAC10\uC2F8\uC138\uC694."
+  Description: "\uC9C0\uC815\uB41C \uC601\uC5ED\uC758 \uB9C8\uB098 \uD750\uB984\uC744
+    \uCC28\uB2E8\uD558\uC5EC \uB9C8\uBC95\uC744 \uBD09\uC778\uD569\uB2C8\uB2E4."
+  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC138\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00
+    \uC138\uBAA8\uB97C \uB458\uB7EC\uC308)"
+  ActivationHint: "\uBD09\uC778\uC758 \uAD6C\uC5ED(\uB124\uBAA8)\uC73C\uB85C \uC2DC\uC804\uC790\uC758
+    \uD798(\uC138\uBAA8)\uC744 \uAC10\uC2F8\uC138\uC694."
   RequiredShapes:
   - Square
   - Triangle
   SpatialRules:
   - RuleType: 1
-    TargetIndices: 0000000001000000i
+    TargetIndices: 0000000001000000

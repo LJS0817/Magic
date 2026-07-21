@@ -11,6 +11,8 @@ namespace Magic.Combat
         PlayerTurn,
         PlayerChanting,
         EnemyTurn,
+        WaveTransition,
+        FloorCleared,
         BattleEnd
     }
 
@@ -19,6 +21,10 @@ namespace Magic.Combat
         public static CombatManager Instance { get; private set; }
 
         public CombatState CurrentState { get; private set; } = CombatState.Idle;
+
+        [Header("Dungeon Progression")]
+        public int currentFloor = 1;
+        public int currentWave = 1;
 
         [Header("ATB Settings")]
         public float maxATB = 100f;
@@ -55,14 +61,14 @@ namespace Magic.Combat
 
         private void Update()
         {
-            if (CurrentState == CombatState.BattleEnd) return;
+            if (CurrentState == CombatState.BattleEnd || CurrentState == CombatState.FloorCleared || CurrentState == CombatState.WaveTransition) return;
 
             if (player == null || enemy == null) return;
             
-            if (player.health <= 0 || enemy.health <= 0)
+            if (player.health <= 0)
             {
                 CurrentState = CombatState.BattleEnd;
-                Debug.Log("[Combat] Battle Ended!");
+                Debug.Log("[Combat] Battle Ended! Player Defeated.");
                 return;
             }
 
@@ -87,7 +93,11 @@ namespace Magic.Combat
         private void FillATBGauges()
         {
             currentPlayerATB += playerATBFillRate * Time.deltaTime;
-            currentEnemyATB += enemyATBFillRate * Time.deltaTime;
+            
+            if (enemy != null)
+            {
+                currentEnemyATB += enemyATBFillRate * Time.deltaTime;
+            }
 
             if (currentPlayerATB >= maxATB)
             {
@@ -232,9 +242,88 @@ namespace Magic.Combat
 
         public void EndEnemyTurn()
         {
+            if (enemy != null)
+            {
+                enemy.OnTurnEnd();
+            }
             currentEnemyATB = 0f;
             IsParryWindowOpen = false;
             CurrentState = CombatState.Idle;
+        }
+
+        public void OnEnemyDefeated()
+        {
+            if (currentWave < 4) // 1, 2, 3 are normal waves, 4 is boss
+            {
+                currentWave++;
+                StartCoroutine(StartNextWaveCoroutine());
+            }
+            else
+            {
+                // Boss defeated!
+                CurrentState = CombatState.FloorCleared;
+                Debug.Log($"<color=yellow>[Combat] Floor {currentFloor} Cleared!</color>");
+            }
+        }
+
+        private System.Collections.IEnumerator StartNextWaveCoroutine()
+        {
+            CurrentState = CombatState.WaveTransition;
+            yield return new WaitForSeconds(1.5f);
+            
+            // Set stats based on floor and wave
+            float healthMultiplier = 1f + (currentFloor - 1) * 0.5f + (currentWave - 1) * 0.2f;
+            float damageMultiplier = 1f + (currentFloor - 1) * 0.2f + (currentWave - 1) * 0.1f;
+            
+            if (currentWave == 4)
+            {
+                healthMultiplier *= 2.0f; // Boss is twice as tanky
+                damageMultiplier *= 1.5f;
+                Debug.Log($"<color=red>[Combat] Floor {currentFloor} - BOSS BATTLE START!</color>");
+            }
+            else
+            {
+                Debug.Log($"<color=cyan>[Combat] Floor {currentFloor} - Wave {currentWave} Start!</color>");
+            }
+
+            enemy.maxHealth = 100f * healthMultiplier;
+            enemy.attackDamage = 15f * damageMultiplier;
+            enemy.Spawn();
+            
+            currentPlayerATB = 0f;
+            currentEnemyATB = 0f;
+            CurrentState = CombatState.Idle;
+        }
+
+        public void StartNextFloor()
+        {
+            currentFloor++;
+            currentWave = 1;
+            StartCoroutine(StartNextWaveCoroutine());
+        }
+
+        private void OnGUI()
+        {
+            GUIStyle labelStyle = new GUIStyle(GUI.skin.label);
+            labelStyle.fontSize = 20;
+            labelStyle.alignment = TextAnchor.UpperCenter;
+            labelStyle.richText = true;
+            GUI.Label(new Rect(0, 20, Screen.width, 30), $"<color=white><b>{currentFloor}F - Wave {currentWave}/4 {(currentWave == 4 ? "(BOSS)" : "")}</b></color>", labelStyle);
+
+            if (CurrentState == CombatState.FloorCleared)
+            {
+                GUIStyle btnStyle = new GUIStyle(GUI.skin.button);
+                btnStyle.fontSize = 24;
+                float width = 200f;
+                float height = 60f;
+                float x = (Screen.width - width) / 2f;
+                float y = (Screen.height - height) / 2f;
+
+                if (GUI.Button(new Rect(x, y, width, height), $"Next Floor ({currentFloor + 1}F)", btnStyle))
+                {
+                    StartNextFloor();
+                }
+            }
         }
     }
 }

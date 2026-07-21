@@ -206,6 +206,7 @@ namespace Magic.Inventory
             DrawCategory<ItemScrollSO>("빈 스크롤 & 완성형 스크롤", db.scrolls.ToArray());
             DrawCategory<ItemInkSO>("마법 잉크", db.inks.ToArray());
             DrawCategory<ItemPenSO>("마법 펜", db.pens.ToArray());
+            DrawCategory<ItemWandSO>("마법 지팡이", db.wands.ToArray());
         }
 
         private void DrawCategory<T>(string title, T[] items) where T : ItemDataSO

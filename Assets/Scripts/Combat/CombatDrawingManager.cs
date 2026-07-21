@@ -35,6 +35,7 @@ namespace Magic.Combat
         private SpellType cachedSpellType = SpellType.Attack;
         private Item_Scroll cachedScroll = null;
         private SpellElement cachedBaseElement = SpellElement.None;
+        private SpellRecipeAsset cachedAsset = null;
 
         [Header("UI Animations")]
         private float chantUIScale = 1f;
@@ -65,6 +66,23 @@ namespace Magic.Combat
             if (penController != null && InventoryManager.Instance != null)
             {
                 penController.forcedTool = InventoryManager.Instance.EquippedWand;
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (isChantingPhase)
+            {
+                HandleChantInput();
+
+                currentChantTimer -= Time.deltaTime;
+                if (currentChantTimer <= 0f)
+                {
+                    Debug.Log("<color=orange>[영창 시간 초과] 속성 부여 없이 마법이 발동됩니다.</color>");
+                    ExecuteSpell();
+                }
             }
         }
 
@@ -148,6 +166,7 @@ namespace Magic.Combat
             cachedSpellScore = averageScore;
             cachedSpellType = sType;
             cachedScroll = _isCastingFromScroll ? _castingScroll : null;
+            cachedAsset = matchedAsset;
             
             currentChantInput.Clear();
             currentElement = SpellElement.None;
@@ -230,9 +249,26 @@ namespace Magic.Combat
                 }
                 else
                 {
-                    foreach (var el in appliedElements)
+                    if (cachedSpellType != SpellType.Utility)
                     {
-                        CombatManager.Instance.enemy.TakeDamage(25f, el);
+                        foreach (var el in appliedElements)
+                        {
+                            CombatManager.Instance.enemy.TakeDamage(25f, el);
+                        }
+                    }
+
+                    if (cachedAsset != null && cachedAsset.statusEffect != StatusEffectType.None)
+                    {
+                        string colorStr = "yellow";
+                        if (cachedAsset.statusEffect == StatusEffectType.Confusion) colorStr = "magenta";
+                        else if (cachedAsset.statusEffect == StatusEffectType.Burn) colorStr = "red";
+                        
+                        Debug.Log($"<color={colorStr}>[전투] {cachedSpellName} 적중! 적에게 {cachedAsset.statusEffect} 효과를 부여합니다.</color>");
+                        CombatManager.Instance.enemy.ApplyStatusEffect(cachedAsset.statusEffect, cachedAsset.statusEffectDuration);
+                    }
+                    else if (cachedSpellType == SpellType.Utility)
+                    {
+                        Debug.Log($"<color=cyan>[전투] {cachedSpellName} 유틸리티 마법이 발동되었습니다!</color>");
                     }
                 }
                 CombatManager.Instance.EndPlayerTurn();
@@ -336,7 +372,7 @@ namespace Magic.Combat
             }
             else if (Input.GetMouseButton(0))
             {
-                if (!isDrawing && isPenReady)
+                if (!isDrawing)
                 {
                     StartStroke();
                 }
@@ -349,6 +385,34 @@ namespace Magic.Combat
             {
                 EndStroke();
             }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                MatchCombo();
+            }
+        }
+
+        protected override void StartStroke()
+        {
+            ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
+            if (currentTool == null) return;
+            
+            if (penController == null || !penController.CanDraw())
+            {
+                Debug.LogWarning("[전투 그리기 실패] 마력을 소진했거나 도구를 사용할 수 없습니다.");
+                return;
+            }
+
+            isDrawing = true;
+            if (penController != null) penController.PlayDrawAnimation();
+            
+            Transform parentTransform = drawingArea != null ? drawingArea : transform;
+            GameObject lineObj = Instantiate(drawingDatabase.linePrefab, parentTransform);
+            currentLine = lineObj.GetComponent<DrawingLine>();
+
+            currentLine.SetColor(Color.cyan); // 전투에서는 기본적으로 지팡이 색(시안색) 사용
+
+            UpdateStroke();
         }
 
     }

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 039e1ab3e8bd97c49a03075552f00a74, type: 3}
+  m_Name: "Wand_\uC2EC\uC5F0\uC758_\uD751\uB2E8\uBAA9_\uC9C0\uD321\uC774"
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemWandSO
+  type: 6
+  rarity: 3
+  itemName: "\uC2EC\uC5F0\uC758 \uD751\uB2E8\uBAA9 \uC9C0\uD321\uC774"
+  itemDescription: "\uBE5B\uC870\uCC28 \uC2A4\uBA70\uB4E4\uC9C0 \uC54A\uB294 \uCE60\uD751
+    \uAC19\uC740 \uD751\uB2E8\uBAA9\uC73C\uB85C \uBCBC\uB824\uB0B4\uC5B4, \uB9C9\uB300\uD55C
+    \uB9C8\uB825\uC744 \uD3ED\uBC1C\uC801\uC73C\uB85C \uC3DF\uC544\uB0BC \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  defaultManaCostMultiplier: 0.6

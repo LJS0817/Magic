@@ -50,3 +50,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 291895129655d8744907035358712aea, type: 2}
   - {fileID: 11400000, guid: 61db6042be2cff243a767d2a3285253e, type: 2}
   - {fileID: 11400000, guid: 62447da46c91d2548ad624d57d9f2edc, type: 2}
+  wands:
+  - {fileID: 11400000, guid: ae38004dd28ebc143b66635c8e2f90e8, type: 2}
+  - {fileID: 11400000, guid: dd049a28dbded5d41923733975d3fa8e, type: 2}
+  - {fileID: 11400000, guid: 7a992ddcfe121244792947cce8071076, type: 2}
+  - {fileID: 11400000, guid: acebd8f8e49ec964b9da226da35b0cfa, type: 2}
+  - {fileID: 11400000, guid: 18b4345e88bbce14d954fac75162c825, type: 2}
+  - {fileID: 11400000, guid: f947a8ef363bcc045bf2c3a5caf05108, type: 2}

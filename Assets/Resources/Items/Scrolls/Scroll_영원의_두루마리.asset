@@ -15,7 +15,8 @@ MonoBehaviour:
   type: 0
   rarity: 4
   itemName: "\uC601\uC6D0\uC758 \uB450\uB8E8\uB9C8\uB9AC"
-  itemDescription: "\uC808\uB300 \uCC22\uC5B4\uC9C0\uC9C0 \uC54A\uC744 \uAC83 \uAC19\uC740 \uC2E0\uBE44\uD55C \uC18C\uC7AC\uC758 \uB450\uB8E8\uB9C8\uB9AC\uC785\uB2C8\uB2E4."
+  itemDescription: "\uC808\uB300 \uCC22\uC5B4\uC9C0\uC9C0 \uC54A\uC744 \uAC83 \uAC19\uC740
+    \uC2E0\uBE44\uD55C \uC18C\uC7AC\uC758 \uB450\uB8E8\uB9C8\uB9AC\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: 4503596007538546124, guid: 5b415b21c38914142bcae80fe9796d38, type: 3}
   basePriceInCopper: 100
   spellName: 

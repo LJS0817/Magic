@@ -15,7 +15,8 @@ MonoBehaviour:
   type: 1
   rarity: 1
   itemName: "\uB18D\uCD95\uB41C \uB9C8\uB825 \uC789\uD06C"
-  itemDescription: "\uB9C8\uB825\uC774 \uC9D9\uAC8C \uBC30\uC5B4\uC788\uC5B4 \uC120\uBA85\uD558\uACE0 \uB69C\uB837\uD55C \uB9C8\uBC95\uC9C4\uC744 \uADF8\uB9B4 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  itemDescription: "\uB9C8\uB825\uC774 \uC9D9\uAC8C \uBC30\uC5B4\uC788\uC5B4 \uC120\uBA85\uD558\uACE0
+    \uB69C\uB837\uD55C \uB9C8\uBC95\uC9C4\uC744 \uADF8\uB9B4 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: -3129803202309773558, guid: c9cf0878a9146da46af45125043c9e1b, type: 3}
   basePriceInCopper: 100
   maxAmount: 150

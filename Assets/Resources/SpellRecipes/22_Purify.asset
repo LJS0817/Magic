@@ -14,15 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Purify
   Type: 2
-  icon: {fileID: 0}
+  icon: {fileID: -1889205205, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 40
-  Description: "\uB300\uC0C1\uC5D0\uAC8C \uAC78\uB9B0 \uBAA8\uB4E0 \uD574\uB85C\uC6B4 \uB9C8\uBC95 \uD6A8\uACFC\uB97C \uC815\uD654\uD569\uB2C8\uB2E4."
-  ActivationCondition: "\uC6D0 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C, \uC6D0 1\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
-  ActivationHint: "\uC815\uD654\uC758 \uACE0\uB9AC(\uC6D0) \uC0AC\uC774\uC5D0 \uB9D1\uC740 \uB9C8\uB098(\uB9C8\uB984\uBAA8)\uB97C \uB450\uC138\uC694."
+  Description: "\uB300\uC0C1\uC5D0\uAC8C \uAC78\uB9B0 \uBAA8\uB4E0 \uD574\uB85C\uC6B4
+    \uB9C8\uBC95 \uD6A8\uACFC\uB97C \uC815\uD654\uD569\uB2C8\uB2E4."
+  ActivationCondition: "\uC6D0 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C, \uC6D0 1\uAC1C
+    (\uC77C\uB82C \uBC30\uCE58)"
+  ActivationHint: "\uC815\uD654\uC758 \uACE0\uB9AC(\uC6D0) \uC0AC\uC774\uC5D0 \uB9D1\uC740
+    \uB9C8\uB098(\uB9C8\uB984\uBAA8)\uB97C \uB450\uC138\uC694."
   RequiredShapes:
   - Circle
   - Rhombus
   - Circle
   SpatialRules:
   - RuleType: 2
-    TargetIndices: 000000000100000002000000i
+    TargetIndices: 000000000100000002000000

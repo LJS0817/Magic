@@ -14,14 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Teleport
   Type: 2
-  icon: {fileID: 0}
+  icon: {fileID: -3160770046920691631, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 70
-  Description: "\uACF5\uAC04\uC744 \uC65C\uACE1\uD558\uC5EC \uC9C0\uC815\uD55C \uC704\uCE58\uB85C \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."
-  ActivationCondition: "\uC6D0 1\uAC1C, \uB124\uBAA8 1\uAC1C (\uC6D0 \uC548\uC5D0 \uB124\uBAA8)"
-  ActivationHint: "\uACF5\uAC04\uC758 \uBB38(\uC6D0) \uC548\uC5D0 \uB3C4\uCC29\uC810(\uB124\uBAA8)\uC744 \uC9C0\uC815\uD558\uC138\uC694."
+  Description: "\uACF5\uAC04\uC744 \uC65C\uACE1\uD558\uC5EC \uC9C0\uC815\uD55C \uC704\uCE58\uB85C
+    \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."
+  ActivationCondition: "\uC6D0 1\uAC1C, \uB124\uBAA8 1\uAC1C (\uC6D0 \uC548\uC5D0
+    \uB124\uBAA8)"
+  ActivationHint: "\uACF5\uAC04\uC758 \uBB38(\uC6D0) \uC548\uC5D0 \uB3C4\uCC29\uC810(\uB124\uBAA8)\uC744
+    \uC9C0\uC815\uD558\uC138\uC694."
   RequiredShapes:
   - Circle
   - Square
   SpatialRules:
   - RuleType: 0
-    TargetIndices: 0100000000000000i
+    TargetIndices: 0100000000000000

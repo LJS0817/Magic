@@ -15,7 +15,9 @@ MonoBehaviour:
   type: 4
   rarity: 0
   itemName: "\uC5F0\uC2B5\uC6A9 \uB098\uBB34 \uD39C"
-  itemDescription: "\uB9C8\uB3C4\uD559\uAD50\uC5D0\uC11C \uD6C8\uB828\uC744 \uC2DC\uC791\uD560 \uB54C \uC9C0\uAE09\uB418\uB294 \uAC00\uC7A5 \uBCF4\uD3B8\uC801\uC774\uACE0 \uACAC\uACE0\uD55C \uB098\uBB34 \uD39C\uC785\uB2C8\uB2E4."
+  itemDescription: "\uB9C8\uB3C4\uD559\uAD50\uC5D0\uC11C \uD6C8\uB828\uC744 \uC2DC\uC791\uD560
+    \uB54C \uC9C0\uAE09\uB418\uB294 \uAC00\uC7A5 \uBCF4\uD3B8\uC801\uC774\uACE0 \uACAC\uACE0\uD55C
+    \uB098\uBB34 \uD39C\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: -2943536437003859100, guid: 9e1cd4e333827a345a1a3f04bee33b94, type: 3}
   basePriceInCopper: 0
   maxInkCapacity: 40

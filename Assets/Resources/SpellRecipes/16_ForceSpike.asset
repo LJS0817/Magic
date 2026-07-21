@@ -14,14 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
   SpellName: Force Spike
   Type: 0
-  icon: {fileID: 0}
+  icon: {fileID: 2068928466, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
+  drawingSampleImage: {fileID: 0}
   manaCost: 35
-  Description: "\uAC70\uB300\uD55C \uB9C8\uB825 \uAC00\uC2DC\uB97C \uBC14\uB2E5\uC5D0\uC11C \uC19F\uAD6C\uCE58\uAC8C \uD569\uB2C8\uB2E4."
-  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00 \uB9C8\uB984\uBAA8\uB97C \uB458\uB7EC\uC308)"
-  ActivationHint: "\uB2E8\uB2E8\uD55C \uAE30\uBC18(\uB124\uBAA8) \uC18D\uC5D0 \uB0A0\uCE74\uB85C\uC6B4 \uAC00\uC2DC(\uB9C8\uB984\uBAA8)\uB97C \uD488\uC73C\uC138\uC694."
+  Description: "\uAC70\uB300\uD55C \uB9C8\uB825 \uAC00\uC2DC\uB97C \uBC14\uB2E5\uC5D0\uC11C
+    \uC19F\uAD6C\uCE58\uAC8C \uD569\uB2C8\uB2E4."
+  ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00
+    \uB9C8\uB984\uBAA8\uB97C \uB458\uB7EC\uC308)"
+  ActivationHint: "\uB2E8\uB2E8\uD55C \uAE30\uBC18(\uB124\uBAA8) \uC18D\uC5D0 \uB0A0\uCE74\uB85C\uC6B4
+    \uAC00\uC2DC(\uB9C8\uB984\uBAA8)\uB97C \uD488\uC73C\uC138\uC694."
   RequiredShapes:
   - Square
   - Rhombus
   SpatialRules:
   - RuleType: 1
-    TargetIndices: 0000000001000000i
+    TargetIndices: 0000000001000000
