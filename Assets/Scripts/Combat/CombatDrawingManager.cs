@@ -360,6 +360,25 @@ namespace Magic.Combat
                 return;
             }
 
+            // 그리기 영역(UI) 제한 검사
+            if (drawingArea != null)
+            {
+                Camera uiCamera = null;
+                Canvas canvas = drawingArea.GetComponentInParent<Canvas>();
+                if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                {
+                    uiCamera = canvas.worldCamera != null ? canvas.worldCamera : mainCamera;
+                }
+
+                if (!RectTransformUtility.RectangleContainsScreenPoint(drawingArea, Input.mousePosition, uiCamera))
+                {
+                    if (isDrawing)
+                        EndStroke(); // 영역을 벗어나면 획 강제 종료
+                    
+                    return; // 밖으로 나가면 마우스를 따라가는 움직임과 상호작용 모두 중지
+                }
+            }
+
             // 전투에서는 스크롤 제한을 우회하여 마법을 그릴 수 있게 합니다. (지팡이 사용)
             if (penController != null && !isRefilling)
             {

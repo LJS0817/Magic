@@ -14,6 +14,7 @@ namespace Magic.Upgrade
         ShapeSellBonus,         // 특정 도형 스펠 판매가 증가
         ShapeDamageBonus,       // 특정 도형 스펠 대미지 증가 (최대 15%)
         DropRateBonus,          // 아이템 드롭 확률 증가
-        FreeInkChance           // 잉크 소모 없음 확률
+        FreeInkChance,          // 잉크 소모 없음 확률
+        CombatLoadoutCapacity   // 전투 로드아웃 칸 수 증가
     }
 }

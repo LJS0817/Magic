@@ -307,6 +307,10 @@ namespace Magic.Store
                     return new Item_Pen(itemData as ItemPenSO);
                 case ItemType.Wand:
                     return new Item_Wand(itemData as ItemWandSO);
+                case ItemType.Potion:
+                    return new Item_Potion(itemData as ItemPotionSO);
+                case ItemType.Pouch:
+                    return new Item_Pouch(itemData as ItemPouchSO);
                 case ItemType.Material:
                     return new Item_Material(itemData);
                 default:

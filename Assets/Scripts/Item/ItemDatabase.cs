@@ -11,13 +11,15 @@ namespace Magic.Inventory
         public List<ItemInkSO> inks = new List<ItemInkSO>();
         public List<ItemScrollSO> scrolls = new List<ItemScrollSO>();
         public List<ItemWandSO> wands = new List<ItemWandSO>();
+        public List<ItemPotionSO> potions = new List<ItemPotionSO>();
+        public List<ItemPouchSO> pouches = new List<ItemPouchSO>();
 
         private Dictionary<string, ItemDataSO> _itemCache;
         private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
 
         public void InitializeCache()
         {
-            if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count)) return;
+            if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count)) return;
 
             _itemCache = new Dictionary<string, ItemDataSO>();
             _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
@@ -50,6 +52,18 @@ namespace Magic.Inventory
             {
                 if (wand != null && !_itemCache.ContainsKey(wand.itemName))
                     _itemCache.Add(wand.itemName, wand);
+            }
+
+            foreach (var potion in potions)
+            {
+                if (potion != null && !_itemCache.ContainsKey(potion.itemName))
+                    _itemCache.Add(potion.itemName, potion);
+            }
+
+            foreach (var pouch in pouches)
+            {
+                if (pouch != null && !_itemCache.ContainsKey(pouch.itemName))
+                    _itemCache.Add(pouch.itemName, pouch);
             }
         }
 

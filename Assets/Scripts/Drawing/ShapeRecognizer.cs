@@ -60,9 +60,9 @@ namespace Magic.Drawing
 
 
 
-            if (result.Score < 0.5f)
+            if (result.Score < 0.15f)
             {
-                Debug.Log($"<color=orange>[ShapeRecognizer] 인식 실패: {result.Name} (Score: {result.Score:F3} < 0.5)</color>");
+                Debug.Log($"<color=orange>[ShapeRecognizer] 인식 실패: {result.Name} (Score: {result.Score:F3} < 0.15)</color>");
                 return new RecognizerResult { Name = "Unknown", Score = result.Score };
             }
 

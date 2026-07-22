@@ -21,6 +21,7 @@ MonoBehaviour:
     \uC788\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: -859035456634602026, guid: 8a81f72af92404f49a830d23b5b2b000, type: 3}
   basePriceInCopper: 0
+  maxStack: 99
   spellName: 
   maxDurability: 15
   accuracyScore: 1.3

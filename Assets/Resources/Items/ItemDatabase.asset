@@ -57,3 +57,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: acebd8f8e49ec964b9da226da35b0cfa, type: 2}
   - {fileID: 11400000, guid: 18b4345e88bbce14d954fac75162c825, type: 2}
   - {fileID: 11400000, guid: f947a8ef363bcc045bf2c3a5caf05108, type: 2}
+  potions:
+  - {fileID: 11400000, guid: e25f2aad22dac44c3a00f8bf44e8e3ae, type: 2}
+  - {fileID: 11400000, guid: 0abbe7ca2516c43349300e21ee31700f, type: 2}
+  - {fileID: 11400000, guid: d1fd3720ac5364d259c828ce6dad4f8e, type: 2}
+  - {fileID: 11400000, guid: b7e01f010c5394e02b553b52a7063c17, type: 2}
+  - {fileID: 11400000, guid: 810e325ffbff3433bb7c767bb4d09c39, type: 2}
+  - {fileID: 11400000, guid: b72622281ee404051920d54882f15439, type: 2}
+  pouches:
+  - {fileID: 11400000, guid: 4cb4e831a3aa149d6948fa9bc1637c79, type: 2}
+  - {fileID: 11400000, guid: 42371bdef895c4b6c9c64b3d29beeb89, type: 2}
+  - {fileID: 11400000, guid: 6f4ed9dbf44ef48f5a8c20a5cd5721bb, type: 2}
+  - {fileID: 11400000, guid: 4c1a42574df8f4ed9a777e4721676497, type: 2}
+  - {fileID: 11400000, guid: 69aaa50203d61476684a93a71cadff80, type: 2}
+  - {fileID: 11400000, guid: 7d0c864526e6c49c59c959c46053abcf, type: 2}

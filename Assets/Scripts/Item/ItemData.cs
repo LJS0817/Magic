@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Magic.Inventory
 {
-    public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand }
+    public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch }
 
     [System.Serializable]
     public abstract class ItemInstance
@@ -177,6 +177,16 @@ namespace Magic.Inventory
         public ItemPotionSO PotionData => data as ItemPotionSO;
 
         public Item_Potion(ItemPotionSO potionData) : base(potionData)
+        {
+        }
+    }
+
+    [System.Serializable]
+    public class Item_Pouch : ItemInstance
+    {
+        public ItemPouchSO PouchData => data as ItemPouchSO;
+
+        public Item_Pouch(ItemPouchSO pouchData) : base(pouchData)
         {
         }
     }

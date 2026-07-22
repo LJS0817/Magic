@@ -20,6 +20,7 @@ MonoBehaviour:
     \uC788\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: 2353702978429711081, guid: c9d7e6c145785d24d802d0938f8e2acf, type: 3}
   basePriceInCopper: 100
+  maxStack: 99
   maxAmount: 200
   inkColor: {r: 0.2, g: 0.8, b: 0.4, a: 1}
   inkElement: 0

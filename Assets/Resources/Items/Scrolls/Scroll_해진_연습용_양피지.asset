@@ -20,6 +20,7 @@ MonoBehaviour:
     \uAC19\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: -7320547195760214525, guid: 19c5208edf9714e488c0080b6a0aa470, type: 3}
   basePriceInCopper: 100
+  maxStack: 99
   spellName: 
   maxDurability: 2
   accuracyScore: 0.8

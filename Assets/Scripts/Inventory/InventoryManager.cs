@@ -72,6 +72,7 @@ namespace Magic.Inventory
         public event System.Action<Item_Ink> OnInkEquipped;
         public event System.Action<Item_Pen> OnPenEquipped;
         public event System.Action<Item_Wand> OnWandEquipped;
+        public event System.Action<Item_Pouch> OnPouchEquipped;
 
         public Item_Scroll EquippedScroll
         {
@@ -113,6 +114,17 @@ namespace Magic.Inventory
             }
         }
 
+        public Item_Pouch EquippedPouch
+        {
+            get => _player.equippedPouch;
+            private set
+            {
+                _player.equippedPouch = value;
+                OnPouchEquipped?.Invoke(value);
+                CheckLoadoutCapacity();
+            }
+        }
+
         public List<ItemInstance> combatLoadout => _player.combatLoadout;
 
         public void InitInstance()
@@ -120,13 +132,70 @@ namespace Magic.Inventory
             Instance = this;
         }
 
-        public void AddToLoadout(ItemInstance item)
+        public int baseCombatLoadoutCapacity = 5;
+
+        public int GetMaxCombatLoadoutCapacity()
+        {
+            int upgradeBonus = Magic.Upgrade.UpgradeManager.Instance != null
+                ? Mathf.RoundToInt(Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.CombatLoadoutCapacity))
+                : 0;
+            
+            int pouchBonus = EquippedPouch != null && EquippedPouch.PouchData != null ? EquippedPouch.PouchData.loadoutCapacityBonus : 0;
+            
+            return baseCombatLoadoutCapacity + upgradeBonus + pouchBonus;
+        }
+
+        private void CheckLoadoutCapacity()
+        {
+            int maxCap = GetMaxCombatLoadoutCapacity();
+            if (combatLoadout.Count > maxCap)
+            {
+                int diff = combatLoadout.Count - maxCap;
+                combatLoadout.RemoveRange(maxCap, diff);
+                NotifyLoadoutChanged();
+            }
+        }
+
+        public void EquipPouch(Item_Pouch newPouch)
+        {
+            if (EquippedPouch != null)
+            {
+                items.Add(EquippedPouch);
+            }
+            if (newPouch != null)
+            {
+                items.Remove(newPouch);
+            }
+            EquippedPouch = newPouch;
+            NotifyInventoryChanged();
+            NotifyLoadoutChanged();
+        }
+
+        public void UnequipPouch()
+        {
+            if (EquippedPouch != null)
+            {
+                items.Add(EquippedPouch);
+                EquippedPouch = null;
+                NotifyInventoryChanged();
+                NotifyLoadoutChanged();
+            }
+        }
+
+        public bool AddToLoadout(ItemInstance item)
         {
             if (!combatLoadout.Contains(item) && items.Contains(item))
             {
+                if (combatLoadout.Count >= GetMaxCombatLoadoutCapacity())
+                {
+                    Debug.LogWarning("[InventoryManager] 전투 로드아웃이 가득 찼습니다!");
+                    return false;
+                }
                 combatLoadout.Add(item);
                 NotifyLoadoutChanged();
+                return true;
             }
+            return false;
         }
 
         public void RemoveFromLoadout(ItemInstance item)

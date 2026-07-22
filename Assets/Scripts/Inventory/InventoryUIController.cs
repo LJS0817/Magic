@@ -146,9 +146,38 @@ namespace Magic.Inventory
             var inv = InventoryManager.Instance;
             if (slot.Item.IsStackable)
             {
-                // 포션, 재료 등의 사용/선택 로직
-                Debug.Log($"[Inventory] {slot.Item.ItemName} {_currentSelectedAmount}개 더블클릭 됨.");
-                // 필요 시 inv.RemoveItem(slot.Item, _currentSelectedAmount); 등으로 처리
+                if (slot.Item is Item_Potion potion)
+                {
+                    var pData = Magic.Data.PlayerDataManager.Instance;
+                    if (pData != null && potion.PotionData != null)
+                    {
+                        if (potion.PotionData.potionType == Magic.Inventory.PotionType.Health)
+                        {
+                            pData.currentHealth += potion.PotionData.recoveryAmount;
+                            if (pData.currentHealth > pData.GetMaxHealth()) pData.currentHealth = pData.GetMaxHealth();
+                            Debug.Log($"<color=green>[아이템] {potion.ItemName}을(를) 사용해 체력을 회복했습니다!</color>");
+                        }
+                        else if (potion.PotionData.potionType == Magic.Inventory.PotionType.Mana)
+                        {
+                            pData.currentMana += potion.PotionData.recoveryAmount;
+                            if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();
+                            
+                            var drawingMgr = FindObjectOfType<Magic.Combat.CombatDrawingManager>();
+                            if (drawingMgr != null && drawingMgr.manaSlider != null)
+                            {
+                                drawingMgr.manaSlider.SetValue(pData.currentMana, pData.GetMaxMana());
+                            }
+                            Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 마력을 회복했습니다!</color>");
+                        }
+                        
+                        inv.RemoveItem(potion, 1);
+                        RefreshList();
+                    }
+                }
+                else
+                {
+                    Debug.Log($"[Inventory] {slot.Item.ItemName} {_currentSelectedAmount}개 더블클릭 됨.");
+                }
             }
             else if (slot.Item is Item_Scroll scroll) 
             {
@@ -174,7 +203,14 @@ namespace Magic.Inventory
             // 장착 상태가 바뀌었으므로 툴팁 정보 갱신
             if (_infoPanel != null && _hoveredSlot == slot)
             {
-                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                if (slot.Item != null)
+                {
+                    _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                }
+                else
+                {
+                    _infoPanel.Close();
+                }
             }
         }
 

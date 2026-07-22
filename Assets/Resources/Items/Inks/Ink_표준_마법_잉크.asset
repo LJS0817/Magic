@@ -19,6 +19,7 @@ MonoBehaviour:
     \uC0AC\uC6A9\uD558\uB294 \uBB34\uB09C\uD55C \uC131\uB2A5\uC758 \uC789\uD06C\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: -6591120442185306534, guid: 3f716fbfe63a59f4f8e2caf31dd4708d, type: 3}
   basePriceInCopper: 100
+  maxStack: 99
   maxAmount: 100
   inkColor: {r: 0, g: 0, b: 0, a: 1}
   inkElement: 0

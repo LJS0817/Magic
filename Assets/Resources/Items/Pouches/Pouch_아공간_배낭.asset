@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e4360882e473459a8588fb230f9f027, type: 3}
+  m_Name: "Pouch_\uC544\uACF5\uAC04_\uBC30\uB0AD"
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemPouchSO
+  type: 7
+  rarity: 3
+  itemName: "\uC544\uACF5\uAC04 \uBC30\uB0AD"
+  itemDescription: "\uBCC4\uB3C4\uC758 \uC544\uACF5\uAC04\uACFC \uC5F0\uACB0\uB418\uC5B4
+    \uBB34\uC218\uD55C \uC2A4\uD06C\uB864\uC744 \uAEBC\uB0BC \uC218 \uC788\uB294
+    \uB6F0\uC5B4\uB09C \uAC00\uBC29\uC785\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  loadoutCapacityBonus: 5

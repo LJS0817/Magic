@@ -32,6 +32,18 @@ namespace Magic.Editor
             public WandDef(string n, float m, string g, string d) { name = n; manaCostMultiplier = m; grade = g; description = d; }
         }
 
+        private struct PotionDef
+        {
+            public string name; public PotionType type; public PotionGrade grade; public float recoveryAmount; public string rarity; public string description;
+            public PotionDef(string n, PotionType t, PotionGrade g, float r, string ra, string d) { name = n; type = t; grade = g; recoveryAmount = r; rarity = ra; description = d; }
+        }
+
+        private struct PouchDef
+        {
+            public string name; public int capacityBonus; public string grade; public string description;
+            public PouchDef(string n, int cb, string g, string d) { name = n; capacityBonus = cb; grade = g; description = d; }
+        }
+
         private static readonly PenDef[] PenDefs = new PenDef[]
         {
             // 일반 등급 5개
@@ -98,6 +110,26 @@ namespace Magic.Editor
             new WandDef("초월자의 이그드라실 가지", 0.4f, "전설", "신화 속 세계수에서 떨어져 나온 신성한 가지로, 마력을 주입하는 즉시 기적을 실체화하는 전설의 지팡이입니다.")
         };
 
+        private static readonly PotionDef[] PotionDefs = new PotionDef[]
+        {
+            new PotionDef("하급 체력 물약", PotionType.Health, PotionGrade.Lesser, 25f, "일반", "작은 상처를 치료할 수 있는 붉은색 물약입니다."),
+            new PotionDef("중급 체력 물약", PotionType.Health, PotionGrade.Medium, 50f, "고급", "보통의 상처를 순식간에 아물게 하는 물약입니다."),
+            new PotionDef("상급 체력 물약", PotionType.Health, PotionGrade.Greater, 100f, "희귀", "치명적인 부상도 빠르게 회복시켜 주는 고농축 물약입니다."),
+            new PotionDef("하급 마나 물약", PotionType.Mana, PotionGrade.Lesser, 25f, "일반", "소모된 마나를 조금 보충해 주는 푸른색 물약입니다."),
+            new PotionDef("중급 마나 물약", PotionType.Mana, PotionGrade.Medium, 50f, "고급", "마나를 꽤 많이 회복시켜 주어 전투 중 유용합니다."),
+            new PotionDef("상급 마나 물약", PotionType.Mana, PotionGrade.Greater, 100f, "희귀", "순수한 마력의 정수가 담겨 있어 마나를 대량으로 회복합니다.")
+        };
+
+        private static readonly PouchDef[] PouchDefs = new PouchDef[]
+        {
+            new PouchDef("조잡한 마법 주머니", 1, "하급", "공간 마법이 아주 조금 적용되어 있는 작은 주머니입니다."),
+            new PouchDef("가죽 마법 주머니", 1, "일반", "일반적인 여행자들이 자주 쓰는 마법 주머니입니다."),
+            new PouchDef("견고한 공간 주머니", 3, "고급", "내부가 제법 넓은 고급 마법 주머니입니다."),
+            new PouchDef("은빛 실 주머니", 3, "희귀", "은빛 실로 짜여 있어 많은 물건을 무리 없이 담을 수 있습니다."),
+            new PouchDef("아공간 배낭", 5, "영웅", "별도의 아공간과 연결되어 무수한 스크롤을 꺼낼 수 있는 뛰어난 가방입니다."),
+            new PouchDef("차원 왜곡의 주머니", 8, "전설", "내부에 작은 우주가 담겨 있는 전설적인 차원 주머니입니다.")
+        };
+
         [MenuItem("Magic/Tools/Generate Item Database")]
         public static void GenerateDatabase()
         {
@@ -107,6 +139,8 @@ namespace Magic.Editor
             CreateFolderIfNotExists(rootPath, "Inks");
             CreateFolderIfNotExists(rootPath, "Scrolls");
             CreateFolderIfNotExists(rootPath, "Wands");
+            CreateFolderIfNotExists(rootPath, "Potions");
+            CreateFolderIfNotExists(rootPath, "Pouches");
 
             string dbPath = rootPath + "/ItemDatabase.asset";
             ItemDatabase db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
@@ -121,6 +155,8 @@ namespace Magic.Editor
             db.inks.Clear();
             db.scrolls.Clear();
             db.wands.Clear();
+            db.potions.Clear();
+            db.pouches.Clear();
 
             // Generate Pens
             foreach (var def in PenDefs)
@@ -186,6 +222,38 @@ namespace Magic.Editor
                 db.wands.Add(asset);
             }
 
+            // Generate Potions
+            foreach (var def in PotionDefs)
+            {
+                string assetPath = $"{rootPath}/Potions/Potion_{def.name.Replace(" ", "_")}.asset";
+                ItemPotionSO asset = GetOrCreateAsset<ItemPotionSO>(assetPath);
+                
+                asset.itemName = def.name;
+                asset.potionType = def.type;
+                asset.potionGrade = def.grade;
+                asset.recoveryAmount = def.recoveryAmount;
+                asset.rarity = GetRarityFromString(def.rarity);
+                asset.itemDescription = def.description;
+                
+                EditorUtility.SetDirty(asset);
+                db.potions.Add(asset);
+            }
+
+            // Generate Pouches
+            foreach (var def in PouchDefs)
+            {
+                string assetPath = $"{rootPath}/Pouches/Pouch_{def.name.Replace(" ", "_")}.asset";
+                ItemPouchSO asset = GetOrCreateAsset<ItemPouchSO>(assetPath);
+                
+                asset.itemName = def.name;
+                asset.loadoutCapacityBonus = def.capacityBonus;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+                
+                EditorUtility.SetDirty(asset);
+                db.pouches.Add(asset);
+            }
+
             if (isNewDb)
             {
                 AssetDatabase.CreateAsset(db, dbPath);
@@ -198,7 +266,7 @@ namespace Magic.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\nDB 위치: {dbPath}");
+            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\nDB 위치: {dbPath}");
         }
 
         private static T GetOrCreateAsset<T>(string path) where T : ScriptableObject

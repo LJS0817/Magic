@@ -90,6 +90,7 @@ namespace Magic.Data
         public Item_Ink equippedInk;
         public Item_Pen equippedPen;
         public Item_Wand equippedWand;
+        public Item_Pouch equippedPouch;
 
         public void InitInstance()
         {

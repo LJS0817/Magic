@@ -20,4 +20,5 @@ MonoBehaviour:
     \uB9C8\uB825\uC744 \uD3ED\uBC1C\uC801\uC73C\uB85C \uC3DF\uC544\uB0BC \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   itemIcon: {fileID: 0}
   basePriceInCopper: 0
+  maxStack: 99
   defaultManaCostMultiplier: 0.6

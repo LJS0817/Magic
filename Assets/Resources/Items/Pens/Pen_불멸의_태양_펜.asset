@@ -20,6 +20,7 @@ MonoBehaviour:
     \uC644\uBCBD\uC5D0 \uAC00\uAE5D\uAC8C \uCC28\uB2E8\uD574 \uC90D\uB2C8\uB2E4."
   itemIcon: {fileID: 8787845490931733337, guid: d2c875bf1d24f4d4e835dc99e1108f73, type: 3}
   basePriceInCopper: 0
+  maxStack: 99
   maxInkCapacity: 300
   inkConsumptionRate: 0.5
   consumesMana: 0

@@ -15,6 +15,7 @@ namespace Magic.UI
         [SerializeField] private RectTransform _inventoryPanel;
         [SerializeField] private int _loadoutCapacity = 20;
         [SerializeField] private InventorySlot _wandSlot;
+        [SerializeField] private InventorySlot _pouchSlot;
 
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
         private InventorySlot _hoveredSlot;
@@ -61,6 +62,7 @@ namespace Magic.UI
             foreach (var key in keysToRemove) _itemBackgroundMap.Remove(key);
 
             UpdateWandSlot();
+            UpdatePouchSlot();
 
             base.RefreshList();
         }
@@ -95,10 +97,39 @@ namespace Magic.UI
             }
         }
 
+        private void UpdatePouchSlot()
+        {
+            if (_pouchSlot == null || InventoryManager.Instance == null) return;
+            var pouch = InventoryManager.Instance.EquippedPouch;
+            _pouchSlot.Initialize(OnPouchSlotClicked, OnSlotPointerEnter, OnSlotPointerExit, OnPouchSlotDoubleClicked, null);
+
+            if (pouch != null)
+            {
+                _pouchSlot.SetInfo(pouch, GetSlotBackground(pouch), _emptySlotIcon, true);
+            }
+            else
+            {
+                _pouchSlot.SetInfo(null, GetSlotBackground(null), _emptySlotIcon, false);
+            }
+        }
+
+        private void OnPouchSlotClicked(InventorySlot slot) { }
+
+        private void OnPouchSlotDoubleClicked(InventorySlot slot)
+        {
+            if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
+            InventoryManager.Instance.UnequipPouch();
+
+            if (_infoPanel != null && _hoveredSlot == slot)
+            {
+                _infoPanel.Close();
+            }
+        }
+
         protected override int GetTotalCapacity()
         {
             if (InventoryManager.Instance == null) return _loadoutCapacity;
-            return Mathf.Max(_loadoutCapacity, InventoryManager.Instance.combatLoadout.Count);
+            return Mathf.Max(InventoryManager.Instance.GetMaxCombatLoadoutCapacity(), InventoryManager.Instance.combatLoadout.Count);
         }
 
         protected override void UpdateSlot(InventorySlot slot, int dataIndex)

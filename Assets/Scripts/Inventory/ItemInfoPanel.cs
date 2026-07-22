@@ -170,7 +170,7 @@ namespace Magic.Inventory
             }
         }
 
-        public void ClippingPosition(RectTransform slotRect, RectTransform boundaryRect)
+        public void ClippingPosition(RectTransform slotRect, RectTransform boundaryRect, bool forceAbove = false)
         {
             if (slotRect == null || boundaryRect == null) return;
             
@@ -190,7 +190,7 @@ namespace Magic.Inventory
             float thresholdY = Mathf.Lerp(invCorners[2].y, invCorners[0].y, 0.75f);
 
             // 슬롯이 해당 기준치보다 아래쪽에 있다면 패널을 슬롯 위(Top)로 표시
-            bool showAbove = slotRect.position.y < thresholdY;
+            bool showAbove = forceAbove || slotRect.position.y < thresholdY;
             
             Vector3[] initialPanelCorners = new Vector3[4];
             

@@ -65,6 +65,14 @@ namespace Magic.UI
                 {
                     _filteredItems.Add(wand);
                 }
+                else if (item is Item_Potion potion)
+                {
+                    _filteredItems.Add(potion);
+                }
+                else if (item is Item_Pouch pouch)
+                {
+                    _filteredItems.Add(pouch);
+                }
             }
 
             List<ItemInstance> keysToRemove = new List<ItemInstance>();
@@ -114,6 +122,10 @@ namespace Magic.UI
                 if (inv.EquippedWand == wand) inv.EquippedWand = null;
                 else inv.EquippedWand = wand;
                 inv.NotifyLoadoutChanged();
+            }
+            else if (slot.Item is Item_Pouch pouch)
+            {
+                inv.EquipPouch(pouch);
             }
             else
             {

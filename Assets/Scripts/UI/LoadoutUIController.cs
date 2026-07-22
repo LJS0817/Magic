@@ -126,10 +126,45 @@ namespace Magic.UI
                 if (inv.EquippedPen == pen) inv.EquippedPen = null;
                 else inv.EquippedPen = pen;
             }
+            else if (slot.Item is Item_Potion potion)
+            {
+                var pData = Magic.Data.PlayerDataManager.Instance;
+                if (pData != null && potion.PotionData != null)
+                {
+                    if (potion.PotionData.potionType == Magic.Inventory.PotionType.Health)
+                    {
+                        pData.currentHealth += potion.PotionData.recoveryAmount;
+                        if (pData.currentHealth > pData.GetMaxHealth()) pData.currentHealth = pData.GetMaxHealth();
+                        Debug.Log($"<color=green>[아이템] {potion.ItemName}을(를) 사용해 체력을 회복했습니다!</color>");
+                    }
+                    else if (potion.PotionData.potionType == Magic.Inventory.PotionType.Mana)
+                    {
+                        pData.currentMana += potion.PotionData.recoveryAmount;
+                        if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();
+                        
+                        var drawingMgr = FindObjectOfType<Magic.Combat.CombatDrawingManager>();
+                        if (drawingMgr != null && drawingMgr.manaSlider != null)
+                        {
+                            drawingMgr.manaSlider.SetValue(pData.currentMana, pData.GetMaxMana());
+                        }
+                        Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 마력을 회복했습니다!</color>");
+                    }
+                    
+                    inv.RemoveItem(potion, 1);
+                    RefreshList();
+                }
+            }
 
             if (_infoPanel != null && _hoveredSlot == slot)
             {
-                _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                if (slot.Item != null)
+                {
+                    _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                }
+                else
+                {
+                    _infoPanel.Close();
+                }
             }
         }
 
@@ -165,7 +200,7 @@ namespace Magic.UI
                 _infoPanel.Open();
                 _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
                 if (_inventoryPanel != null)
-                    _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
+                    _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel, true);
             }
         }
 

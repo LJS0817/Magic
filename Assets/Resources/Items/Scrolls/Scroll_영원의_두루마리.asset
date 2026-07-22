@@ -19,6 +19,7 @@ MonoBehaviour:
     \uC2E0\uBE44\uD55C \uC18C\uC7AC\uC758 \uB450\uB8E8\uB9C8\uB9AC\uC785\uB2C8\uB2E4."
   itemIcon: {fileID: 4503596007538546124, guid: 5b415b21c38914142bcae80fe9796d38, type: 3}
   basePriceInCopper: 100
+  maxStack: 99
   spellName: 
   maxDurability: 50
   accuracyScore: 1.5
