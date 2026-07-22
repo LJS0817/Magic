@@ -445,6 +445,17 @@ namespace Magic.Drawing
                 if (currentScroll != null && currentScroll.isEmpty)
                 {
                     float drawCost = spellManaCost * 0.5f;
+
+                    if (Magic.Upgrade.UpgradeManager.Instance != null)
+                    {
+                        float freeChance = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.FreeInkChance);
+                        if (UnityEngine.Random.Range(0f, 100f) < freeChance)
+                        {
+                            Debug.Log($"<color=cyan>[Free Ink] 잉크 소모 없음 효과가 발동했습니다!</color>");
+                            drawCost = 0f;
+                        }
+                    }
+
                     if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= drawCost)
                     {
                         PlayerDataManager.Instance.currentMana -= drawCost;

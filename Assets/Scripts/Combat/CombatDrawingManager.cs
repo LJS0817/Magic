@@ -130,6 +130,16 @@ namespace Magic.Combat
             float costMultiplier = _isCastingFromScroll ? 0.5f : 1.0f;
             float drawCost = spellCost * costMultiplier;
 
+            if (Magic.Upgrade.UpgradeManager.Instance != null)
+            {
+                float freeChance = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.FreeInkChance);
+                if (UnityEngine.Random.Range(0f, 100f) < freeChance)
+                {
+                    Debug.Log($"<color=cyan>[Free Ink] 잉크 소모 없음 효과가 발동했습니다!</color>");
+                    drawCost = 0f;
+                }
+            }
+
             if (PlayerDataManager.Instance == null || PlayerDataManager.Instance.currentMana < drawCost)
             {
                 Debug.Log($"<color=red>[전투] 마나가 부족하여 마법을 사용할 수 없습니다! (필요 마나: {drawCost:F1})</color>");
@@ -251,9 +261,33 @@ namespace Magic.Combat
                 {
                     if (cachedSpellType != SpellType.Utility)
                     {
+                        float baseDamage = cachedAsset != null ? cachedAsset.manaCost : 25f;
+                        float damageMultiplier = 1f;
+                        float shapeBonus = 0f;
+
+                        if (Magic.Upgrade.UpgradeManager.Instance != null)
+                        {
+                            damageMultiplier += Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.SpellDamageMultiplier) / 100f;
+                            
+                            if (cachedAsset != null && cachedAsset.RequiredShapes != null)
+                            {
+                                foreach (var shape in cachedAsset.RequiredShapes)
+                                {
+                                    shapeBonus += Magic.Upgrade.UpgradeManager.Instance.GetTotalTargetedUpgradeValue(Magic.Upgrade.UpgradeType.ShapeDamageBonus, shape) / 100f;
+                                }
+                            }
+                        }
+
                         foreach (var el in appliedElements)
                         {
-                            CombatManager.Instance.enemy.TakeDamage(25f, el);
+                            float elementBonus = 0f;
+                            if (Magic.Upgrade.UpgradeManager.Instance != null && el != SpellElement.None)
+                            {
+                                elementBonus = Magic.Upgrade.UpgradeManager.Instance.GetTotalTargetedUpgradeValue(Magic.Upgrade.UpgradeType.ElementDamageBonus, el.ToString()) / 100f;
+                            }
+                            
+                            float finalDamage = baseDamage * (damageMultiplier + shapeBonus + elementBonus);
+                            CombatManager.Instance.enemy.TakeDamage(finalDamage, el);
                         }
                     }
 

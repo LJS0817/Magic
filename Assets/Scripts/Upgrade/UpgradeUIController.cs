@@ -1,8 +1,10 @@
+using DG.Tweening;
+using Magic.Inventory;
 using System.Collections.Generic;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using Magic.Inventory;
 
 namespace Magic.Upgrade
 {
@@ -14,6 +16,9 @@ namespace Magic.Upgrade
         public RectTransform nodeContainer; // Where node prefabs are spawned
         public RectTransform lineContainer; // Where lines are drawn (should be behind nodes)
 
+        [Header("Scroll")]
+        public ScrollRect scrollRect;
+
         [Header("Prefabs")]
         public GameObject nodePrefab;
         public GameObject linePrefab;
@@ -24,12 +29,16 @@ namespace Magic.Upgrade
         public TMP_Text detailDescText;
         public TMP_Text detailCostText;
         public Button purchaseButton;
+        public Vector2 detailPanelOffset = new Vector2(100f, 0f);
 
         private List<UpgradeNodeUI> spawnedNodes = new List<UpgradeNodeUI>();
         private UpgradeNodeUI selectedNodeUI;
 
         private void Start()
         {
+            if (scrollRect == null)
+                scrollRect = GetComponentInChildren<ScrollRect>();
+
             if (detailPanel != null)
                 detailPanel.SetActive(false);
 
@@ -48,16 +57,23 @@ namespace Magic.Upgrade
 
         public void Open()
         {
-            _canvasGroup.alpha = 1f;
+            _canvasGroup.DOKill();
+            _canvasGroup.DOFade(1f, 0.3f);
             _canvasGroup.interactable = true;
             _canvasGroup.blocksRaycasts = true;
             _canvas.enabled = true;
             Magic.Drawing.DrawingManager.IsDrawingBlocked = true;
+
+            if (scrollRect != null)
+            {
+                scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
+            }
         }
 
         public void Close()
         {
-            _canvasGroup.alpha = 0f;
+            _canvasGroup.DOKill();
+            _canvasGroup.DOFade(0f, 0.3f);
             _canvasGroup.interactable = false;
             _canvasGroup.blocksRaycasts = false;
             _canvas.enabled = false;
@@ -96,8 +112,13 @@ namespace Magic.Upgrade
             }
 
             // Automatically resize the containers so they fit inside a Scroll View perfectly
-            float totalWidth = (maxX - minX) + 500f; // 500f is padding
-            float totalHeight = (maxY - minY) + 500f;
+            // Since (0,0) is always at the center of the container, we need to double the max distance 
+            // from the center to ensure all nodes fit without clipping.
+            float maxDistX = Mathf.Max(Mathf.Abs(minX), Mathf.Abs(maxX));
+            float maxDistY = Mathf.Max(Mathf.Abs(minY), Mathf.Abs(maxY));
+
+            float totalWidth = (maxDistX * 2f) + 500f; // 500f is padding
+            float totalHeight = (maxDistY * 2f) + 500f;
 
             if (nodeContainer != null) 
             {
@@ -153,6 +174,7 @@ namespace Magic.Upgrade
             if (selectedNodeUI == null || detailPanel == null) return;
             
             detailPanel.SetActive(true);
+
             var data = selectedNodeUI.nodeData;
 
             if (detailNameText != null) detailNameText.text = data.nodeName;
@@ -171,6 +193,20 @@ namespace Magic.Upgrade
             {
                 if (detailCostText != null) detailCostText.text = $"Cost: {data.costAmount} Gem";
                 if (purchaseButton != null) purchaseButton.interactable = (isUnlockable && hasMoney);
+            }
+
+            RectTransform detailRect = detailPanel.GetComponent<RectTransform>();
+            RectTransform nodeRect = selectedNodeUI.GetComponent<RectTransform>();
+            if (detailRect != null && nodeRect != null)
+            {
+                // Info를 Content에 넣었을 때 다른 노드들에 가려지지 않도록 최상단으로 끌어올립니다.
+                detailRect.SetAsLastSibling();
+
+                // UI 텍스트 변경 후 ContentSizeFitter가 즉시 크기를 갱신하도록 강제 적용
+                LayoutRebuilder.ForceRebuildLayoutImmediate(detailRect);
+
+                detailRect.position = nodeRect.position;
+                detailRect.anchoredPosition += detailPanelOffset;
             }
         }
 

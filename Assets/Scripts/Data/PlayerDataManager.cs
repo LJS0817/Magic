@@ -98,5 +98,23 @@ namespace Magic.Data
         }
 
         public bool IsInit => Instance != null;
+
+        private void Update()
+        {
+            if (Magic.Upgrade.UpgradeManager.Instance == null) return;
+            
+            float hpRegen = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.HealthRegeneration);
+            float mpRegen = Magic.Upgrade.UpgradeManager.Instance.GetTotalUpgradeValue(Magic.Upgrade.UpgradeType.ManaRegeneration);
+
+            if (hpRegen > 0f && currentHealth < GetMaxHealth())
+            {
+                currentHealth = Mathf.Min(GetMaxHealth(), currentHealth + hpRegen * Time.deltaTime);
+            }
+
+            if (mpRegen > 0f && currentMana < GetMaxMana())
+            {
+                currentMana = Mathf.Min(GetMaxMana(), currentMana + mpRegen * Time.deltaTime);
+            }
+        }
     }
 }

@@ -19,10 +19,24 @@ namespace Magic.Upgrade
 
         public event System.Action OnUpgradeUnlocked;
 
+        private Dictionary<UpgradeType, float> _cachedUpgradeValues = new Dictionary<UpgradeType, float>();
+        private Dictionary<string, float> _cachedTargetedValues = new Dictionary<string, float>();
+
 
         public void InitInstance()
         {
             Instance = this;
+            if (allNodes != null)
+            {
+                foreach (var node in allNodes)
+                {
+                    if (node != null && string.IsNullOrEmpty(node.nodeID))
+                    {
+                        node.nodeID = node.name;
+                    }
+                }
+            }
+            InitializeCache();
         }
 
         public bool IsNodeUnlocked(UpgradeNodeSO node)
@@ -67,6 +81,9 @@ namespace Magic.Upgrade
                 // Unlock
                 unlockedNodeIDs.Add(node.nodeID);
 
+                // Update caches with only the newly unlocked node's effects
+                AddNodeEffectsToCache(node);
+
                 // Instantly apply some effects like filling health/mana
                 ApplyInstantEffects(node);
 
@@ -94,46 +111,55 @@ namespace Magic.Upgrade
             }
         }
 
-        public float GetTotalUpgradeValue(UpgradeType type)
+        private void InitializeCache()
         {
-            float total = 0f;
+            _cachedUpgradeValues.Clear();
+            _cachedTargetedValues.Clear();
+
             foreach (var nodeID in unlockedNodeIDs)
             {
-                var node = allNodes.FirstOrDefault(n => n.nodeID == nodeID);
+                var node = allNodes.FirstOrDefault(n => n != null && n.nodeID == nodeID);
                 if (node != null)
                 {
-                    foreach (var effect in node.effects)
-                    {
-                        if (effect.upgradeType == type)
-                        {
-                            total += effect.value;
-                        }
-                    }
+                    AddNodeEffectsToCache(node);
                 }
             }
-            return total;
+        }
+
+        private void AddNodeEffectsToCache(UpgradeNodeSO node)
+        {
+            if (node == null || node.effects == null) return;
+
+            foreach (var effect in node.effects)
+            {
+                // Add to general cache
+                if (!_cachedUpgradeValues.ContainsKey(effect.upgradeType))
+                    _cachedUpgradeValues[effect.upgradeType] = 0f;
+                
+                _cachedUpgradeValues[effect.upgradeType] += effect.value;
+
+                // Add to targeted cache if targetName exists
+                if (!string.IsNullOrEmpty(effect.targetName))
+                {
+                    string key = $"{effect.upgradeType}_{effect.targetName.ToLower()}";
+                    if (!_cachedTargetedValues.ContainsKey(key))
+                        _cachedTargetedValues[key] = 0f;
+                    
+                    _cachedTargetedValues[key] += effect.value;
+                }
+            }
+        }
+
+        public float GetTotalUpgradeValue(UpgradeType type)
+        {
+            return _cachedUpgradeValues.TryGetValue(type, out float val) ? val : 0f;
         }
 
         public float GetTotalTargetedUpgradeValue(UpgradeType type, string targetName)
         {
-            float total = 0f;
-            foreach (var nodeID in unlockedNodeIDs)
-            {
-                var node = allNodes.FirstOrDefault(n => n.nodeID == nodeID);
-                if (node != null)
-                {
-                    foreach (var effect in node.effects)
-                    {
-                        // Check type AND targetName (case-insensitive)
-                        if (effect.upgradeType == type && 
-                            string.Equals(effect.targetName, targetName, System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            total += effect.value;
-                        }
-                    }
-                }
-            }
-            return total;
+            if (string.IsNullOrEmpty(targetName)) return 0f;
+            string key = $"{type}_{targetName.ToLower()}";
+            return _cachedTargetedValues.TryGetValue(key, out float val) ? val : 0f;
         }
     }
 }
