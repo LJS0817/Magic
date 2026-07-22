@@ -16,6 +16,7 @@ namespace Magic.Inventory
         private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
         private ItemInstance _selectedItem;
         private InventorySlot _hoveredSlot;
+        private int _currentSelectedAmount = 1;
 
         protected override void Awake()
         {
@@ -39,6 +40,26 @@ namespace Magic.Inventory
         private void OnScrollEquipped(Item_Scroll item) => RefreshList();
         private void OnInkEquipped(Item_Ink item) => RefreshList();
         private void OnPenEquipped(Item_Pen item) => RefreshList();
+
+        private void Update()
+        {
+            if (_hoveredSlot != null && _hoveredSlot.Item != null && _hoveredSlot.Item.IsStackable)
+            {
+                float scroll = Input.mouseScrollDelta.y;
+                if (Mathf.Abs(scroll) > 0.01f)
+                {
+                    if (scroll > 0) _currentSelectedAmount++;
+                    else _currentSelectedAmount--;
+
+                    _currentSelectedAmount = Mathf.Clamp(_currentSelectedAmount, 1, _hoveredSlot.Item.count);
+                    
+                    if (_infoPanel != null)
+                    {
+                        _infoPanel.UpdateStackAmount(_currentSelectedAmount);
+                    }
+                }
+            }
+        }
 
         private void OnDestroy()
         {
@@ -121,9 +142,15 @@ namespace Magic.Inventory
                 return;
             }
 
-            // 2. 일반 장착 로직
+            // 2. 일반 장착 및 사용 로직
             var inv = InventoryManager.Instance;
-            if (slot.Item is Item_Scroll scroll) 
+            if (slot.Item.IsStackable)
+            {
+                // 포션, 재료 등의 사용/선택 로직
+                Debug.Log($"[Inventory] {slot.Item.ItemName} {_currentSelectedAmount}개 더블클릭 됨.");
+                // 필요 시 inv.RemoveItem(slot.Item, _currentSelectedAmount); 등으로 처리
+            }
+            else if (slot.Item is Item_Scroll scroll) 
             {
                 if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
                 else inv.EquippedScroll = scroll;
@@ -155,11 +182,26 @@ namespace Magic.Inventory
         {
             if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
-            InventoryManager.Instance.RemoveItem(slot.Item);
+            int amountToRemove = slot.Item.IsStackable ? _currentSelectedAmount : -1;
+            InventoryManager.Instance.RemoveItem(slot.Item, amountToRemove);
+            
             if (_hoveredSlot == slot)
             {
-                _hoveredSlot = null;
-                if (_infoPanel != null) _infoPanel.Close();
+                if (slot.Item == null || !InventoryManager.Instance.items.Contains(slot.Item))
+                {
+                    _hoveredSlot = null;
+                    if (_infoPanel != null) _infoPanel.Close();
+                }
+                else
+                {
+                    // Item still exists (only part of stack removed)
+                    _currentSelectedAmount = Mathf.Clamp(_currentSelectedAmount, 1, slot.Item.count);
+                    if (_infoPanel != null)
+                    {
+                        _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                        _infoPanel.UpdateStackAmount(_currentSelectedAmount);
+                    }
+                }
             }
         }
 
@@ -168,12 +210,19 @@ namespace Magic.Inventory
             if (slot == null || slot.Item == null) return;
             
             _hoveredSlot = slot;
+            _currentSelectedAmount = 1;
 
             // 슬롯 호버 시 정보 패널을 띄우고 위치를 슬롯 아래로 이동
             if (_infoPanel != null)
             {
                 _infoPanel.Open();
                 _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
+                
+                if (slot.Item.IsStackable)
+                {
+                    _infoPanel.UpdateStackAmount(_currentSelectedAmount);
+                }
+                
                 _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
             }
         }

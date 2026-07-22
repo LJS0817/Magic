@@ -119,9 +119,18 @@ namespace Magic.Inventory
                         if (item is Item_Scroll || item is Item_Ink || item is Item_Pen || item is Item_Wand)
                         {
                             actionText = isEquipped ? "장착 해제" : "장착";
+                            _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
+                        }
+                        else if (item.IsStackable)
+                        {
+                            actionText = "사용/선택";
+                            _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 1개 버리기\n(마우스 휠로 수량 조절)";
+                        }
+                        else
+                        {
+                            _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
                         }
                     }
-                    _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : 버리기";
                 }
             }
 
@@ -141,6 +150,24 @@ namespace Magic.Inventory
                 LayoutRebuilder.ForceRebuildLayoutImmediate(_clickInfoText.GetComponent<RectTransform>());
 
             LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+        }
+
+        public void UpdateStackAmount(int amount)
+        {
+            if (_currentItem != null && _currentItem.IsStackable && _clickInfoText != null)
+            {
+                string actionText = "사용/선택";
+                if (StoreManager.Instance != null && StoreManager.Instance.IsOpened)
+                {
+                    actionText = "<color=gray>선택 불가</color>";
+                }
+                _clickInfoText.text = $"더블 클릭 : {actionText} | 우클릭 : {amount}개 버리기\n(마우스 휠로 수량 조절)";
+                
+                Canvas.ForceUpdateCanvases();
+                if (_clickInfoText.gameObject.activeSelf)
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(_clickInfoText.GetComponent<RectTransform>());
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_rectTransform);
+            }
         }
 
         public void ClippingPosition(RectTransform slotRect, RectTransform boundaryRect)

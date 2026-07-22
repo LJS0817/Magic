@@ -16,6 +16,10 @@ namespace Magic.Inventory
         public ItemType Type => data != null ? data.type : ItemType.Pen;
         public ItemRarity Rarity => data != null ? data.rarity : ItemRarity.Common;
         public Sprite ItemIcon => data != null ? data.itemIcon : null;
+        
+        public int count = 1;
+        public bool IsStackable => Type == ItemType.Material || Type == ItemType.Potion || Type == ItemType.RecipeBook;
+        public int MaxStack => data != null && IsStackable ? data.maxStack : 1;
 
         private static long _lastAcquisitionTicks = 0;
         private static long GetUniqueAcquisitionId()
@@ -163,6 +167,16 @@ namespace Magic.Inventory
         public ItemWandSO WandData => data as ItemWandSO;
 
         public Item_Wand(ItemWandSO wandData) : base(wandData)
+        {
+        }
+    }
+
+    [System.Serializable]
+    public class Item_Potion : ItemInstance
+    {
+        public ItemPotionSO PotionData => data as ItemPotionSO;
+
+        public Item_Potion(ItemPotionSO potionData) : base(potionData)
         {
         }
     }

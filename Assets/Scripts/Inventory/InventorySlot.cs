@@ -10,6 +10,7 @@ namespace Magic.Inventory
         [SerializeField] private Image _iconImage;
         [SerializeField] private Button _slotButton;
         [SerializeField] private GameObject _equippedMark;
+        [SerializeField] private TMPro.TMP_Text _countText;
 
         private ItemInstance _item;
         public ItemInstance Item => _item;
@@ -65,6 +66,19 @@ namespace Magic.Inventory
             if (_equippedMark != null)
             {
                 _equippedMark.SetActive(isEquipped);
+            }
+
+            if (_countText != null)
+            {
+                if (_item != null && _item.IsStackable && _item.count > 1)
+                {
+                    _countText.text = _item.count.ToString();
+                    _countText.gameObject.SetActive(true);
+                }
+                else
+                {
+                    _countText.gameObject.SetActive(false);
+                }
             }
         }
 

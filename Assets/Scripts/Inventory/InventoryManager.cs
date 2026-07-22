@@ -155,20 +155,50 @@ namespace Magic.Inventory
             return baseInventoryCapacity + upgradeBonus;
         }
 
-        public bool AddItem(ItemInstance item)
+        public bool AddItem(ItemInstance itemToAdd)
         {
+            if (itemToAdd.IsStackable)
+            {
+                // Try to add to existing stacks first
+                foreach (var item in items)
+                {
+                    if (item.data == itemToAdd.data && item.count < item.MaxStack)
+                    {
+                        int space = item.MaxStack - item.count;
+                        if (itemToAdd.count <= space)
+                        {
+                            item.count += itemToAdd.count;
+                            OnInventoryChanged?.Invoke();
+                            return true;
+                        }
+                        else
+                        {
+                            item.count += space;
+                            itemToAdd.count -= space;
+                        }
+                    }
+                }
+            }
+
             if (items.Count >= GetMaxCapacity())
             {
                 Debug.LogWarning("[InventoryManager] 인벤토리가 가득 찼습니다! (Inventory is full)");
                 return false;
             }
-            items.Add(item);
+            items.Add(itemToAdd);
             OnInventoryChanged?.Invoke();
             return true;
         }
 
-        public void RemoveItem(ItemInstance item)
+        public void RemoveItem(ItemInstance item, int amount = -1)
         {
+            if (amount > 0 && item.count > amount)
+            {
+                item.count -= amount;
+                OnInventoryChanged?.Invoke();
+                return;
+            }
+
             items.Remove(item);
             OnInventoryChanged?.Invoke();
             if (combatLoadout.Contains(item))
