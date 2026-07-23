@@ -1296,7 +1296,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 639961079021639810, guid: 688aeba1e31d2d74f960b01691ca98d7, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 59.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3060562571859898282, guid: 688aeba1e31d2d74f960b01691ca98d7, type: 3}
       propertyPath: m_Name
@@ -4801,7 +4801,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 639961079021639810, guid: 688aeba1e31d2d74f960b01691ca98d7, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 59.2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3060562571859898282, guid: 688aeba1e31d2d74f960b01691ca98d7, type: 3}
       propertyPath: m_Name
@@ -6635,7 +6635,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1244135234
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6747,7 +6747,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1244135233}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0

@@ -22,4 +22,4 @@ MonoBehaviour:
   - upgradeType: 10
     value: 3
     targetName: Square
-  uiPosition: {x: -252.63147, y: -222.56824}
+  uiPosition: {x: -204, y: -201}

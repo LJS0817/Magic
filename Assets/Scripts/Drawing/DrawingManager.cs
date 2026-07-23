@@ -78,15 +78,20 @@ namespace Magic.Drawing
             if (manaSlider != null && PlayerDataManager.Instance != null)
             {
                 manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
+                PlayerDataManager.Instance.OnManaChanged += HandleManaChanged;
             }
 
             penController.OnResourceConsumed += HandleResourceConsumed;
         }
 
+        private void HandleManaChanged(float currentMana, float maxMana)
+        {
+            if (manaSlider != null) manaSlider.SetValue(currentMana, maxMana);
+        }
+
         private void HandleResourceConsumed(PlayerDataManager pMan)
         {
-            if (manaSlider == null) return;
-            manaSlider.SetValue(pMan.currentMana, pMan.GetMaxMana());
+            if (pMan != null) pMan.NotifyManaChanged();
         }
 
         private void HandleInkEquipped(Item_Ink ink)
@@ -144,6 +149,11 @@ namespace Magic.Drawing
             if (penController != null)
             {
                 penController.OnResourceConsumed -= HandleResourceConsumed;
+            }
+
+            if (PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.OnManaChanged -= HandleManaChanged;
             }
         }
 
@@ -356,7 +366,7 @@ namespace Magic.Drawing
             {
                 PlayerDataManager.Instance.currentMana -= rate * Time.deltaTime;
                 if (PlayerDataManager.Instance.currentMana < 0) PlayerDataManager.Instance.currentMana = 0;
-                if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
+                PlayerDataManager.Instance.NotifyManaChanged();
             }
             else
             {
@@ -459,7 +469,7 @@ namespace Magic.Drawing
                     if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= drawCost)
                     {
                         PlayerDataManager.Instance.currentMana -= drawCost;
-                        if (manaSlider != null) manaSlider.SetValue(PlayerDataManager.Instance.currentMana, PlayerDataManager.Instance.GetMaxMana());
+                        PlayerDataManager.Instance.NotifyManaChanged();
                         
                         currentScroll.isEmpty = false;
                         if (currentScroll.ScrollData != null)

@@ -92,12 +92,35 @@ namespace Magic.Data
         public Item_Wand equippedWand;
         public Item_Pouch equippedPouch;
 
+        public event System.Action<float, float> OnManaChanged;
+
+        public void NotifyManaChanged()
+        {
+            OnManaChanged?.Invoke(currentMana, GetMaxMana());
+        }
+
         public void InitInstance()
         {
             Instance = this;
         }
 
         public bool IsInit => Instance != null;
+
+        private void Start()
+        {
+            if (Magic.Upgrade.UpgradeManager.Instance != null)
+            {
+                Magic.Upgrade.UpgradeManager.Instance.OnUpgradeUnlocked += NotifyManaChanged;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (Magic.Upgrade.UpgradeManager.Instance != null)
+            {
+                Magic.Upgrade.UpgradeManager.Instance.OnUpgradeUnlocked -= NotifyManaChanged;
+            }
+        }
 
         private void Update()
         {
@@ -114,6 +137,7 @@ namespace Magic.Data
             if (mpRegen > 0f && currentMana < GetMaxMana())
             {
                 currentMana = Mathf.Min(GetMaxMana(), currentMana + mpRegen * Time.deltaTime);
+                NotifyManaChanged();
             }
         }
     }

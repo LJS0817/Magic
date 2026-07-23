@@ -48,8 +48,8 @@ namespace Magic.Editor
 
         private void OnGUI()
         {
-            DrawGrid(20, 0.2f, Color.gray);
-            DrawGrid(100, 0.4f, Color.gray);
+            DrawRadialGrid(70.505f, 0.2f, Color.gray);  
+            DrawRadialGrid(141.42f, 0.4f, Color.gray); 
 
             DrawConnections();
             DrawConnectionLine(Event.current);
@@ -60,24 +60,42 @@ namespace Magic.Editor
             if (GUI.changed) Repaint();
         }
 
-        private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor)
+        private void DrawRadialGrid(float spacing, float opacity, Color gridColor)
         {
-            int widthDivs = Mathf.CeilToInt(position.width / gridSpacing);
-            int heightDivs = Mathf.CeilToInt(position.height / gridSpacing);
-
             Handles.BeginGUI();
-            Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, gridOpacity);
+            Handles.color = new Color(gridColor.r, gridColor.g, gridColor.b, opacity);
 
-            Vector3 newOffset = new Vector3(panOffset.x % gridSpacing, panOffset.y % gridSpacing, 0);
+            // 노드의 (0,0) 원점을 기준으로 원형 배경을 그립니다.
+            Vector3 center = new Vector3(panOffset.x, panOffset.y, 0);
 
-            for (int i = 0; i < widthDivs; i++)
+            // 화면 모서리까지의 최대 거리를 구해서 원을 몇 개 그릴지 결정
+            float maxDist = 0f;
+            Vector2[] corners = new Vector2[] {
+                new Vector2(0, 0),
+                new Vector2(position.width, 0),
+                new Vector2(0, position.height),
+                new Vector2(position.width, position.height)
+            };
+            foreach (var corner in corners)
             {
-                Handles.DrawLine(new Vector3(gridSpacing * i, -gridSpacing, 0) + newOffset, new Vector3(gridSpacing * i, position.height, 0f) + newOffset);
+                float dist = Vector2.Distance(center, corner);
+                if (dist > maxDist) maxDist = dist;
             }
 
-            for (int j = 0; j < heightDivs; j++)
+            int numCircles = Mathf.CeilToInt(maxDist / spacing);
+
+            // 원 그리기
+            for (int i = 1; i <= numCircles; i++)
             {
-                Handles.DrawLine(new Vector3(-gridSpacing, gridSpacing * j, 0) + newOffset, new Vector3(position.width, gridSpacing * j, 0f) + newOffset);
+                Handles.DrawWireDisc(center, Vector3.forward, spacing * i);
+            }
+
+            // 추가로 중앙에서 뻗어나가는 선 8개를 그려줍니다 (방향 안내선)
+            for (int i = 0; i < 8; i++)
+            {
+                float angle = i * 45f * Mathf.Deg2Rad;
+                Vector3 dir = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
+                Handles.DrawLine(center, center + dir * maxDist);
             }
 
             Handles.color = Color.white;

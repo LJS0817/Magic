@@ -22,4 +22,4 @@ MonoBehaviour:
   - upgradeType: 12
     value: 1
     targetName: 
-  uiPosition: {x: -365.48334, y: 188.84743}
+  uiPosition: {x: -300, y: 0}
