@@ -815,6 +815,14 @@ MonoBehaviour:
   currentPlayerTurnTimer: 0
   parryWindowDuration: 1.5
   currentParryTimer: 0
+  normalEnemies:
+  - {fileID: 11400000, guid: 26a31b8fe80c22f47894468ff21d6264, type: 2}
+  - {fileID: 11400000, guid: a9a32ef5a7af8b04bacd020375198dd4, type: 2}
+  - {fileID: 11400000, guid: 01c4327586d93cc45abde9425ee03f65, type: 2}
+  - {fileID: 11400000, guid: 0f415e34304d4b64aa527b01214b8959, type: 2}
+  - {fileID: 11400000, guid: 8a3aaf26ecbf7b04f8c8371431d166f8, type: 2}
+  bossEnemies:
+  - {fileID: 11400000, guid: 0bddc0776f0ea414f88173d6b6806625, type: 2}
   player: {fileID: 1512672473}
   enemy: {fileID: 1068636474}
 --- !u!4 &670511620
@@ -1209,13 +1217,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac4daf7c865d13f46be825c45bb8ac2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.EnemyController
+  enemyData: {fileID: 0}
   maxHealth: 100
   health: 100
   attackDamage: 15
   currentAttackElement: 0
+  nameText: {fileID: 0}
   spriteRenderer: {fileID: 1068636476}
   hpSlider: {fileID: 1469125954}
   activeEffects: []
+  statusEffectUI: {fileID: 0}
 --- !u!4 &1068636475
 Transform:
   m_ObjectHideFlags: 0

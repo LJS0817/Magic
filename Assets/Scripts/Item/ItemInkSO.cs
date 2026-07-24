@@ -1,25 +1,23 @@
 using UnityEngine;
 
-namespace Magic.Inventory
+[CreateAssetMenu(fileName = "New Ink Data", menuName = "Magic/Items/Ink Data")]
+public class ItemInkSO : ItemDataSO
 {
-    [CreateAssetMenu(fileName = "New Ink Data", menuName = "Magic/Items/Ink Data")]
-    public class ItemInkSO : ItemDataSO
+    [Header("Ink Specifics")]
+    public float maxAmount;
+    public Color inkColor = Color.black; // 그려지는 잉크의 색상
+    public SpellElement inkElement = SpellElement.None;
+
+    [Header("Ink Parts (For Assembled Visual)")]
+    public Sprite inkBaseSprite;
+    public Sprite inkLiquidSprite;
+    public Color inkLiquidColorAlpha = Color.white;
+    public Sprite inkTopBackSprite;
+    public Sprite inkTopSprite;
+
+    private void OnEnable()
     {
-        [Header("Ink Specifics")]
-        public float maxAmount;
-        public Color inkColor = Color.black; // 그려지는 잉크의 색상
-        public Magic.Combat.SpellElement inkElement = Magic.Combat.SpellElement.None;
-
-        [Header("Ink Parts (For Assembled Visual)")]
-        public Sprite inkBaseSprite;
-        public Sprite inkLiquidSprite;
-        public Color inkLiquidColorAlpha = Color.white;
-        public Sprite inkTopBackSprite;
-        public Sprite inkTopSprite;
-
-        private void OnEnable()
-        {
-            type = ItemType.Ink;
-        }
+        type = ItemType.Ink;
     }
 }
+

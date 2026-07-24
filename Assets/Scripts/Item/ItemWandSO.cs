@@ -1,16 +1,14 @@
 using UnityEngine;
 
-namespace Magic.Inventory
+[CreateAssetMenu(fileName = "NewWand", menuName = "Magic/Item/Wand")]
+public class ItemWandSO : ItemDataSO
 {
-    [CreateAssetMenu(fileName = "NewWand", menuName = "Magic/Item/Wand")]
-    public class ItemWandSO : ItemDataSO
+    [Header("Wand Specifics")]
+    public float defaultManaCostMultiplier = 1.0f;
+    
+    private void Reset()
     {
-        [Header("Wand Specifics")]
-        public float defaultManaCostMultiplier = 1.0f;
-        
-        private void Reset()
-        {
-            type = ItemType.Wand;
-        }
+        type = ItemType.Wand;
     }
 }
+

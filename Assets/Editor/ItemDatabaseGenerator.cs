@@ -1,8 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using Magic.Inventory;
-using System.IO;
-using System.Collections.Generic;
 
 namespace Magic.Editor
 {

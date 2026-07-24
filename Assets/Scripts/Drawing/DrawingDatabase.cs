@@ -1,34 +1,32 @@
 using UnityEngine;
 
-namespace Magic.Drawing
+public class DrawingDatabase : MonoBehaviour
 {
-    public class DrawingDatabase : MonoBehaviour
+    public static DrawingDatabase Instance { get; private set; }
+
+    [Header("Global Spell Recipes")]
+    [Tooltip("게임 전역에서 사용할 마법 레시피 에셋들을 넣어주세요.")]
+    public SpellRecipeAsset[] recipes;
+    
+    [Header("Settings")]
+    public GameObject linePrefab;
+
+    public void InitInstance()
     {
-        public static DrawingDatabase Instance { get; private set; }
+        Instance = this;
+    }
 
-        [Header("Global Spell Recipes")]
-        [Tooltip("게임 전역에서 사용할 마법 레시피 에셋들을 넣어주세요.")]
-        public SpellRecipeAsset[] recipes;
-        
-        [Header("Settings")]
-        public GameObject linePrefab;
-
-        public void InitInstance()
+    public SpellRecipeAsset GetRecipeByName(string name)
+    {
+        if (recipes == null) return null;
+        foreach (var recipe in recipes)
         {
-            Instance = this;
-        }
-
-        public SpellRecipeAsset GetRecipeByName(string name)
-        {
-            if (recipes == null) return null;
-            foreach (var recipe in recipes)
+            if (recipe != null && recipe.SpellName == name)
             {
-                if (recipe != null && recipe.SpellName == name)
-                {
-                    return recipe;
-                }
+                return recipe;
             }
-            return null;
         }
+        return null;
     }
 }
+

@@ -1,11 +1,9 @@
-namespace Magic.Combat
+public enum SpellElement
 {
-    public enum SpellElement
-    {
-        None,
-        Fire,
-        Ice,
-        Lightning,
-        Earth
-    }
+    None,
+    Fire,
+    Ice,
+    Lightning,
+    Earth
 }
+
