@@ -26,8 +26,13 @@ public class MapFocusableObject : MonoBehaviour
 
     public void OnClick()
     {
-        if(_onClickEvent == null) {
-            if (!string.IsNullOrEmpty(_sceneName)) SceneManager.LoadScene(_sceneName);
+        Cursor.visible = true;
+        if(_onClickEvent.GetPersistentEventCount() == 0) {
+            if (!string.IsNullOrEmpty(_sceneName))
+            {
+                // 클릭 입력 프레임과 씬 로드 프레임을 분리하여 다음 씬으로 클릭 이벤트가 전파되는 것을 방지
+                DOVirtual.DelayedCall(0.05f, () => SceneManager.LoadScene(_sceneName));
+            }
         } else {
             _onClickEvent?.Invoke();
         }

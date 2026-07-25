@@ -95,6 +95,7 @@ public class MapUIController : MonoBehaviour
                 return;
             }
 
+            isOpened = false; // 씬 전환 중 중복 클릭 및 입력 방지
             _currentFocused.OnClick();
         }
     }

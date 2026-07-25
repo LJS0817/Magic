@@ -55,16 +55,13 @@ public class MarketItemSlotUI : MonoBehaviour
             priceText.text = $"{price} Cu";
         }
 
-        if (buyButton != null)
-        {
-            buyButton.onClick.RemoveAllListeners();
-            buyButton.onClick.AddListener(OnBuyClicked);
-        }
+        buyButton.onClick.RemoveAllListeners();
+        buyButton.onClick.AddListener(OnBuyClicked);
     }
 
     private void OnBuyClicked()
     {
-        if (_itemData != null && MarketManager.Instance != null)
+        if (_itemData != null)
         {
             bool success = MarketManager.Instance.BuyItem(_itemData);
             if (success)

@@ -20,6 +20,7 @@ public class MarketManager : MonoBehaviour
         if (itemData == null) return false;
 
         int price = itemData.basePriceInCopper;
+        if (price <= 0) price = 100; // UI(MarketItemSlotUI)의 가격 설정과 동일하게 맞춤
         
         // Apply ShopDiscount
         if (UpgradeManager.Instance != null)
@@ -45,7 +46,7 @@ public class MarketManager : MonoBehaviour
             {
                 InventoryManager.Instance.AddItem(newItem);
                 Debug.Log($"<color=cyan>[Market] {itemData.itemName}을(를) {price} 동화 가치에 구매했습니다.</color>");
-                return true;
+                return true;z`
             }
             else
             {
@@ -67,25 +68,36 @@ public class MarketManager : MonoBehaviour
     /// </summary>
     private ItemInstance CreateInstanceFromData(ItemDataSO itemData)
     {
+        if (itemData == null) return null;
+
         switch (itemData.type)
         {
             case ItemType.Scroll:
-                return new Item_Scroll(itemData as ItemScrollSO);
+                if (itemData is ItemScrollSO scrollSO) return new Item_Scroll(scrollSO);
+                break;
             case ItemType.Ink:
-                return new Item_Ink(itemData as ItemInkSO);
+                if (itemData is ItemInkSO inkSO) return new Item_Ink(inkSO);
+                break;
             case ItemType.Pen:
-                return new Item_Pen(itemData as ItemPenSO);
+                if (itemData is ItemPenSO penSO) return new Item_Pen(penSO);
+                break;
             case ItemType.Wand:
-                return new Item_Wand(itemData as ItemWandSO);
+                if (itemData is ItemWandSO wandSO) return new Item_Wand(wandSO);
+                break;
             case ItemType.Potion:
-                return new Item_Potion(itemData as ItemPotionSO);
+                if (itemData is ItemPotionSO potionSO) return new Item_Potion(potionSO);
+                break;
             case ItemType.Pouch:
-                return new Item_Pouch(itemData as ItemPouchSO);
+                if (itemData is ItemPouchSO pouchSO) return new Item_Pouch(pouchSO);
+                break;
             case ItemType.Material:
                 return new Item_Material(itemData);
             default:
-                return new Item_Material(itemData); // 기본 폴백
+                return new Item_Material(itemData);
         }
+
+        Debug.LogError($"[MarketManager] '{itemData.itemName}'의 ItemType은 {itemData.type}로 설정되어 있지만, ScriptableObject 파일이 해당 SO 자식 클래스로 생성되지 않았습니다! 임시로 Item_Material로 생성합니다.");
+        return new Item_Material(itemData);
     }
 }
 

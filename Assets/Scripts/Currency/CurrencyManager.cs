@@ -199,7 +199,8 @@ public class CurrencyManager : MonoBehaviour
     /// <returns>소비 성공 여부</returns>
     public bool SpendCurrency(CurrencyType type, int amount, bool autoConvert = true, bool allowNegative = false)
     {
-        if (amount <= 0) return false;
+        if (amount < 0) return false;
+        if (amount == 0) return true;
 
         if (!allowNegative && !HasEnoughCurrency(type, amount, autoConvert))
         {

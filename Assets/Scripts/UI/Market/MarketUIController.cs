@@ -1,57 +1,47 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 public class MarketUIController : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject marketPanel;
-    public Transform contentParent;
-    public GameObject marketItemSlotPrefab;
-    public GameObject categoryHeaderPrefab; // Optional: prefab for category title (e.g. TextMeshProUGUI)
+    public List<MarketUI> _markets;
+    public TMP_Text marketNameText;
 
-    private bool _isOpened = false;
-    private List<GameObject> _spawnedSlots = new List<GameObject>();
+    [Header("Market Navigation")]
+    public Button nextMarketButton;
+    public Button prevMarketButton;
+
+    private int _marketIndex = -1;
+    private bool _isInitialized = false;
+
+    private void Awake()
+    {
+        if (nextMarketButton != null) nextMarketButton.onClick.AddListener(NextMarket);
+        if (prevMarketButton != null) prevMarketButton.onClick.AddListener(PrevMarket);
+    }
 
     private void Start()
     {
-        if (marketPanel != null)
-            marketPanel.SetActive(false);
+        InitializeMarkets();
     }
 
-    public void Open()
+    void Update()
     {
-        if (_isOpened) return;
-        _isOpened = true;
-
-        if (marketPanel != null)
-            marketPanel.SetActive(true);
-
-        RefreshMarketItems();
-    }
-
-    public void Close()
-    {
-        if (!_isOpened) return;
-        _isOpened = false;
-
-        if (marketPanel != null)
-            marketPanel.SetActive(false);
-    }
-
-    public void Toggle()
-    {
-        if (_isOpened) Close();
-        else Open();
-    }
-
-    private void RefreshMarketItems()
-    {
-        // Clear existing
-        foreach (var slot in _spawnedSlots)
+        if(Input.GetKeyDown(KeyCode.A))
         {
-            Destroy(slot);
+            PrevMarket();
         }
-        _spawnedSlots.Clear();
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            NextMarket();   
+        }
+    }
+
+    private void InitializeMarkets()
+    {
+        if (_isInitialized) return;
 
         var db = InventoryManager.Instance != null ? InventoryManager.Instance.itemDatabase : null;
         if (db == null)
@@ -60,47 +50,81 @@ public class MarketUIController : MonoBehaviour
             return;
         }
 
-        // Populate categories
-        PopulateCategory("스크롤", db.scrolls.ToArray());
-        PopulateCategory("잉크", db.inks.ToArray());
-        PopulateCategory("마법 펜", db.pens.ToArray());
-        PopulateCategory("지팡이", db.wands.ToArray());
-        PopulateCategory("물약", db.potions.ToArray());
-        PopulateCategory("주머니", db.pouches.ToArray());
+        foreach (var market in _markets)
+        {
+            if (market == null) continue;
+
+            List<ItemDataSO> items = new List<ItemDataSO>();
+            switch (market.marketType)
+            {
+                case MarketType.WandShop:
+                    if (db.wands != null) items.AddRange(db.wands);
+                    break;
+                case MarketType.InkAndPenShop:
+                    if (db.inks != null) items.AddRange(db.inks);
+                    if (db.pens != null) items.AddRange(db.pens);
+                    break;
+                case MarketType.ParchmentShop:
+                    if (db.scrolls != null) items.AddRange(db.scrolls);
+                    break;
+                case MarketType.AdventurerGuild:
+                    if (db.potions != null) items.AddRange(db.potions);
+                    break;
+            }
+            market.Setup(items);
+        }
+        SelectMarket(0, true);
+        _isInitialized = true;
     }
 
-    private void PopulateCategory<T>(string categoryName, T[] items) where T : ItemDataSO
+    public void SelectMarket(int index, bool goLeft)
     {
-        if (items == null || items.Length == 0) return;
+        if(_marketIndex == index) return;
+        
+        if(_marketIndex >= 0) _markets[_marketIndex].Hide(goLeft);
+        _marketIndex = index;
 
-        // Optional: Spawn Category Header
-        if (categoryHeaderPrefab != null && contentParent != null)
+        _markets[_marketIndex].Show(goLeft);
+        _markets[_marketIndex].RefreshList();
+        UpdateMarketUI(_marketIndex);
+    }
+
+    private void UpdateMarketUI(int index)
+    {
+        if (marketNameText != null && _markets != null && index >= 0 && index < _markets.Count)
         {
-            GameObject header = Instantiate(categoryHeaderPrefab, contentParent);
-            var textComp = header.GetComponentInChildren<TMPro.TMP_Text>();
-            if (textComp != null)
+            var market = _markets[index];
+            if (market != null)
             {
-                textComp.text = $"--- {categoryName} ---";
-            }
-            _spawnedSlots.Add(header);
-        }
-
-        // Spawn Slots
-        foreach (var item in items)
-        {
-            if (item == null) continue;
-
-            if (marketItemSlotPrefab != null && contentParent != null)
-            {
-                GameObject slotObj = Instantiate(marketItemSlotPrefab, contentParent);
-                MarketItemSlotUI slotUI = slotObj.GetComponent<MarketItemSlotUI>();
-                if (slotUI != null)
-                {
-                    slotUI.Setup(item);
-                }
-                _spawnedSlots.Add(slotObj);
+                marketNameText.text = GetMarketName(market.marketType);
             }
         }
+    }
+
+    private string GetMarketName(MarketType type)
+    {
+        switch (type)
+        {
+            case MarketType.WandShop: return "지팡이 전문 마켓";
+            case MarketType.InkAndPenShop: return "잉크 펜 전문 마켓";
+            case MarketType.ParchmentShop: return "양피지 전문 마켓";
+            case MarketType.AdventurerGuild: return "모험자 길드";
+            default: return "상점";
+        }
+    }
+
+    public void NextMarket()
+    {
+        if (_markets == null || _markets.Count == 0) return;
+        int nextIndex = (_marketIndex + 1) % _markets.Count;
+        SelectMarket(nextIndex, true);
+    }
+
+    public void PrevMarket()
+    {
+        if (_markets == null || _markets.Count == 0) return;
+        int prevIndex = (_marketIndex - 1 + _markets.Count) % _markets.Count;
+        SelectMarket(prevIndex, false);
     }
 }
 
