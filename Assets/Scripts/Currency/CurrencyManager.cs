@@ -23,10 +23,10 @@ public class CurrencyManager : MonoBehaviour
     // [SerializeField] private int _gold;
     // [SerializeField] private int _platinum;
     // [SerializeField] private int _gem;
-    private int[] _money;
+    private long[] _money;
 
     // 외부 읽기용 프로퍼티 및 변경 시 이벤트 호출
-    public int Copper
+    public long Copper
     {
         get => _money[0];
         private set
@@ -39,7 +39,7 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-    public int Silver
+    public long Silver
     {
         get => _money[1];
         private set
@@ -52,7 +52,7 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-    public int Gold
+    public long Gold
     {
         get => _money[2];
         private set
@@ -65,7 +65,7 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-    public int Platinum
+    public long Platinum
     {
         get => _money[3];
         private set
@@ -78,7 +78,7 @@ public class CurrencyManager : MonoBehaviour
         }
     }
 
-    public int Gem
+    public long Gem
     {
         get => _money[4];
         private set
@@ -92,7 +92,7 @@ public class CurrencyManager : MonoBehaviour
     }
 
     // 재화 변경 이벤트 (재화 타입, 변경된 보유량)
-    public event Action<CurrencyType, int> OnCurrencyChanged;
+    public event Action<CurrencyType, long> OnCurrencyChanged;
 
     // 파산 이벤트 및 한계치
     public event Action OnBankruptcy;
@@ -100,7 +100,7 @@ public class CurrencyManager : MonoBehaviour
 
     private void Awake()
     {
-        _money = new int[5] { 0, 0, 0, 0, 0 };
+        _money = new long[5] { 0, 0, 0, 0, 0 };
         if (Instance == null)
         {
             Instance = this;
@@ -115,7 +115,7 @@ public class CurrencyManager : MonoBehaviour
     /// <summary>
     /// 특정 재화의 보유량을 반환합니다.
     /// </summary>
-    public int GetCurrencyAmount(CurrencyType type)
+    public long GetCurrencyAmount(CurrencyType type)
     {
         switch (type)
         {
@@ -145,7 +145,7 @@ public class CurrencyManager : MonoBehaviour
     /// <param name="type">체크할 재화 종류</param>
     /// <param name="amount">요청 수량</param>
     /// <param name="autoConvert">자동 상하위 화폐 환산 적용 여부 (Gem은 제외)</param>
-    public bool HasEnoughCurrency(CurrencyType type, int amount, bool autoConvert = true)
+    public bool HasEnoughCurrency(CurrencyType type, long amount, bool autoConvert = true)
     {
         if (amount < 0) return false;
 
@@ -168,7 +168,7 @@ public class CurrencyManager : MonoBehaviour
     /// <summary>
     /// 재화를 추가합니다. (autoConvert가 true일 경우 상위 화폐로 자동 환전합니다.)
     /// </summary>
-    public void AddCurrency(CurrencyType type, int amount, bool autoConvert = true)
+    public void AddCurrency(CurrencyType type, long amount, bool autoConvert = true)
     {
         if (amount <= 0) return;
 
@@ -197,7 +197,7 @@ public class CurrencyManager : MonoBehaviour
     /// <param name="autoConvert">자동 화폐 변환 적용 여부 (예: 은화 결제 시 동화가 부족하면 금화를 깨거나 동화를 합쳐 지불)</param>
     /// <param name="allowNegative">마이너스 자산을 허용할지 여부 (예: 위약금 차감 등)</param>
     /// <returns>소비 성공 여부</returns>
-    public bool SpendCurrency(CurrencyType type, int amount, bool autoConvert = true, bool allowNegative = false)
+    public bool SpendCurrency(CurrencyType type, long amount, bool autoConvert = true, bool allowNegative = false)
     {
         if (amount < 0) return false;
         if (amount == 0) return true;
@@ -261,7 +261,7 @@ public class CurrencyManager : MonoBehaviour
     /// <summary>
     /// 특정 화폐 수량을 동화 가치로 환산하여 반환합니다.
     /// </summary>
-    private long GetValueInCopper(CurrencyType type, int amount)
+    private long GetValueInCopper(CurrencyType type, long amount)
     {
         switch (type)
         {
@@ -280,16 +280,16 @@ public class CurrencyManager : MonoBehaviour
     {
         long remaining = totalCopper;
 
-        int newPlatinum = (int)(remaining / VALUE_PLATINUM);
+        long newPlatinum = remaining / VALUE_PLATINUM;
         remaining %= VALUE_PLATINUM;
 
-        int newGold = (int)(remaining / VALUE_GOLD);
+        long newGold = remaining / VALUE_GOLD;
         remaining %= VALUE_GOLD;
 
-        int newSilver = (int)(remaining / VALUE_SILVER);
+        long newSilver = remaining / VALUE_SILVER;
         remaining %= VALUE_SILVER;
 
-        int newCopper = (int)(remaining / VALUE_COPPER);
+        long newCopper = remaining / VALUE_COPPER;
 
         Platinum = newPlatinum;
         Gold = newGold;

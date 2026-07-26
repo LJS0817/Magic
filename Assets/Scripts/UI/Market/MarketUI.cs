@@ -16,6 +16,9 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
     RectTransform _rectTransform;
     public MarketType marketType;
     private List<ItemDataSO> _marketItems = new List<ItemDataSO>();
+    [SerializeField] MarketItemInfoUI _infoUI;
+    private MarketItemSlotUI _selectedSlot;
+    [SerializeField] Sprite _slotImage;
 
     public void Setup(List<ItemDataSO> items)
     {
@@ -31,16 +34,54 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
         return _marketItems != null ? _marketItems.Count : 0;
     }
 
+    protected override void OnSlotCreated(MarketItemSlotUI slot)
+    {
+        if (slot != null) slot.SetFocusImage(_slotImage);
+    }
+
     protected override void UpdateSlot(MarketItemSlotUI slot, int dataIndex)
     {
         if (_marketItems != null && dataIndex >= 0 && dataIndex < _marketItems.Count)
         {
-            slot.Setup(_marketItems[dataIndex]);
+            slot.Setup(_marketItems[dataIndex], (item, price) => OnSlotClicked(slot, item, price));
         }
         else
         {
             slot.gameObject.SetActive(false);
         }
+    }
+
+    private void OnSlotClicked(MarketItemSlotUI clickedSlot, ItemDataSO itemData, long price)
+    {
+        if (_selectedSlot != null && _selectedSlot != clickedSlot)
+        {
+            _selectedSlot.Deselect();
+        }
+
+        _selectedSlot = clickedSlot;
+        if (_selectedSlot != null)
+        {
+            _selectedSlot.Select();
+        }
+
+        if (_infoUI != null)
+        {
+            _infoUI.SetUp(itemData, price);
+        }
+    }
+
+    public override void RefreshList()
+    {
+        if (_selectedSlot != null)
+        {
+            _selectedSlot.Deselect(immediate: true);
+            _selectedSlot = null;
+        }
+        if (_infoUI != null)
+        {
+            _infoUI.Clear();
+        }
+        base.RefreshList();
     }
 
     protected override void Awake()
@@ -80,6 +121,15 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
 
     public void Hide(bool goLeft)
     {
+        if (_selectedSlot != null)
+        {
+            _selectedSlot.Deselect(immediate: true);
+            _selectedSlot = null;
+        }
+        if (_infoUI != null)
+        {
+            _infoUI.Clear();
+        }
         ControlCanvasGroup(false);
         ControlRectTransform(false, goLeft);
     }

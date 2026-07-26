@@ -13,13 +13,13 @@ public class MarketManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 상점(마켓)에서 아이템 데이터를 기반으로 새 아이템을 구매합니다.
+    /// 아이템의 기본 가격에 상점 할인율을 적용한 최종 1개당 단가를 반환합니다.
     /// </summary>
-    public bool BuyItem(ItemDataSO itemData)
+    public long GetItemPrice(ItemDataSO itemData)
     {
-        if (itemData == null) return false;
+        if (itemData == null) return 0;
 
-        int price = itemData.basePriceInCopper;
+        long price = itemData.basePriceInCopper;
         if (price <= 0) price = 100; // UI(MarketItemSlotUI)의 가격 설정과 동일하게 맞춤
         
         // Apply ShopDiscount
@@ -28,36 +28,63 @@ public class MarketManager : MonoBehaviour
             float discountPercent = UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.ShopDiscount);
             // Cap discount at 90%
             float discountMultiplier = 1f - Mathf.Clamp(discountPercent / 100f, 0f, 0.9f);
-            price = Mathf.RoundToInt(price * discountMultiplier);
+            price = (long)Mathf.Round(price * discountMultiplier);
         }
+
+        return price;
+    }
+
+    /// <summary>
+    /// 상점(마켓)에서 아이템 데이터를 기반으로 새 아이템을 지정한 수량만큼 구매합니다.
+    /// </summary>
+    public bool BuyItem(ItemDataSO itemData, int amount = 1)
+    {
+        if (itemData == null || amount <= 0) return false;
+
+        long unitPrice = GetItemPrice(itemData);
+        long totalPrice = unitPrice * amount;
         
         // Check Inventory Capacity first
-        if (InventoryManager.Instance != null && InventoryManager.Instance.items.Count >= InventoryManager.Instance.GetMaxCapacity())
+        if (InventoryManager.Instance != null && (InventoryManager.Instance.items.Count + amount) > InventoryManager.Instance.GetMaxCapacity())
         {
-            Debug.LogWarning("[MarketManager] 인벤토리가 가득 차서 아이템을 구매할 수 없습니다.");
+            Debug.LogWarning("[MarketManager] 인벤토리 여유 공간이 부족하여 아이템을 구매할 수 없습니다.");
             return false;
         }
 
         // 지갑에 돈이 충분한지 확인 후 차감 (자동 변환 결제 활성화)
-        if (CurrencyManager.Instance.SpendCurrency(CurrencyType.Copper, price, autoConvert: true))
+        if (CurrencyManager.Instance.SpendCurrency(CurrencyType.Copper, totalPrice, autoConvert: true))
         {
-            ItemInstance newItem = CreateInstanceFromData(itemData);
-            if (newItem != null)
+            int successCount = 0;
+            for (int i = 0; i < amount; i++)
             {
-                InventoryManager.Instance.AddItem(newItem);
-                Debug.Log($"<color=cyan>[Market] {itemData.itemName}을(를) {price} 동화 가치에 구매했습니다.</color>");
-                return true;z`
+                ItemInstance newItem = CreateInstanceFromData(itemData);
+                if (newItem != null)
+                {
+                    InventoryManager.Instance.AddItem(newItem);
+                    successCount++;
+                }
+            }
+
+            if (successCount == amount)
+            {
+                Debug.Log($"<color=cyan>[Market] {itemData.itemName} {amount}개를 {totalPrice} 동화 가치에 구매했습니다.</color>");
+                return true;
             }
             else
             {
                 // 생성 실패 시 환불 처리
-                CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, price);
-                Debug.LogError("[MarketManager] 아이템 생성 실패로 환불되었습니다.");
+                long refund = unitPrice * (amount - successCount);
+                if (refund > 0)
+                {
+                    CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, refund);
+                    Debug.LogError($"[MarketManager] 아이템 {amount - successCount}개 생성 실패로 환불되었습니다.");
+                }
+                return successCount > 0;
             }
         }
         else
         {
-            Debug.LogWarning($"<color=red>[Market] 돈이 부족하여 {itemData.itemName}을(를) 살 수 없습니다. (필요: {price} 동화 가치)</color>");
+            Debug.LogWarning($"<color=red>[Market] 돈이 부족하여 {itemData.itemName}을(를) 살 수 없습니다. (필요: {totalPrice} 동화 가치)</color>");
         }
 
         return false;

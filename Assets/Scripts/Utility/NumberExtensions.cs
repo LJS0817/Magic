@@ -20,10 +20,14 @@ public static class NumberExtensions
     /// </summary>
     public static string ToShortFormat(this long amount)
     {
-        if (amount >= 1000000)
-            return (amount / 1000000f).ToString("0.#") + "m";
-        if (amount >= 1000)
-            return (amount / 1000f).ToString("0.#") + "k";
+        if (amount >= 1000000000000L)
+            return (amount / 1000000000000d).ToString("0.#") + "t";
+        if (amount >= 1000000000L)
+            return (amount / 1000000000d).ToString("0.#") + "b";
+        if (amount >= 1000000L)
+            return (amount / 1000000d).ToString("0.#") + "m";
+        if (amount >= 1000L)
+            return (amount / 1000d).ToString("0.#") + "k";
         
         return amount.ToString("N0");
     }

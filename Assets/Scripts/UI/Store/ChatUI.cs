@@ -237,20 +237,20 @@ public class ChatUI : MonoBehaviour
         }
 
         int haggleIndex = Mathf.RoundToInt((100f - data.patience) / 34f);
-        int pt = 0, g = 0, s = 0, c = 0;
-        if (platinumInput != null && !string.IsNullOrEmpty(platinumInput.text)) int.TryParse(platinumInput.text, out pt);
-        if (goldInput != null && !string.IsNullOrEmpty(goldInput.text)) int.TryParse(goldInput.text, out g);
-        if (silverInput != null && !string.IsNullOrEmpty(silverInput.text)) int.TryParse(silverInput.text, out s);
-        if (copperInput != null && !string.IsNullOrEmpty(copperInput.text)) int.TryParse(copperInput.text, out c);
+        long pt = 0, g = 0, s = 0, c = 0;
+        if (platinumInput != null && !string.IsNullOrEmpty(platinumInput.text)) long.TryParse(platinumInput.text, out pt);
+        if (goldInput != null && !string.IsNullOrEmpty(goldInput.text)) long.TryParse(goldInput.text, out g);
+        if (silverInput != null && !string.IsNullOrEmpty(silverInput.text)) long.TryParse(silverInput.text, out s);
+        if (copperInput != null && !string.IsNullOrEmpty(copperInput.text)) long.TryParse(copperInput.text, out c);
 
         long totalCopper = pt * CurrencyManager.VALUE_PLATINUM +
                            g * CurrencyManager.VALUE_GOLD +
                            s * CurrencyManager.VALUE_SILVER +
                            c * CurrencyManager.VALUE_COPPER;
 
-        if (totalCopper > 0 && totalCopper <= int.MaxValue)
+        if (totalCopper > 0)
         {
-            int askingPrice = (int)totalCopper;
+            long askingPrice = totalCopper;
             int beforeCount = data.chatHistory.Count;
 
             // StoreManager의 HaggleOrder 호출 (호출 후 chatHistory에 2~3줄 추가됨)

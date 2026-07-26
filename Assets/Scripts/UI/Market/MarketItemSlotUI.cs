@@ -1,18 +1,28 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class MarketItemSlotUI : MonoBehaviour
 {
     [Header("UI Elements")]
     public Image iconImage;
     public TMP_Text nameText;
-    public TMP_Text priceText;
-    public Button buyButton;
+    public SlotCustomButton getDetail;
+    [SerializeField] CurrencyValueUI valueUI;
+    [SerializeField] Image focusImg;
 
     private ItemDataSO _itemData;
 
-    public void Setup(ItemDataSO itemData)
+    public void SetFocusImage(Sprite sprite)
+    {
+        if (focusImg != null && sprite != null)
+        {
+            focusImg.sprite = sprite;
+        }
+    }
+
+    public void Setup(ItemDataSO itemData, Action<ItemDataSO, long> callback)
     {
         _itemData = itemData;
 
@@ -39,36 +49,34 @@ public class MarketItemSlotUI : MonoBehaviour
             nameText.text = _itemData.itemName;
         }
 
-        if (priceText != null)
+        long price = 100;
+        if (MarketManager.Instance != null)
         {
-            int price = _itemData.basePriceInCopper;
-            if (price <= 0) price = 100; // Default fallback if not set
-            
-            // Apply visual discount calculation for display if needed
-            if (UpgradeManager.Instance != null)
-            {
-                float discountPercent = UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.ShopDiscount);
-                float discountMultiplier = 1f - Mathf.Clamp(discountPercent / 100f, 0f, 0.9f);
-                price = Mathf.RoundToInt(price * discountMultiplier);
-            }
-
-            priceText.text = $"{price} Cu";
+            price = MarketManager.Instance.GetItemPrice(_itemData);
+        }
+        else if (_itemData.basePriceInCopper > 0)
+        {
+            price = _itemData.basePriceInCopper;
         }
 
-        buyButton.onClick.RemoveAllListeners();
-        buyButton.onClick.AddListener(OnBuyClicked);
+        valueUI.SetValue(price);
+
+        if (getDetail != null)
+        {
+            getDetail.Deselect(immediate: true);
+            getDetail.onClick.RemoveAllListeners();
+            getDetail.onClick.AddListener(() => { callback(_itemData, price); });
+        }
     }
 
-    private void OnBuyClicked()
+    public void Select()
     {
-        if (_itemData != null)
-        {
-            bool success = MarketManager.Instance.BuyItem(_itemData);
-            if (success)
-            {
-                // Optional: Play buy sound, show particle, etc.
-            }
-        }
+        if (getDetail != null) getDetail.Select();
+    }
+
+    public void Deselect(bool immediate = false)
+    {
+        if (getDetail != null) getDetail.Deselect(immediate);
     }
 }
 

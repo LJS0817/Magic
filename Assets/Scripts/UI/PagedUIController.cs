@@ -55,6 +55,11 @@ public abstract class PagedUIController<TSlot> : MonoBehaviour where TSlot : Mon
             _slotPool[i].gameObject.SetActive(false);
         }
 
+        if (_slotContainer is RectTransform rectTransform)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
+        }
+
         if (_pageText != null) _pageText.text = $"{_currentPage + 1} / {totalPages}";
         if (_prevPageButton != null) _prevPageButton.interactable = _currentPage > 0;
         if (_nextPageButton != null) _nextPageButton.interactable = _currentPage < totalPages - 1;
@@ -91,9 +96,12 @@ public abstract class PagedUIController<TSlot> : MonoBehaviour where TSlot : Mon
         GameObject slotObj = Instantiate(_slotPrefab, _slotContainer);
         TSlot slot = slotObj.GetComponent<TSlot>();
         _slotPool.Add(slot);
+        OnSlotCreated(slot);
         
         return slot;
     }
+
+    protected virtual void OnSlotCreated(TSlot slot) { }
 
     // Subclasses must implement these
     protected abstract int GetTotalCapacity();

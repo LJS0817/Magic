@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using DG.Tweening;
 
-[RequireComponent(typeof(Graphic))]
 public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
     [Header("Visuals")]

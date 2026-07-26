@@ -7,7 +7,6 @@ public class MarketUIController : MonoBehaviour
 {
     [Header("UI References")]
     public List<MarketUI> _markets;
-    public TMP_Text marketNameText;
 
     [Header("Market Navigation")]
     public Button nextMarketButton;
@@ -86,19 +85,6 @@ public class MarketUIController : MonoBehaviour
 
         _markets[_marketIndex].Show(goLeft);
         _markets[_marketIndex].RefreshList();
-        UpdateMarketUI(_marketIndex);
-    }
-
-    private void UpdateMarketUI(int index)
-    {
-        if (marketNameText != null && _markets != null && index >= 0 && index < _markets.Count)
-        {
-            var market = _markets[index];
-            if (market != null)
-            {
-                marketNameText.text = GetMarketName(market.marketType);
-            }
-        }
     }
 
     private string GetMarketName(MarketType type)

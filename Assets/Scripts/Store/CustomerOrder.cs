@@ -27,24 +27,24 @@ public class CustomerOrder
     public string requestedSpellName;
     public SpellElement requestedElement;
     
-    public int marketPrice;
-    public int customerBudget; // This is now used as claimedBudget when initially shown? Wait, let's add specific fields.
+    public long marketPrice;
+    public long customerBudget; // This is now used as claimedBudget when initially shown? Wait, let's add specific fields.
     
-    public int trueBudget;
-    public int claimedBudget;
+    public long trueBudget;
+    public long claimedBudget;
     public bool isBluffing;
     
     public OrderState state;
     public CustomerFaction faction;
     public float patience;
-    public int agreedPrice;
+    public long agreedPrice;
 
     public System.Collections.Generic.List<string> chatHistory;
 
     // Use this to display the base reward if needed, or we can just use marketPrice/budget
-    public int offeredReward; 
+    public long offeredReward; 
 
-    public CustomerOrder(string name, string desc, string spell, SpellElement element, int marketPrice, int tBudget, int cBudget, bool bluff, CustomerFaction fac)
+    public CustomerOrder(string name, string desc, string spell, SpellElement element, long marketPrice, long tBudget, long cBudget, bool bluff, CustomerFaction fac)
     {
         orderID = System.Guid.NewGuid().ToString();
         customerName = name;

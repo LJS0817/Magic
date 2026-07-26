@@ -20,7 +20,7 @@ public abstract class ItemDataSO : ScriptableObject
     
     [Header("Economy")]
     [Tooltip("아이템의 기본 가치 (동화 기준)")]
-    public int basePriceInCopper;
+    public long basePriceInCopper;
 
     [Header("Stacking")]
     [Tooltip("한 슬롯에 최대로 겹칠 수 있는 개수")]

@@ -62,10 +62,10 @@ public class StoreManager : MonoBehaviour
             string desc = $"최근 몬스터가 너무 많아서... 혹시 <color=#37a689>[{elementText}] {randomRecipe.SpellName}</color> 마법이 담긴 스크롤이 있습니까?";
             
             // Base reward calculation based on recipe mana cost and element
-            int baseVal = Mathf.RoundToInt(randomRecipe.manaCost * 5f);
+            long baseVal = (long)Mathf.Round(randomRecipe.manaCost * 5f);
             if (reqElement != SpellElement.None)
             {
-                baseVal = Mathf.RoundToInt(baseVal * 1.5f);
+                baseVal = (long)Mathf.Round(baseVal * 1.5f);
             }
             
             // Add Upgrade Multipliers to define the actual "Market Price"
@@ -82,7 +82,7 @@ public class StoreManager : MonoBehaviour
                 }
             }
             
-            int marketPrice = Mathf.RoundToInt(baseVal * marketMultiplier);
+            long marketPrice = (long)Mathf.Round(baseVal * marketMultiplier);
             
             // Generate Faction and Budget
             CustomerFaction faction = (CustomerFaction)UnityEngine.Random.Range(0, 5);
@@ -98,13 +98,13 @@ public class StoreManager : MonoBehaviour
                 case CustomerFaction.Cultist: trueBudgetMultiplier = UnityEngine.Random.Range(1.0f, 1.5f); isBluffing = UnityEngine.Random.value < 0.5f; break;
             }
 
-            int trueBudget = Mathf.RoundToInt(marketPrice * trueBudgetMultiplier);
-            int claimedBudget = trueBudget;
+            long trueBudget = (long)Mathf.Round(marketPrice * trueBudgetMultiplier);
+            long claimedBudget = trueBudget;
 
             if (isBluffing)
             {
                 // 거짓말을 하면 진짜 예산보다 낮게 부름 (30% ~ 70% 수준)
-                claimedBudget = Mathf.RoundToInt(trueBudget * UnityEngine.Random.Range(0.3f, 0.7f));
+                claimedBudget = (long)Mathf.Round(trueBudget * UnityEngine.Random.Range(0.3f, 0.7f));
             }
 
             var order = new CustomerOrder(name, desc, randomRecipe.SpellName, reqElement, marketPrice, trueBudget, claimedBudget, isBluffing, faction);
@@ -125,7 +125,7 @@ public class StoreManager : MonoBehaviour
     /// <summary>
     /// 손님과 가격을 흥정합니다.
     /// </summary>
-    public bool HaggleOrder(string orderId, int askingPrice)
+    public bool HaggleOrder(string orderId, long askingPrice)
     {
         if (!activeOrders.TryGetValue(orderId, out var order)) return false;
         
@@ -181,7 +181,7 @@ public class StoreManager : MonoBehaviour
             // C. 단순 실패 및 부정행위 판정
             if (scroll.ScrollData.spellName != order.requestedSpellName || scroll.ScrollData.scrollElement != order.requestedElement)
             {
-                int penalty = order.agreedPrice * 2;
+                long penalty = order.agreedPrice * 2;
                 Debug.Log($"<color=red>[Store] 사기 적발! 위약금 {penalty} 차감 및 아이템 파괴됨.</color>");
                 
                 CurrencyManager.Instance.SpendCurrency(CurrencyType.Copper, penalty, autoConvert: true, allowNegative: true);
@@ -200,12 +200,12 @@ public class StoreManager : MonoBehaviour
             bool isOverachievement = scroll.ScrollData.accuracyScore >= 1.2f; 
             bool isPartialSuccess = scroll.ScrollData.accuracyScore < 1.0f;
 
-            int finalPayment = order.agreedPrice;
+            long finalPayment = order.agreedPrice;
 
             if (isOverachievement)
             {
-                int maxTip = order.trueBudget - order.agreedPrice;
-                int actualTip = Mathf.RoundToInt(order.agreedPrice * 0.2f); // 20% 팁
+                long maxTip = order.trueBudget - order.agreedPrice;
+                long actualTip = (long)Mathf.Round(order.agreedPrice * 0.2f); // 20% 팁
                 if (actualTip > maxTip) actualTip = maxTip;
                 
                 finalPayment += actualTip;
@@ -213,7 +213,7 @@ public class StoreManager : MonoBehaviour
             }
             else if (isPartialSuccess)
             {
-                int discount = Mathf.RoundToInt(order.agreedPrice * 0.3f); // 30% 강제 할인
+                long discount = (long)Mathf.Round(order.agreedPrice * 0.3f); // 30% 강제 할인
                 finalPayment -= discount;
                 order.chatHistory.Add($"손님: 품질이 생각보다 별로네요. {CurrencyManager.FormatCurrency(discount)}만큼은 빼고 드리겠습니다.");
             }

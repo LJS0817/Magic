@@ -33,7 +33,7 @@ public class CurrencyUIController : MonoBehaviour
         }
     }
 
-    private void UpdateCurrencyUI(CurrencyType type, int amount)
+    private void UpdateCurrencyUI(CurrencyType type, long amount)
     {
         // Utility 네임스페이스의 ToShortFormat 확장 메서드 사용 (C# 확장 메서드 특성상 namespace 추가 필요)
         string amountStr = type == CurrencyType.Gem ? amount.ToShortFormat() : amount.ToString("N0");

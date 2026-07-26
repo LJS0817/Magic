@@ -24,7 +24,7 @@ public class UpgradeNodeSO : ScriptableObject
     public List<UpgradeNodeSO> requiredParents;
     
     [Tooltip("Cost in Gem to unlock this node")]
-    public int costAmount;
+    public long costAmount;
 
     [Header("Upgrade Effects")]
     public List<UpgradeEffect> effects;
