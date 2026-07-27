@@ -419,6 +419,7 @@ public class CombatDrawingManager : DrawingManager
         }
         else if (Input.GetMouseButton(0))
         {
+            if (isStamping) return;
             if (!isDrawing)
             {
                 StartStroke();
@@ -430,6 +431,7 @@ public class CombatDrawingManager : DrawingManager
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            isStamping = false;
             EndStroke();
         }
 
@@ -443,6 +445,8 @@ public class CombatDrawingManager : DrawingManager
     {
         ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
         if (currentTool == null) return;
+        
+        if (TryStampWithDrawingTool(currentTool)) return;
         
         if (penController == null || !penController.CanDraw())
         {

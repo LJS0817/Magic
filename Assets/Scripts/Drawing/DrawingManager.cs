@@ -26,6 +26,7 @@ public class DrawingManager : MonoBehaviour
     protected bool isRefilling = false;
     protected bool isOutsideArea = false;
     protected bool isPenReady = false;
+    protected bool isStamping = false;
 
     protected DrawingDatabase drawingDatabase;
 
@@ -217,6 +218,7 @@ public class DrawingManager : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
+            if (isStamping) return;
             if (!isDrawing && isPenReady)
             {
                 StartStroke();
@@ -228,6 +230,7 @@ public class DrawingManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            isStamping = false;
             EndStroke();
         }
 
@@ -261,9 +264,10 @@ public class DrawingManager : MonoBehaviour
         }
 
         ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
+        if (TryStampWithDrawingTool(currentTool)) return;
         
-        // 지팡이가 아니라면(펜이라면) 빈 스크롤이 장착되어 있어야 함
-        if (!(currentTool is Item_Wand))
+        // 지팡이나 도장이 아니라면(펜이라면) 빈 스크롤이 장착되어 있어야 함
+        if (!(currentTool is Item_Wand || currentTool is Item_DrawingTool))
         {
             Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
             if (currentScroll == null || !currentScroll.isEmpty)
@@ -300,6 +304,101 @@ public class DrawingManager : MonoBehaviour
         currentLine.SetColor(lineColor);
 
         UpdateStroke();
+    }
+
+    protected bool TryStampWithDrawingTool(ItemInstance currentTool)
+    {
+        if (currentTool is Item_DrawingTool drawingTool)
+        {
+            if (penController != null && !penController.CanDraw())
+            {
+                Debug.LogWarning("[도장 실패] 사용할 자원(잉크)이 부족합니다.");
+                return true;
+            }
+
+            Transform parentTransform = drawingArea != null ? drawingArea : transform;
+            Camera uiCamera = null;
+            Canvas canvas = parentTransform.GetComponentInParent<Canvas>();
+            if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
+                uiCamera = canvas.worldCamera != null ? canvas.worldCamera : mainCamera;
+            }
+
+            Vector3 mousePos = Input.mousePosition;
+            Vector2 localPos;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentTransform as RectTransform, mousePos, uiCamera, out localPos))
+            {
+                isStamping = true;
+                StampEquippedDrawingTool(localPos);
+                if (penController != null) penController.ConsumeResource();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public virtual void StampEquippedDrawingTool(Vector2 center)
+    {
+        ItemInstance currentTool = penController != null ? penController.CurrentTool : (InventoryManager.Instance != null ? InventoryManager.Instance.EquippedDrawingTool : null);
+        if (currentTool is Item_DrawingTool tool && tool.DrawingToolData != null)
+        {
+            if (drawingDatabase == null || drawingDatabase.linePrefab == null) return;
+
+            string shapeName = tool.DrawingToolData.GetShapeName();
+            float accuracy = tool.DrawingToolData.accuracyBonus;
+            float radius = 80f;
+
+            Transform parentTransform = drawingArea != null ? drawingArea : transform;
+            GameObject lineObj = Instantiate(drawingDatabase.linePrefab, parentTransform);
+            DrawingLine line = lineObj.GetComponent<DrawingLine>();
+            line.minDistanceToUpdate = 0f;
+            line.SetColor(new Color(1f, 0.84f, 0f)); // 황금색/빛나는 도장 색상!
+
+            List<Vector2> pts = new List<Vector2>();
+            if (tool.DrawingToolData.targetShape == DrawingToolShape.Circle)
+            {
+                int segs = 32;
+                for (int i = 0; i <= segs; i++)
+                {
+                    float angle = i * Mathf.PI * 2f / segs;
+                    pts.Add(new Vector2(center.x + Mathf.Cos(angle) * radius, center.y + Mathf.Sin(angle) * radius));
+                }
+            }
+            else if (tool.DrawingToolData.targetShape == DrawingToolShape.Triangle)
+            {
+                pts.Add(new Vector2(center.x, center.y + radius));
+                pts.Add(new Vector2(center.x - radius * 0.866f, center.y - radius * 0.5f));
+                pts.Add(new Vector2(center.x + radius * 0.866f, center.y - radius * 0.5f));
+                pts.Add(new Vector2(center.x, center.y + radius));
+            }
+            else if (tool.DrawingToolData.targetShape == DrawingToolShape.Square)
+            {
+                pts.Add(new Vector2(center.x - radius, center.y + radius));
+                pts.Add(new Vector2(center.x + radius, center.y + radius));
+                pts.Add(new Vector2(center.x + radius, center.y - radius));
+                pts.Add(new Vector2(center.x - radius, center.y - radius));
+                pts.Add(new Vector2(center.x - radius, center.y + radius));
+            }
+            else if (tool.DrawingToolData.targetShape == DrawingToolShape.Rhombus)
+            {
+                pts.Add(new Vector2(center.x, center.y + radius));
+                pts.Add(new Vector2(center.x + radius, center.y));
+                pts.Add(new Vector2(center.x, center.y - radius));
+                pts.Add(new Vector2(center.x - radius, center.y));
+                pts.Add(new Vector2(center.x, center.y + radius));
+            }
+
+            foreach (var pt in pts)
+            {
+                line.AddPoint(pt);
+            }
+
+            Rect bounds = new Rect(center.x - radius, center.y - radius, radius * 2, radius * 2);
+            drawnShapes.Add(new DrawnShape(shapeName, bounds, center, accuracy));
+
+            Debug.Log($"<color=yellow>[제도 도장] {shapeName} 도형을 찍어냈습니다! (정확도: {accuracy * 100:F1}%)</color>");
+            PrintCurrentStats();
+        }
     }
 
     protected virtual void UpdateStroke()

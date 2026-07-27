@@ -11,13 +11,16 @@ public class ItemDatabase : ScriptableObject
     public List<ItemWandSO> wands = new List<ItemWandSO>();
     public List<ItemPotionSO> potions = new List<ItemPotionSO>();
     public List<ItemPouchSO> pouches = new List<ItemPouchSO>();
+    public List<ItemRobeSO> robes = new List<ItemRobeSO>();
+    public List<ItemCloakSO> cloaks = new List<ItemCloakSO>();
+    public List<ItemDrawingToolSO> drawingTools = new List<ItemDrawingToolSO>();
 
     private Dictionary<string, ItemDataSO> _itemCache;
     private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
 
     public void InitializeCache()
     {
-        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count)) return;
+        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count + robes.Count + cloaks.Count + drawingTools.Count)) return;
 
         _itemCache = new Dictionary<string, ItemDataSO>();
         _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
@@ -62,6 +65,24 @@ public class ItemDatabase : ScriptableObject
         {
             if (pouch != null && !_itemCache.ContainsKey(pouch.itemName))
                 _itemCache.Add(pouch.itemName, pouch);
+        }
+
+        foreach (var robe in robes)
+        {
+            if (robe != null && !_itemCache.ContainsKey(robe.itemName))
+                _itemCache.Add(robe.itemName, robe);
+        }
+
+        foreach (var cloak in cloaks)
+        {
+            if (cloak != null && !_itemCache.ContainsKey(cloak.itemName))
+                _itemCache.Add(cloak.itemName, cloak);
+        }
+
+        foreach (var tool in drawingTools)
+        {
+            if (tool != null && !_itemCache.ContainsKey(tool.itemName))
+                _itemCache.Add(tool.itemName, tool);
         }
     }
 
@@ -108,6 +129,24 @@ public class ItemDatabase : ScriptableObject
     {
         var wandData = GetItemData<ItemWandSO>(itemName);
         return wandData != null ? new Item_Wand(wandData) : null;
+    }
+
+    public Item_Robe CreateRobeInstance(string itemName)
+    {
+        var robeData = GetItemData<ItemRobeSO>(itemName);
+        return robeData != null ? new Item_Robe(robeData) : null;
+    }
+
+    public Item_Cloak CreateCloakInstance(string itemName)
+    {
+        var cloakData = GetItemData<ItemCloakSO>(itemName);
+        return cloakData != null ? new Item_Cloak(cloakData) : null;
+    }
+
+    public Item_DrawingTool CreateDrawingToolInstance(string itemName)
+    {
+        var toolData = GetItemData<ItemDrawingToolSO>(itemName);
+        return toolData != null ? new Item_DrawingTool(toolData) : null;
     }
 }
 

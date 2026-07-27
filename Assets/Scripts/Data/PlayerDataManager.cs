@@ -75,7 +75,48 @@ public class PlayerDataManager : MonoBehaviour
         float upgradeBonus = UpgradeManager.Instance != null 
             ? UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.MaxMana) 
             : 0f;
-        return baseMaxMana + upgradeBonus;
+        float robeBonus = (equippedRobe != null && equippedRobe.RobeData != null) ? equippedRobe.RobeData.bonusMaxMana : 0f;
+        float cloakBonus = (equippedCloak != null && equippedCloak.CloakData != null) ? equippedCloak.CloakData.bonusMaxMana : 0f;
+        return baseMaxMana + upgradeBonus + robeBonus + cloakBonus;
+    }
+
+    public int GetTotalDefense()
+    {
+        int def = 0;
+        if (equippedRobe != null && equippedRobe.RobeData != null) def += equippedRobe.RobeData.bonusDefense;
+        if (equippedCloak != null && equippedCloak.CloakData != null) def += equippedCloak.CloakData.bonusDefense;
+        return def;
+    }
+
+    public int GetTotalBonusAttack()
+    {
+        int atk = 0;
+        if (equippedRobe != null && equippedRobe.RobeData != null) atk += equippedRobe.RobeData.bonusAttack;
+        if (equippedCloak != null && equippedCloak.CloakData != null) atk += equippedCloak.CloakData.bonusAttack;
+        return atk;
+    }
+
+    private Dictionary<SpellElement, float> _activeResistancePotions = new Dictionary<SpellElement, float>();
+    private Dictionary<SpellElement, float> _resistanceTimers = new Dictionary<SpellElement, float>();
+
+    public void ApplyElementalResistancePotion(SpellElement element, float percentage, float duration)
+    {
+        if (element == SpellElement.None) return;
+        _activeResistancePotions[element] = percentage;
+        _resistanceTimers[element] = duration;
+    }
+
+    public float GetElementalResistance(SpellElement element)
+    {
+        if (element == SpellElement.None) return 0f;
+        float res = 0f;
+        if (equippedRobe != null && equippedRobe.RobeData != null && equippedRobe.RobeData.robeElement == element)
+            res += equippedRobe.RobeData.elementResistanceBonus;
+        if (equippedCloak != null && equippedCloak.CloakData != null && equippedCloak.CloakData.cloakElement == element)
+            res += equippedCloak.CloakData.elementResistanceBonus;
+        if (_activeResistancePotions.TryGetValue(element, out float potionRes))
+            res += potionRes;
+        return Mathf.Clamp01(res);
     }
 
     [Header("Inventory Data")]
@@ -88,6 +129,9 @@ public class PlayerDataManager : MonoBehaviour
     public Item_Pen equippedPen;
     public Item_Wand equippedWand;
     public Item_Pouch equippedPouch;
+    public Item_Robe equippedRobe;
+    public Item_Cloak equippedCloak;
+    public Item_DrawingTool equippedDrawingTool;
 
     public event System.Action<float, float> OnManaChanged;
 
@@ -135,6 +179,21 @@ public class PlayerDataManager : MonoBehaviour
         {
             currentMana = Mathf.Min(GetMaxMana(), currentMana + mpRegen * Time.deltaTime);
             NotifyManaChanged();
+        }
+
+        if (_resistanceTimers.Count > 0)
+        {
+            List<SpellElement> keys = new List<SpellElement>(_resistanceTimers.Keys);
+            foreach (var key in keys)
+            {
+                _resistanceTimers[key] -= Time.deltaTime;
+                if (_resistanceTimers[key] <= 0f)
+                {
+                    _resistanceTimers.Remove(key);
+                    _activeResistancePotions.Remove(key);
+                    Debug.Log($"<color=gray>[물약] {key} 속성 내성 효과가 종료되었습니다.</color>");
+                }
+            }
         }
     }
 }
