@@ -32,13 +32,42 @@ namespace Magic.Editor
         private struct PotionDef
         {
             public string name; public PotionType type; public PotionGrade grade; public float recoveryAmount; public string rarity; public string description;
-            public PotionDef(string n, PotionType t, PotionGrade g, float r, string ra, string d) { name = n; type = t; grade = g; recoveryAmount = r; rarity = ra; description = d; }
+            public SpellElement resElement; public float resDuration; public float resPercentage;
+            public PotionDef(string n, PotionType t, PotionGrade g, float r, string ra, string d, SpellElement re = SpellElement.None, float rd = 30f, float rp = 0.25f)
+            {
+                name = n; type = t; grade = g; recoveryAmount = r; rarity = ra; description = d;
+                resElement = re; resDuration = rd; resPercentage = rp;
+            }
         }
 
         private struct PouchDef
         {
             public string name; public int capacityBonus; public string grade; public string description;
             public PouchDef(string n, int cb, string g, string d) { name = n; capacityBonus = cb; grade = g; description = d; }
+        }
+
+        private struct CloakDef
+        {
+            public string name; public int def; public int atk; public float mana; public SpellElement element; public float res; public string grade; public string description;
+            public CloakDef(string n, int d, int a, float m, SpellElement e, float r, string g, string desc) { name = n; def = d; atk = a; mana = m; element = e; res = r; grade = g; description = desc; }
+        }
+
+        private struct DrawingToolDef
+        {
+            public string name; public DrawingToolShape shape; public float accuracy; public float inkMult; public string grade; public string description;
+            public DrawingToolDef(string n, DrawingToolShape s, float a, float i, string g, string desc) { name = n; shape = s; accuracy = a; inkMult = i; grade = g; description = desc; }
+        }
+
+        private struct RobeDef
+        {
+            public string name; public int def; public int atk; public float mana; public SpellElement element; public float res; public string grade; public string description;
+            public RobeDef(string n, int d, int a, float m, SpellElement e, float r, string g, string desc) { name = n; def = d; atk = a; mana = m; element = e; res = r; grade = g; description = desc; }
+        }
+
+        private struct MaterialDef
+        {
+            public string name; public long price; public int maxStack; public string grade; public string description;
+            public MaterialDef(string n, long p, int ms, string g, string desc) { name = n; price = p; maxStack = ms; grade = g; description = desc; }
         }
 
         private static readonly PenDef[] PenDefs = new PenDef[]
@@ -114,7 +143,23 @@ namespace Magic.Editor
             new PotionDef("상급 체력 물약", PotionType.Health, PotionGrade.Greater, 100f, "희귀", "치명적인 부상도 빠르게 회복시켜 주는 고농축 물약입니다."),
             new PotionDef("하급 마나 물약", PotionType.Mana, PotionGrade.Lesser, 25f, "일반", "소모된 마나를 조금 보충해 주는 푸른색 물약입니다."),
             new PotionDef("중급 마나 물약", PotionType.Mana, PotionGrade.Medium, 50f, "고급", "마나를 꽤 많이 회복시켜 주어 전투 중 유용합니다."),
-            new PotionDef("상급 마나 물약", PotionType.Mana, PotionGrade.Greater, 100f, "희귀", "순수한 마력의 정수가 담겨 있어 마나를 대량으로 회복합니다.")
+            new PotionDef("상급 마나 물약", PotionType.Mana, PotionGrade.Greater, 100f, "희귀", "순수한 마력의 정수가 담겨 있어 마나를 대량으로 회복합니다."),
+            new PotionDef("하급 화염 저항 물약", PotionType.ElementalResistance, PotionGrade.Lesser, 0f, "일반", "화염 속성 공격에 대한 저항력을 15% 높여주는 물약입니다.", SpellElement.Fire, 20f, 0.15f),
+            new PotionDef("중급 화염 저항 물약", PotionType.ElementalResistance, PotionGrade.Medium, 0f, "고급", "화염 속성 공격에 대한 저항력을 30% 높여주는 물약입니다.", SpellElement.Fire, 40f, 0.30f),
+            new PotionDef("상급 화염 저항 물약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "희귀", "화염 속성 공격에 대한 저항력을 50% 높여주는 고농축 물약입니다.", SpellElement.Fire, 60f, 0.50f),
+            new PotionDef("하급 냉기 저항 물약", PotionType.ElementalResistance, PotionGrade.Lesser, 0f, "일반", "냉기 속성 공격에 대한 저항력을 15% 높여주는 따뜻한 물약입니다.", SpellElement.Ice, 20f, 0.15f),
+            new PotionDef("중급 냉기 저항 물약", PotionType.ElementalResistance, PotionGrade.Medium, 0f, "고급", "냉기 속성 공격에 대한 저항력을 30% 높여주는 불꽃빛 물약입니다.", SpellElement.Ice, 40f, 0.30f),
+            new PotionDef("상급 냉기 저항 물약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "희귀", "혹한의 눈보라 속에서도 60초간 50%의 냉기 내성을 보장하는 고농축 물약입니다.", SpellElement.Ice, 60f, 0.50f),
+            new PotionDef("하급 번개 저항 물약", PotionType.ElementalResistance, PotionGrade.Lesser, 0f, "일반", "전격 속성 공격에 대한 저항력을 15% 높여주는 절연 물약입니다.", SpellElement.Lightning, 20f, 0.15f),
+            new PotionDef("중급 번개 저항 물약", PotionType.ElementalResistance, PotionGrade.Medium, 0f, "고급", "전격 속성 공격에 대한 저항력을 30% 높여주는 노란 절연 물약입니다.", SpellElement.Lightning, 40f, 0.30f),
+            new PotionDef("상급 번개 저항 물약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "희귀", "거센 번개 공격 속에서도 60초간 50%의 전격 내성을 보장하는 고농축 물약입니다.", SpellElement.Lightning, 60f, 0.50f),
+            new PotionDef("하급 대지 저항 물약", PotionType.ElementalResistance, PotionGrade.Lesser, 0f, "일반", "대지 속성 공격에 대한 저항력을 15% 높여주는 가벼운 물약입니다.", SpellElement.Earth, 20f, 0.15f),
+            new PotionDef("중급 대지 저항 물약", PotionType.ElementalResistance, PotionGrade.Medium, 0f, "고급", "대지 공격 및 진동에 대한 저항력을 30% 높여주는 초록빛 물약입니다.", SpellElement.Earth, 40f, 0.30f),
+            new PotionDef("상급 대지 저항 물약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "희귀", "거대한 암석과 지진 속에서도 60초간 50%의 대지 내성을 보장하는 고농축 물약입니다.", SpellElement.Earth, 60f, 0.50f),
+            new PotionDef("영웅의 화염 저항 영약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "영웅", "고대 드래곤의 피가 섞여 90초 동안 화염 내성을 70%까지 부여하는 영웅의 영약입니다.", SpellElement.Fire, 90f, 0.70f),
+            new PotionDef("영웅의 냉기 저항 영약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "영웅", "만년빙의 정수가 담겨 90초 동안 냉기 내성을 70%까지 부여하는 영웅의 영약입니다.", SpellElement.Ice, 90f, 0.70f),
+            new PotionDef("전설의 번개 저항 영약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "전설", "천둥 신의 번개를 가둬 120초 동안 전격 내성을 85%까지 부여하는 전설적인 영약입니다.", SpellElement.Lightning, 120f, 0.85f),
+            new PotionDef("전설의 대지 저항 영약", PotionType.ElementalResistance, PotionGrade.Greater, 0f, "전설", "대지의 심장부 기운을 담아 120초 동안 대지 내성을 85%까지 부여하는 전설적인 영약입니다.", SpellElement.Earth, 120f, 0.85f)
         };
 
         private static readonly PouchDef[] PouchDefs = new PouchDef[]
@@ -125,6 +170,62 @@ namespace Magic.Editor
             new PouchDef("은빛 실 주머니", 3, "희귀", "은빛 실로 짜여 있어 많은 물건을 무리 없이 담을 수 있습니다."),
             new PouchDef("아공간 배낭", 5, "영웅", "별도의 아공간과 연결되어 무수한 스크롤을 꺼낼 수 있는 뛰어난 가방입니다."),
             new PouchDef("차원 왜곡의 주머니", 8, "전설", "내부에 작은 우주가 담겨 있는 전설적인 차원 주머니입니다.")
+        };
+
+        private static readonly CloakDef[] CloakDefs = new CloakDef[]
+        {
+            new CloakDef("여행자의 낡은 망토", 2, 0, 5f, SpellElement.None, 0f, "하급", "비바람을 막아주는 낡고 얇은 여행자용 망토입니다."),
+            new CloakDef("견습 마법사의 망토", 3, 1, 10f, SpellElement.None, 0f, "일반", "마도학교 견습생들에게 지급되는 표준 단색 망토입니다."),
+            new CloakDef("마력의 룬 망토", 5, 2, 20f, SpellElement.None, 0.05f, "고급", "천에 미세한 마나 룬이 수놓아져 있어 마력 흐름을 돕는 망토입니다."),
+            new CloakDef("타오르는 불꽃 망토", 6, 3, 15f, SpellElement.Fire, 0.10f, "고급", "화염 정령의 실로 짜여 있어 화염 힘을 수용하고 능력을 더해줍니다."),
+            new CloakDef("서리벌판의 그림자 망토", 8, 4, 30f, SpellElement.Ice, 0.15f, "희귀", "차가운 서리의 기운을 뿜어내며 착용자의 마력을 보호합니다."),
+            new CloakDef("폭풍을 부르는 자의 망토", 10, 5, 35f, SpellElement.Lightning, 0.15f, "희귀", "정전기가 일어나는 푸른 망토로, 번개의 힘을 수용합니다."),
+            new CloakDef("대지거인의 수호 망토", 15, 6, 45f, SpellElement.Earth, 0.20f, "영웅", "대지의 단단함을 품은 두꺼운 마법 가죽 망토입니다."),
+            new CloakDef("홍염의 불사조 망토", 14, 10, 50f, SpellElement.Fire, 0.25f, "영웅", "불사조의 깃털로 장식되어 막대한 화염 속성 내성을 제공합니다."),
+            new CloakDef("별빛 차원의 망토", 20, 12, 70f, SpellElement.None, 0.30f, "전설", "밤하늘의 별빛을 엮어 만들어 차원의 공격을 흘려보내는 신비한 망토입니다."),
+            new CloakDef("대마도사의 영광", 25, 15, 100f, SpellElement.None, 0.35f, "전설", "역사상 최고의 대마도사가 둘렀던 전설적인 망토로 완벽에 가까운 마력 보조를 자랑합니다.")
+        };
+
+        private static readonly DrawingToolDef[] DrawingToolDefs = new DrawingToolDef[]
+        {
+            new DrawingToolDef("조잡한 나무 원형 도장", DrawingToolShape.Circle, 0.85f, 1.2f, "하급", "나무를 깎아 만든 투박한 원형 도장입니다. 잉크가 많이 낭비됩니다."),
+            new DrawingToolDef("표준 마도 삼각 자", DrawingToolShape.Triangle, 0.88f, 1.1f, "일반", "기하학 마법을 그릴 때 사용하는 기본적인 삼각 도끼 모양 도구입니다."),
+            new DrawingToolDef("단단한 황동 사각 인장", DrawingToolShape.Square, 0.90f, 1.0f, "일반", "사각형 마법진을 빠르고 정확하게 찍어내는 황동 인장입니다."),
+            new DrawingToolDef("정밀한 유리 마름모 도구", DrawingToolShape.Rhombus, 0.92f, 0.95f, "고급", "정밀하게 가공된 유리가 마름모 형태의 술식을 잉크 낭비 없이 그려냅니다."),
+            new DrawingToolDef("마도공학 원형 컴퍼스", DrawingToolShape.Circle, 0.93f, 0.90f, "고급", "완벽한 원을 그리도록 도와주는 마도공학 보조 도구입니다."),
+            new DrawingToolDef("은빛 룬 삼각 도장", DrawingToolShape.Triangle, 0.95f, 0.85f, "희귀", "순은으로 제작된 삼각형 도장으로 룬의 힘이 마법 완성도를 보정해줍니다."),
+            new DrawingToolDef("황금 비율의 사각 틀", DrawingToolShape.Square, 0.96f, 0.80f, "희귀", "황금비로 제작된 사각 인장으로, 안정적인 마술 구조를 직조합니다."),
+            new DrawingToolDef("차원 결정의 마름모 인장", DrawingToolShape.Rhombus, 0.97f, 0.75f, "영웅", "차원 결정이 박혀 있어 마름모 형태의 마법을 극도의 정밀함으로 구현합니다."),
+            new DrawingToolDef("천상의 원형 성상", DrawingToolShape.Circle, 0.98f, 0.70f, "영웅", "천상의 기하학이 담긴 성물로, 원형 마법진의 정확도를 비약적으로 끌어올립니다."),
+            new DrawingToolDef("창조의 기하학 마도구", DrawingToolShape.Circle, 0.99f, 0.50f, "전설", "태초의 기하학적 진리가 담긴 전설의 마도구로 잉크 소모를 최소화하며 완벽에 가까운 도형을 직조합니다.")
+        };
+
+        private static readonly RobeDef[] RobeDefs = new RobeDef[]
+        {
+            new RobeDef("견습생의 낡은 로브", 3, 0, 10f, SpellElement.None, 0f, "하급", "마도학교 입학 시 지급되는 얇고 수수한 견습생용 로브입니다."),
+            new RobeDef("정규 학도의 로브", 5, 1, 20f, SpellElement.None, 0f, "일반", "마도학 연구와 실습을 위해 편안하게 제작된 표준 로브입니다."),
+            new RobeDef("마력 보존의 두꺼운 로브", 8, 2, 35f, SpellElement.None, 0.05f, "고급", "특수한 약재에 절여 마력 보존율을 높인 고급 펠트 로브입니다."),
+            new RobeDef("홍염의 수술 로브", 9, 4, 30f, SpellElement.Fire, 0.10f, "고급", "화염 술사들을 위해 불에 타지 않는 방화포로 제작된 붉은 로브입니다."),
+            new RobeDef("빙하의 결정 로브", 12, 5, 50f, SpellElement.Ice, 0.15f, "희귀", "만년빙의 냉기를 품은 실로 짜여져 정신을 맑게 하고 마나를 채워줍니다."),
+            new RobeDef("천둥벌판의 도사 로브", 14, 7, 55f, SpellElement.Lightning, 0.15f, "희귀", "번개 문양이 새겨진 푸른 빛 로브로 전격 마법과 훌륭한 공명을 이룹니다."),
+            new RobeDef("대지의 수호자 의복", 20, 8, 70f, SpellElement.Earth, 0.20f, "영웅", "대지 정령의 가호가 깃들어 뛰어난 물리 및 마법 방어력을 자랑합니다."),
+            new RobeDef("고위 학정의 예복", 18, 12, 85f, SpellElement.None, 0.22f, "영웅", "마도협회 고위 간부들만이 입을 수 있는 위엄 넘치고 화려한 예복입니다."),
+            new RobeDef("심연의 별자리 로브", 28, 18, 120f, SpellElement.None, 0.30f, "전설", "옷감 위에 심연의 우주와 별자리가 살아 움직이는 듯한 전설적인 예복입니다."),
+            new RobeDef("영원불멸의 대마도사 예복", 35, 25, 150f, SpellElement.None, 0.35f, "전설", "세계를 구원한 전설적인 대마도사가 입었다고 전해지는 궁극의 로브입니다.")
+        };
+
+        private static readonly MaterialDef[] MaterialDefs = new MaterialDef[]
+        {
+            new MaterialDef("슬라임의 점액질", 10, 99, "하급", "어디서나 흔히 볼 수 있는 슬라임에서 채취한 끈적한 점액입니다."),
+            new MaterialDef("마력 깃든 풀잎", 20, 99, "일반", "미세한 마나를 품고 자라난 푸른 약초 잎사귀입니다."),
+            new MaterialDef("마도석 조각", 30, 99, "일반", "마력이 응축된 광산에서 캐낸 작은 마도석 파편입니다."),
+            new MaterialDef("그리폰의 깃털", 50, 99, "고급", "바람을 가르는 그리폰의 깃털로, 가볍고 튼튼한 마법 도구 재료로 쓰입니다."),
+            new MaterialDef("화염 원소의 가루", 60, 99, "고급", "화염 정령의 잔해에서 수집한 따뜻한 열기를 품은 가루입니다."),
+            new MaterialDef("만년빙의 결정", 100, 50, "희귀", "녹지 않는 얼음동굴 깊은 곳에서 채취한 투명하고 차가운 결정입니다."),
+            new MaterialDef("비룡의 비늘", 150, 50, "희귀", "하늘을 지배하는 비룡의 단단한 비늘로 뛰어난 내성을 지녔습니다."),
+            new MaterialDef("세계수 수액", 300, 20, "영웅", "고대 세계수에서 천 년에 한 방울 떨어진다는 황금빛 생명의 수액입니다."),
+            new MaterialDef("심연의 암흑 물질", 500, 20, "영웅", "차원의 균열 너머에서 흘러들어온 순수한 어둠의 농축물입니다."),
+            new MaterialDef("드래곤의 심장 결정", 1000, 10, "전설", "고대 드래곤의 중심에서 거대한 마력을 생성해내던 궁극의 연금술 재료입니다.")
         };
 
         [MenuItem("Magic/Tools/Generate Item Database")]
@@ -138,6 +239,10 @@ namespace Magic.Editor
             CreateFolderIfNotExists(rootPath, "Wands");
             CreateFolderIfNotExists(rootPath, "Potions");
             CreateFolderIfNotExists(rootPath, "Pouches");
+            CreateFolderIfNotExists(rootPath, "Cloaks");
+            CreateFolderIfNotExists(rootPath, "DrawingTools");
+            CreateFolderIfNotExists(rootPath, "Robes");
+            CreateFolderIfNotExists(rootPath, "Materials");
 
             string dbPath = rootPath + "/ItemDatabase.asset";
             ItemDatabase db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
@@ -154,6 +259,10 @@ namespace Magic.Editor
             db.wands.Clear();
             db.potions.Clear();
             db.pouches.Clear();
+            db.cloaks.Clear();
+            db.drawingTools.Clear();
+            db.robes.Clear();
+            db.materials.Clear();
 
             // Generate Pens
             foreach (var def in PenDefs)
@@ -229,6 +338,9 @@ namespace Magic.Editor
                 asset.potionType = def.type;
                 asset.potionGrade = def.grade;
                 asset.recoveryAmount = def.recoveryAmount;
+                asset.resistanceElement = def.resElement;
+                asset.resistanceDuration = def.resDuration;
+                asset.resistancePercentage = def.resPercentage;
                 asset.rarity = GetRarityFromString(def.rarity);
                 asset.itemDescription = def.description;
                 
@@ -251,6 +363,77 @@ namespace Magic.Editor
                 db.pouches.Add(asset);
             }
 
+            // Generate Cloaks
+            foreach (var def in CloakDefs)
+            {
+                string assetPath = $"{rootPath}/Cloaks/Cloak_{def.name.Replace(" ", "_")}.asset";
+                ItemCloakSO asset = GetOrCreateAsset<ItemCloakSO>(assetPath);
+
+                asset.itemName = def.name;
+                asset.bonusDefense = def.def;
+                asset.bonusAttack = def.atk;
+                asset.bonusMaxMana = def.mana;
+                asset.cloakElement = def.element;
+                asset.elementResistanceBonus = def.res;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+
+                EditorUtility.SetDirty(asset);
+                db.cloaks.Add(asset);
+            }
+
+            // Generate DrawingTools
+            foreach (var def in DrawingToolDefs)
+            {
+                string assetPath = $"{rootPath}/DrawingTools/DrawingTool_{def.name.Replace(" ", "_")}.asset";
+                ItemDrawingToolSO asset = GetOrCreateAsset<ItemDrawingToolSO>(assetPath);
+
+                asset.itemName = def.name;
+                asset.targetShape = def.shape;
+                asset.accuracyBonus = def.accuracy;
+                asset.inkConsumptionMultiplier = def.inkMult;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+
+                EditorUtility.SetDirty(asset);
+                db.drawingTools.Add(asset);
+            }
+
+            // Generate Robes
+            foreach (var def in RobeDefs)
+            {
+                string assetPath = $"{rootPath}/Robes/Robe_{def.name.Replace(" ", "_")}.asset";
+                ItemRobeSO asset = GetOrCreateAsset<ItemRobeSO>(assetPath);
+
+                asset.itemName = def.name;
+                asset.bonusDefense = def.def;
+                asset.bonusAttack = def.atk;
+                asset.bonusMaxMana = def.mana;
+                asset.robeElement = def.element;
+                asset.elementResistanceBonus = def.res;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+
+                EditorUtility.SetDirty(asset);
+                db.robes.Add(asset);
+            }
+
+            // Generate Materials
+            foreach (var def in MaterialDefs)
+            {
+                string assetPath = $"{rootPath}/Materials/Material_{def.name.Replace(" ", "_")}.asset";
+                ItemMaterialSO asset = GetOrCreateAsset<ItemMaterialSO>(assetPath);
+
+                asset.itemName = def.name;
+                asset.basePriceInCopper = def.price;
+                asset.maxStack = def.maxStack;
+                asset.rarity = GetRarityFromString(def.grade);
+                asset.itemDescription = def.description;
+
+                EditorUtility.SetDirty(asset);
+                db.materials.Add(asset);
+            }
+
             if (isNewDb)
             {
                 AssetDatabase.CreateAsset(db, dbPath);
@@ -263,7 +446,7 @@ namespace Magic.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\nDB 위치: {dbPath}");
+            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\n- 망토: {db.cloaks.Count}종\n- 도구(도장): {db.drawingTools.Count}종\n- 로브: {db.robes.Count}종\n- 재료: {db.materials.Count}종\nDB 위치: {dbPath}");
         }
 
         private static T GetOrCreateAsset<T>(string path) where T : ScriptableObject

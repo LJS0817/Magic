@@ -56,18 +56,23 @@ public class MarketUIController : MonoBehaviour
             List<ItemDataSO> items = new List<ItemDataSO>();
             switch (market.marketType)
             {
-                case MarketType.WandShop:
-                    if (db.wands != null) items.AddRange(db.wands);
+                case MarketType.PotionShop:
+                    if (db.potions != null) items.AddRange(db.potions);
                     break;
-                case MarketType.InkAndPenShop:
+                case MarketType.EquipmentShop:
+                    if (db.wands != null) items.AddRange(db.wands);
+                    if (db.pouches != null) items.AddRange(db.pouches);
+                    if (db.robes != null) items.AddRange(db.robes);
+                    if (db.cloaks != null) items.AddRange(db.cloaks);
+                    break;
+                case MarketType.DrawingShop:
                     if (db.inks != null) items.AddRange(db.inks);
                     if (db.pens != null) items.AddRange(db.pens);
-                    break;
-                case MarketType.ParchmentShop:
                     if (db.scrolls != null) items.AddRange(db.scrolls);
+                    if (db.drawingTools != null) items.AddRange(db.drawingTools);
                     break;
                 case MarketType.AdventurerGuild:
-                    if (db.potions != null) items.AddRange(db.potions);
+                    if (db.materials != null) items.AddRange(db.materials);
                     break;
             }
             market.Setup(items);
@@ -85,18 +90,6 @@ public class MarketUIController : MonoBehaviour
 
         _markets[_marketIndex].Show(goLeft);
         _markets[_marketIndex].RefreshList();
-    }
-
-    private string GetMarketName(MarketType type)
-    {
-        switch (type)
-        {
-            case MarketType.WandShop: return "지팡이 전문 마켓";
-            case MarketType.InkAndPenShop: return "잉크 펜 전문 마켓";
-            case MarketType.ParchmentShop: return "양피지 전문 마켓";
-            case MarketType.AdventurerGuild: return "모험자 길드";
-            default: return "상점";
-        }
     }
 
     public void NextMarket()

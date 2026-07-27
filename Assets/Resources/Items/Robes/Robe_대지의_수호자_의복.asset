@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a4ee2c49843a423fb97cd75ae73ae0c, type: 3}
+  m_Name: "Robe_\uB300\uC9C0\uC758_\uC218\uD638\uC790_\uC758\uBCF5"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemRobeSO
+  type: 8
+  rarity: 3
+  itemName: "\uB300\uC9C0\uC758 \uC218\uD638\uC790 \uC758\uBCF5"
+  itemDescription: "\uB300\uC9C0 \uC815\uB839\uC758 \uAC00\uD638\uAC00 \uAE43\uB4E4\uC5B4
+    \uB6F0\uC5B4\uB09C \uBB3C\uB9AC \uBC0F \uB9C8\uBC95 \uBC29\uC5B4\uB825\uC744
+    \uC790\uB791\uD569\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  bonusDefense: 20
+  bonusAttack: 8
+  bonusMaxMana: 70
+  robeElement: 4
+  elementResistanceBonus: 0.2

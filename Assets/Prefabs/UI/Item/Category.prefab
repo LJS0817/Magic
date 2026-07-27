@@ -107,8 +107,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5238962610041309910}
   - {fileID: 6425571671495676538}
+  - {fileID: 5238962610041309910}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -191,6 +191,8 @@ MonoBehaviour:
   _filterNameText: {fileID: 7945320511636128766}
   _button: {fileID: 4321634446849088545}
   _filterActiveSprite: {fileID: 8542305173432910416}
+  _type: 0
+  _ele: 0
 --- !u!1 &5759542291240366952
 GameObject:
   m_ObjectHideFlags: 0

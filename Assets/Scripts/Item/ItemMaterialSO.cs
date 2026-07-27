@@ -7,5 +7,15 @@ public class ItemMaterialSO : ItemDataSO
     {
         type = ItemType.Material;
     }
+
+    private void Reset()
+    {
+        type = ItemType.Material;
+    }
+
+    private void OnValidate()
+    {
+        type = ItemType.Material;
+    }
 }
 

@@ -1289,9 +1289,9 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 0
-  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 0
@@ -1309,7 +1309,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _itemFilterPrefab: {fileID: 2152678274894965537, guid: 73fb2fffc7ddf4cc89cbd62693ac5702, type: 3}
+  _filterByItemType: 1
   _filterNames: []
+  _filterTypes: 
+  _filterElements: 
   _filterActiveSprite: {fileID: 0}
 --- !u!1 &2493211925230951116
 GameObject:
@@ -3705,6 +3708,7 @@ MonoBehaviour:
   marketType: 0
   _infoUI: {fileID: 2691179939578549495}
   _slotImage: {fileID: 0}
+  _filterGroup: {fileID: 5846773551188442621}
 --- !u!225 &5217633202946896841 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 329207140009148918, guid: 73626ba9418e5954fa282922bb281b7b, type: 3}

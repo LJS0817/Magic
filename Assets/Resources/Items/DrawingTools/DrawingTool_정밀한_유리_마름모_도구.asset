@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cf557e49fb234f92ab3eb040ca87d42, type: 3}
+  m_Name: "DrawingTool_\uC815\uBC00\uD55C_\uC720\uB9AC_\uB9C8\uB984\uBAA8_\uB3C4\uAD6C"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDrawingToolSO
+  type: 10
+  rarity: 1
+  itemName: "\uC815\uBC00\uD55C \uC720\uB9AC \uB9C8\uB984\uBAA8 \uB3C4\uAD6C"
+  itemDescription: "\uC815\uBC00\uD558\uAC8C \uAC00\uACF5\uB41C \uC720\uB9AC\uAC00
+    \uB9C8\uB984\uBAA8 \uD615\uD0DC\uC758 \uC220\uC2DD\uC744 \uC789\uD06C \uB0AD\uBE44
+    \uC5C6\uC774 \uADF8\uB824\uB0C5\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  targetShape: 3
+  accuracyBonus: 0.92
+  inkConsumptionMultiplier: 0.95

@@ -167,6 +167,11 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                         }
                         Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 마력을 회복했습니다!</color>");
                     }
+                    else if (potion.PotionData.potionType == PotionType.ElementalResistance)
+                    {
+                        pData.ApplyElementalResistancePotion(potion.PotionData.resistanceElement, potion.PotionData.resistancePercentage, potion.PotionData.resistanceDuration);
+                        Debug.Log($"<color=yellow>[아이템] {potion.ItemName}을(를) 사용해 {potion.PotionData.resistanceElement} 속성 내성이 {potion.PotionData.resistancePercentage * 100}% 증가했습니다 ({potion.PotionData.resistanceDuration}초)!</color>");
+                    }
                     
                     inv.RemoveItem(potion, 1);
                     RefreshList();

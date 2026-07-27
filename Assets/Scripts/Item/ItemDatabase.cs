@@ -14,13 +14,14 @@ public class ItemDatabase : ScriptableObject
     public List<ItemRobeSO> robes = new List<ItemRobeSO>();
     public List<ItemCloakSO> cloaks = new List<ItemCloakSO>();
     public List<ItemDrawingToolSO> drawingTools = new List<ItemDrawingToolSO>();
+    public List<ItemMaterialSO> materials = new List<ItemMaterialSO>();
 
     private Dictionary<string, ItemDataSO> _itemCache;
     private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
 
     public void InitializeCache()
     {
-        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count + robes.Count + cloaks.Count + drawingTools.Count)) return;
+        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count + robes.Count + cloaks.Count + drawingTools.Count + materials.Count)) return;
 
         _itemCache = new Dictionary<string, ItemDataSO>();
         _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
@@ -83,6 +84,12 @@ public class ItemDatabase : ScriptableObject
         {
             if (tool != null && !_itemCache.ContainsKey(tool.itemName))
                 _itemCache.Add(tool.itemName, tool);
+        }
+
+        foreach (var material in materials)
+        {
+            if (material != null && !_itemCache.ContainsKey(material.itemName))
+                _itemCache.Add(material.itemName, material);
         }
     }
 
@@ -147,6 +154,12 @@ public class ItemDatabase : ScriptableObject
     {
         var toolData = GetItemData<ItemDrawingToolSO>(itemName);
         return toolData != null ? new Item_DrawingTool(toolData) : null;
+    }
+
+    public Item_Material CreateMaterialInstance(string itemName)
+    {
+        var materialData = GetItemData<ItemMaterialSO>(itemName);
+        return materialData != null ? new Item_Material(materialData) : null;
     }
 }
 

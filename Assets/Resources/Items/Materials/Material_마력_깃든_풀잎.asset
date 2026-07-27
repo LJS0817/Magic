@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d54ee3aeb3d34ec45be71783ba83f6d4, type: 3}
+  m_Name: "Material_\uB9C8\uB825_\uAE43\uB4E0_\uD480\uC78E"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemMaterialSO
+  type: 2
+  rarity: 0
+  itemName: "\uB9C8\uB825 \uAE43\uB4E0 \uD480\uC78E"
+  itemDescription: "\uBBF8\uC138\uD55C \uB9C8\uB098\uB97C \uD488\uACE0 \uC790\uB77C\uB09C
+    \uD478\uB978 \uC57D\uCD08 \uC78E\uC0AC\uADC0\uC785\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 20
+  maxStack: 99

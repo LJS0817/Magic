@@ -23,3 +23,6 @@ MonoBehaviour:
   potionType: 1
   potionGrade: 2
   recoveryAmount: 100
+  resistanceElement: 0
+  resistanceDuration: 30
+  resistancePercentage: 0.25

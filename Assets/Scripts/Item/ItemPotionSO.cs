@@ -26,6 +26,11 @@ public class ItemPotionSO : ItemDataSO
         type = ItemType.Potion;
     }
 
+    private void Reset()
+    {
+        type = ItemType.Potion;
+    }
+
     private void OnValidate()
     {
         type = ItemType.Potion;

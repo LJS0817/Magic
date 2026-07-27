@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50102fe69a6739c4cb5b4c4982093845, type: 3}
+  m_Name: "Potion_\uC804\uC124\uC758_\uBC88\uAC1C_\uC800\uD56D_\uC601\uC57D"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemPotionSO
+  type: 3
+  rarity: 4
+  itemName: "\uC804\uC124\uC758 \uBC88\uAC1C \uC800\uD56D \uC601\uC57D"
+  itemDescription: "\uCC9C\uB465 \uC2E0\uC758 \uBC88\uAC1C\uB97C \uAC00\uB46C 120\uCD08
+    \uB3D9\uC548 \uC804\uACA9 \uB0B4\uC131\uC744 85%\uAE4C\uC9C0 \uBD80\uC5EC\uD558\uB294
+    \uC804\uC124\uC801\uC778 \uC601\uC57D\uC785\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  potionType: 2
+  potionGrade: 2
+  recoveryAmount: 0
+  resistanceElement: 3
+  resistanceDuration: 120
+  resistancePercentage: 0.85

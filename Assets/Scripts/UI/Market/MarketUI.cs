@@ -4,9 +4,9 @@ using UnityEngine;
 
 public enum MarketType
 {
-    WandShop,
-    InkAndPenShop,
-    ParchmentShop,
+    EquipmentShop,
+    DrawingShop,
+    PotionShop,
     AdventurerGuild
 }
 
@@ -19,11 +19,22 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
     [SerializeField] MarketItemInfoUI _infoUI;
     private MarketItemSlotUI _selectedSlot;
     [SerializeField] Sprite _slotImage;
+    [SerializeField] ItemFilterGroup _filterGroup;
+    private List<ItemDataSO> _filteredItems = new List<ItemDataSO>();
 
     public void Setup(List<ItemDataSO> items)
     {
         _marketItems = items;
-        RefreshList();
+        if (_filterGroup != null)
+        {
+            _filterGroup.Init();
+            _filterGroup.ResetFilter();
+        }
+        else
+        {
+            FilterItems(null);
+            RefreshList();
+        }
         _canvasGroup.alpha = 0f;
         _canvasGroup.blocksRaycasts = false;
         _canvasGroup.interactable = false;
@@ -31,7 +42,7 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
 
     protected override int GetTotalCapacity()
     {
-        return _marketItems != null ? _marketItems.Count : 0;
+        return _filteredItems != null ? _filteredItems.Count : 0;
     }
 
     protected override void OnSlotCreated(MarketItemSlotUI slot)
@@ -41,9 +52,9 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
 
     protected override void UpdateSlot(MarketItemSlotUI slot, int dataIndex)
     {
-        if (_marketItems != null && dataIndex >= 0 && dataIndex < _marketItems.Count)
+        if (_filteredItems != null && dataIndex >= 0 && dataIndex < _filteredItems.Count)
         {
-            slot.Setup(_marketItems[dataIndex], (item, price) => OnSlotClicked(slot, item, price));
+            slot.Setup(_filteredItems[dataIndex], (item, price) => OnSlotClicked(slot, item, price));
         }
         else
         {
@@ -89,6 +100,64 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
         base.Awake();
         _rectTransform = GetComponent<RectTransform>();
         _canvasGroup = GetComponent<CanvasGroup>();
+
+        if (_filterGroup == null) _filterGroup = GetComponentInChildren<ItemFilterGroup>(true);
+        if (_filterGroup != null)
+        {
+            _filterGroup.Init();
+            _filterGroup.OnFilterChanged += OnFilterChanged;
+        }
+    }
+
+    private void OnFilterChanged(ItemFilter filter)
+    {
+        FilterItems(filter);
+        RefreshList();
+    }
+
+    private void FilterItems(ItemFilter filter)
+    {
+        _filteredItems.Clear();
+        if (_marketItems == null) return;
+
+        bool isAll = filter == null || 
+                     string.IsNullOrEmpty(filter.FilterName) || 
+                     filter.FilterName.Equals("All", System.StringComparison.OrdinalIgnoreCase) || 
+                     filter.FilterName.Equals("전체", System.StringComparison.OrdinalIgnoreCase);
+
+        foreach (var item in _marketItems)
+        {
+            if (item == null) continue;
+
+            if (isAll)
+            {
+                _filteredItems.Add(item);
+                continue;
+            }
+
+            if (MatchesFilter(item, filter))
+            {
+                _filteredItems.Add(item);
+            }
+        }
+    }
+
+    private bool MatchesFilter(ItemDataSO item, ItemFilter filter)
+    {
+        if (filter == null) return true;
+
+        if (item is ItemPotionSO potion)
+        {
+            SpellElement elem = potion.potionType == PotionType.ElementalResistance 
+                ? potion.resistanceElement 
+                : SpellElement.None;
+
+            return elem == filter.Element;
+        }
+        else
+        {
+            return item.type == filter.Type;
+        }
     }
 
     void ControlCanvasGroup(bool show)

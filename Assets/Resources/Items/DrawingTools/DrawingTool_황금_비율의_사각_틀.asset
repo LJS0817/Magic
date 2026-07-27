@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cf557e49fb234f92ab3eb040ca87d42, type: 3}
+  m_Name: "DrawingTool_\uD669\uAE08_\uBE44\uC728\uC758_\uC0AC\uAC01_\uD2C0"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDrawingToolSO
+  type: 10
+  rarity: 2
+  itemName: "\uD669\uAE08 \uBE44\uC728\uC758 \uC0AC\uAC01 \uD2C0"
+  itemDescription: "\uD669\uAE08\uBE44\uB85C \uC81C\uC791\uB41C \uC0AC\uAC01 \uC778\uC7A5\uC73C\uB85C,
+    \uC548\uC815\uC801\uC778 \uB9C8\uC220 \uAD6C\uC870\uB97C \uC9C1\uC870\uD569\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  targetShape: 2
+  accuracyBonus: 0.96
+  inkConsumptionMultiplier: 0.8

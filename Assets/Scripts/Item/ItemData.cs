@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch, Robe, Cloak, DrawingTool }
+public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch, Robe, Cloak, DrawingTool, Quest }
 
 [System.Serializable]
 public abstract class ItemInstance

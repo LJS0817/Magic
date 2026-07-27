@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20805171778274429a508ce43dd33409, type: 3}
+  m_Name: "Cloak_\uD3ED\uD48D\uC744_\uBD80\uB974\uB294_\uC790\uC758_\uB9DD\uD1A0"
+  m_EditorClassIdentifier: Assembly-CSharp::ItemCloakSO
+  type: 9
+  rarity: 2
+  itemName: "\uD3ED\uD48D\uC744 \uBD80\uB974\uB294 \uC790\uC758 \uB9DD\uD1A0"
+  itemDescription: "\uC815\uC804\uAE30\uAC00 \uC77C\uC5B4\uB098\uB294 \uD478\uB978
+    \uB9DD\uD1A0\uB85C, \uBC88\uAC1C\uC758 \uD798\uC744 \uC218\uC6A9\uD569\uB2C8\uB2E4."
+  itemIcon: {fileID: 0}
+  basePriceInCopper: 0
+  maxStack: 99
+  bonusDefense: 10
+  bonusAttack: 5
+  bonusMaxMana: 35
+  cloakElement: 3
+  elementResistanceBonus: 0.15
