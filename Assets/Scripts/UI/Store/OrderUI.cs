@@ -1,93 +1,144 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using TMPro;
 using System;
 
 [RequireComponent(typeof(RectTransform))]
-public class OrderUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+public class OrderUI : MonoBehaviour
 {
     public CustomerOrder OrderData { get; private set; }
     private Action<OrderUI> _onClickCallback;
+    private Action<OrderUI> _onReturnToPoolCallback;
 
-    private RectTransform _rectTransform;
-    private Canvas _canvas;
-    private RectTransform _parentRectTransform;
+    [Header("UI Elements")]
+    [SerializeField] SlotCustomButton _button;
+    [SerializeField] private TMP_Text spellNameText;
+    [SerializeField] private TMP_Text elementText;
+    [SerializeField] private CurrencyValueUI budgetUI;
+    [SerializeField] private TMP_Text stateText;
 
-    public void Initialize(CustomerOrder order, Action<OrderUI> onClickCallback, Canvas canvas)
+    public void Initialize(CustomerOrder order, Action<OrderUI> onClickCallback, Action<OrderUI> onReturnToPoolCallback = null)
     {
+        if (OrderData != null)
+        {
+            OrderData.OnStateChanged -= OnOrderStateChanged;
+        }
+
         OrderData = order;
         _onClickCallback = onClickCallback;
-        _canvas = canvas;
-        _rectTransform = GetComponent<RectTransform>();
-        _parentRectTransform = _rectTransform.parent as RectTransform;
+        _onReturnToPoolCallback = onReturnToPoolCallback;
+
+        if (_button != null)
+        {
+            _button.Deselect(immediate: true);
+            _button.onClick.RemoveAllListeners();
+            _button.onClick.AddListener(OnSlotClicked);
+        }
+
+        if (OrderData != null)
+        {
+            OrderData.OnStateChanged += OnOrderStateChanged;
+        }
+
+        UpdateUI();
     }
 
-    private void Update()
+    public void UpdateUI()
     {
-        if (OrderData != null && (OrderData.state == OrderState.Completed || OrderData.state == OrderState.Failed))
+        if (OrderData == null) return;
+
+        if (spellNameText != null)
+            spellNameText.text = OrderData.requestedSpellName;
+
+        if (elementText != null)
         {
-            Destroy(gameObject);
+            string elementStr = "무속성";
+            switch (OrderData.requestedElement)
+            {
+                case SpellElement.Fire: elementStr = "화염 속성"; break;
+                case SpellElement.Ice: elementStr = "빙결 속성"; break;
+                case SpellElement.Lightning: elementStr = "전기 속성"; break;
+                case SpellElement.Earth: elementStr = "대지 속성"; break;
+            }
+            elementText.text = elementStr;
+        }
+
+        budgetUI.SetValue(OrderData.claimedBudget);
+
+        UpdateStateText();
+    }
+
+    private void UpdateStateText()
+    {
+        if (OrderData == null || stateText == null) return;
+
+        string stateStr = "";
+        switch (OrderData.state)
+        {
+            case OrderState.Received: stateStr = "주문 접수"; break;
+            case OrderState.Haggling: stateStr = "흥정 중"; break;
+            case OrderState.Pending: stateStr = "배송 대기"; break;
+            case OrderState.Completed: stateStr = "거래 완료"; break;
+            case OrderState.Failed: stateStr = "거래 실패"; break;
+        }
+        stateText.text = stateStr;
+    }
+
+    private void OnOrderStateChanged(OrderState newState)
+    {
+        if (newState == OrderState.Completed || newState == OrderState.Failed)
+        {
+            if (OrderData != null)
+            {
+                OrderData.OnStateChanged -= OnOrderStateChanged;
+            }
+
+            if (_onReturnToPoolCallback != null)
+            {
+                _onReturnToPoolCallback.Invoke(this);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+            return;
+        }
+
+        UpdateStateText();
+    }
+
+    private void OnDestroy()
+    {
+        if (OrderData != null)
+        {
+            OrderData.OnStateChanged -= OnOrderStateChanged;
         }
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    private void OnSlotClicked()
     {
-        // Bring to front while dragging
-        transform.SetAsLastSibling();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (_canvas == null || _parentRectTransform == null) return;
-
-        // Move the object based on pointer delta and canvas scale
-        _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
-        ClampPosition();
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        ClampPosition();
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // Don't register click if we were dragging
-        if (eventData.dragging) return;
-
         _onClickCallback?.Invoke(this);
     }
 
-    private void ClampPosition()
+    public void Select()
     {
-        if (_parentRectTransform == null) return;
+        if (_button != null) _button.Select();
+    }
 
-        Vector3[] parentCorners = new Vector3[4];
-        _parentRectTransform.GetWorldCorners(parentCorners);
-
-        Vector3[] rectCorners = new Vector3[4];
-        _rectTransform.GetWorldCorners(rectCorners);
-
-        // Using local bounds of parent
-        Vector2 minPosition = _parentRectTransform.rect.min - _rectTransform.rect.min;
-        Vector2 maxPosition = _parentRectTransform.rect.max - _rectTransform.rect.max;
-
-        Vector2 clampedPosition = _rectTransform.anchoredPosition;
-        clampedPosition.x = Mathf.Clamp(clampedPosition.x, minPosition.x, maxPosition.x);
-        clampedPosition.y = Mathf.Clamp(clampedPosition.y, minPosition.y, maxPosition.y);
-
-        _rectTransform.anchoredPosition = clampedPosition;
+    public void Deselect(bool immediate = false)
+    {
+        if (_button != null) _button.Deselect(immediate);
     }
 
     public void CompleteOrder()
     {
-        OrderData.state = OrderState.Completed;
-        Destroy(gameObject);
+        if (OrderData != null) OrderData.state = OrderState.Completed;
     }
 
     public void FailOrder()
     {
-        OrderData.state = OrderState.Failed;
-        Destroy(gameObject);
+        if (OrderData != null) OrderData.state = OrderState.Failed;
     }
 }
+
 

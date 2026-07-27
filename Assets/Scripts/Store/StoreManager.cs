@@ -21,18 +21,40 @@ public class StoreManager : MonoBehaviour
     public ItemInstance SelectedOrderItem { get; set; }
 
     [Header("Customer Orders")]
-    public Dictionary<string, CustomerOrder> activeOrders = new Dictionary<string, CustomerOrder>();
-    
-    private string[] customerNames = { "마을 청년", "지친 용병", "마법 학도", "수상한 상인", "지나가는 행인" };
+    private Dictionary<string, CustomerOrder> _fallbackOrders = new Dictionary<string, CustomerOrder>();
+    public Dictionary<string, CustomerOrder> activeOrders => 
+        PlayerDataManager.Instance != null ? PlayerDataManager.Instance.activeOrders : _fallbackOrders;
 
+    [SerializeField] private int _poolingCount = 10;
+    public int PoolingCount => _poolingCount;
+    
     [SerializeField] StoreUIController _controller;
     public bool IsOpened => _controller.IsOpened;
 
     private void Start()
     {
-        for (int i = 0; i < 10; i++)
+        if (PlayerDataManager.Instance != null)
         {
-            GenerateRandomOrder();
+            if (!PlayerDataManager.Instance.hasGeneratedInitialOrders)
+            {
+                PlayerDataManager.Instance.hasGeneratedInitialOrders = true;
+                for (int i = 0; i < _poolingCount; i++)
+                {
+                    GenerateRandomOrder();
+                }
+            }
+            else
+            {
+                // 씬을 전환하고 돌아온 경우: 이미 생성되어 유지 중인 주문 목록을 UI로 복원
+                Debug.Log($"[StoreManager] 씬 전환 전 유지되던 {activeOrders.Count}개의 주문을 복원합니다.");
+                foreach (var order in activeOrders.Values)
+                {
+                    if (_controller != null)
+                    {
+                        _controller.SpawnOrder(order);
+                    }
+                }
+            }
         }
     }
 
@@ -42,7 +64,6 @@ public class StoreManager : MonoBehaviour
         if (db != null && db.recipes != null && db.recipes.Length > 0)
         {
             var randomRecipe = db.recipes[UnityEngine.Random.Range(0, db.recipes.Length)];
-            string name = customerNames[UnityEngine.Random.Range(0, customerNames.Length)];
             
             // Element generation based on Max Mana
             SpellElement reqElement = SpellElement.None;
@@ -107,12 +128,12 @@ public class StoreManager : MonoBehaviour
                 claimedBudget = (long)Mathf.Round(trueBudget * UnityEngine.Random.Range(0.3f, 0.7f));
             }
 
-            var order = new CustomerOrder(name, desc, randomRecipe.SpellName, reqElement, marketPrice, trueBudget, claimedBudget, isBluffing, faction);
+            var order = new CustomerOrder(desc, randomRecipe.SpellName, reqElement, marketPrice, trueBudget, claimedBudget, isBluffing, faction);
             activeOrders.Add(order.orderID, order);
             
-            order.chatHistory.Add($"[{faction}] {name}: {desc} (예산: 약 {CurrencyManager.FormatCurrency(claimedBudget)} 생각합니다.)");
+            order.chatHistory.Add($"[{faction}] {desc} (예산: 약 {CurrencyManager.FormatCurrency(claimedBudget)} 생각합니다.)");
 
-            Debug.Log($"<color=cyan>[Store] 새 주문 도착! ID:{order.orderID} {name} - {elementText} {randomRecipe.SpellName} (Market: {marketPrice}, TrueBudget: {trueBudget}, Claimed: {claimedBudget}, Bluff: {isBluffing})</color>");
+            Debug.Log($"<color=cyan>[Store] 새 주문 도착! ID:{order.orderID} {elementText} {randomRecipe.SpellName} (Market: {marketPrice}, TrueBudget: {trueBudget}, Claimed: {claimedBudget}, Bluff: {isBluffing})</color>");
             
             _controller.SpawnOrder(order);
         }

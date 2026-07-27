@@ -22,7 +22,6 @@ public enum CustomerFaction
 public class CustomerOrder
 {
     public string orderID;
-    public string customerName;
     public string orderDescription;
     public string requestedSpellName;
     public SpellElement requestedElement;
@@ -34,7 +33,20 @@ public class CustomerOrder
     public long claimedBudget;
     public bool isBluffing;
     
-    public OrderState state;
+    [SerializeField] private OrderState _state;
+    public OrderState state
+    {
+        get => _state;
+        set
+        {
+            if (_state != value)
+            {
+                _state = value;
+                OnStateChanged?.Invoke(_state);
+            }
+        }
+    }
+    public System.Action<OrderState> OnStateChanged;
     public CustomerFaction faction;
     public float patience;
     public long agreedPrice;
@@ -44,10 +56,9 @@ public class CustomerOrder
     // Use this to display the base reward if needed, or we can just use marketPrice/budget
     public long offeredReward; 
 
-    public CustomerOrder(string name, string desc, string spell, SpellElement element, long marketPrice, long tBudget, long cBudget, bool bluff, CustomerFaction fac)
+    public CustomerOrder(string desc, string spell, SpellElement element, long marketPrice, long tBudget, long cBudget, bool bluff, CustomerFaction fac)
     {
         orderID = System.Guid.NewGuid().ToString();
-        customerName = name;
         orderDescription = desc;
         requestedSpellName = spell;
         requestedElement = element;

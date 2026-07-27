@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class StoreUIController : MonoBehaviour
 {
@@ -7,22 +8,36 @@ public class StoreUIController : MonoBehaviour
     [SerializeField] private GameObject orderPrefab;
     [SerializeField] private ChatUI chatUI;
     [SerializeField] private OrderContainerUI orderContainer;
-    [SerializeField] private Canvas parentCanvas;
 
-    [Header("Spawn Settings")]
-    [SerializeField] private float minRotationZ = -15f;
-    [SerializeField] private float maxRotationZ = 15f;
+    [Header("Pooling Settings")]
+    [SerializeField] private int _poolingCount = 10;
+    private Queue<OrderUI> _orderPool = new Queue<OrderUI>();
+    private bool _isPoolInitialized = false;
 
     bool isOpen = false;
     public bool IsOpened => isOpen;
 
     private void Start()
     {
-        if (parentCanvas == null)
-        {
-            parentCanvas = GetComponentInParent<Canvas>();
-        }
         if (!chatUI.gameObject.activeInHierarchy) chatUI.gameObject.SetActive(true);
+    }
+
+    private void InitializePool()
+    {
+        if (_isPoolInitialized || orderPrefab == null || spawnArea == null) return;
+        _isPoolInitialized = true;
+
+        int count = StoreManager.Instance != null ? StoreManager.Instance.PoolingCount : _poolingCount;
+        for (int i = 0; i < count; i++)
+        {
+            GameObject orderObj = Instantiate(orderPrefab, spawnArea);
+            orderObj.SetActive(false);
+            OrderUI orderUI = orderObj.GetComponent<OrderUI>();
+            if (orderUI != null)
+            {
+                _orderPool.Enqueue(orderUI);
+            }
+        }
     }
 
     public void SpawnOrder(CustomerOrder newOrder)
@@ -33,25 +48,40 @@ public class StoreUIController : MonoBehaviour
             return;
         }
 
-        // Instantiate prefab
-        GameObject orderObj = Instantiate(orderPrefab, spawnArea);
-        RectTransform rect = orderObj.GetComponent<RectTransform>();
+        if (!_isPoolInitialized) InitializePool();
 
-        // Randomize position within spawn area
-        // Assuming spawnArea's pivot is 0.5, 0.5
-        float randomX = Random.Range(spawnArea.rect.xMin + rect.rect.width / 2f, spawnArea.rect.xMax - rect.rect.width / 2f);
-        float randomY = Random.Range(spawnArea.rect.yMin + rect.rect.height / 2f, spawnArea.rect.yMax - rect.rect.height / 2f);
-        rect.anchoredPosition = new Vector2(randomX, randomY);
-
-        // Randomize rotation
-        float randomRotZ = Random.Range(minRotationZ, maxRotationZ);
-        rect.localRotation = Quaternion.Euler(0, 0, randomRotZ);
-
-        // Initialize OrderUI
-        OrderUI orderUI = orderObj.GetComponent<OrderUI>();
+        OrderUI orderUI = GetOrCreateOrderUI();
         if (orderUI != null)
         {
-            orderUI.Initialize(newOrder, OpenChatForOrder, parentCanvas);
+            orderUI.Initialize(newOrder, OpenChatForOrder, ReturnToPool);
+        }
+    }
+
+    private OrderUI GetOrCreateOrderUI()
+    {
+        if (_orderPool.Count > 0)
+        {
+            OrderUI orderUI = _orderPool.Dequeue();
+            orderUI.gameObject.SetActive(true);
+            orderUI.transform.SetAsLastSibling();
+            return orderUI;
+        }
+        else
+        {
+            // 풀에 대기 중인 오브젝트가 부족할 경우 새롭게 생성 (동적 확장)
+            Debug.Log("[StoreUIController] 풀에 대기 중인 오브젝트가 부족하여 새 OrderUI를 인스턴스화합니다.");
+            GameObject orderObj = Instantiate(orderPrefab, spawnArea);
+            return orderObj.GetComponent<OrderUI>();
+        }
+    }
+
+    public void ReturnToPool(OrderUI orderUI)
+    {
+        if (orderUI != null)
+        {
+            orderUI.Deselect(immediate: true);
+            orderUI.gameObject.SetActive(false);
+            _orderPool.Enqueue(orderUI);
         }
     }
 
@@ -60,7 +90,6 @@ public class StoreUIController : MonoBehaviour
     private void TestSpawnOrder()
     {
         CustomerOrder dummyOrder = new CustomerOrder(
-            "Test Customer", 
             "I need a fire spell", 
             "Fireball", 
             SpellElement.Fire, 

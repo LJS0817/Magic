@@ -12,6 +12,10 @@ public class PlayerDataManager : MonoBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
 
+    [Header("Store Orders Persistence")]
+    public Dictionary<string, CustomerOrder> activeOrders = new Dictionary<string, CustomerOrder>();
+    public bool hasGeneratedInitialOrders = false;
+
     [Header("Recipe Compendium")]
     public Dictionary<string, RecipeUnlockState> unlockedRecipes = new Dictionary<string, RecipeUnlockState>();
 
