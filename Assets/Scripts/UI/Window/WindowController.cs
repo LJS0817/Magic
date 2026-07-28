@@ -81,11 +81,16 @@ public class WindowController : MonoBehaviour
     {
         if (_recipe == null) return;
         _recipe.ToggleWindow();
+        
+        if(_recipe.IsOpened) HideDrawingArea();
+        else ShowDrawingArea();
+
         _inventory.DOKill();
         _inventory.DOFade(_recipe.IsOpened ? 0f : 1f, _animDuration);
         RecipeDeveloper.IsDrawingBlocked = true;
         if (_store.IsOpened) ToggleStoreUI();
         SetStoreVisibie(!_recipe.IsOpened);
+        _upgrade.SetVisibleArrow(!_recipe.IsOpened);
         //_drawing.blocksRaycasts = !_recipe.IsOpened;
         //_drawing.interactable = !_recipe.IsOpened;
     }
@@ -100,6 +105,8 @@ public class WindowController : MonoBehaviour
         DOTween.To(() => _frame.offsetMax, x => _frame.offsetMax = x, Vector2.zero, _animDuration).SetTarget(_frame);
 
         SetMenuVisible(false);
+        _recipe.Close(false, true);
+        _upgrade.SetVisibleArrow(false);
         HideDrawingArea();
     }
 
@@ -113,6 +120,8 @@ public class WindowController : MonoBehaviour
         DOTween.To(() => _frame.offsetMax, x => _frame.offsetMax = x, _originOffsetMax, _animDuration).SetTarget(_frame);
 
         SetMenuVisible(true);
+        _recipe.Close(false, false);
+        _upgrade.SetVisibleArrow(true);
         ShowDrawingArea();
     }
 
@@ -140,7 +149,7 @@ public class WindowController : MonoBehaviour
     {
         if (_upgrade == null) return;
         _upgrade.Open();
-        if (_recipe.IsOpened) ToggleRecipeUI();
+        HideDrawingArea();
         SetFullFrame();
     }
 
@@ -148,6 +157,7 @@ public class WindowController : MonoBehaviour
     {
         if (_upgrade == null) return;
         _upgrade.Close();
+        ShowDrawingArea();
         SetOriginFrame();
     }
 

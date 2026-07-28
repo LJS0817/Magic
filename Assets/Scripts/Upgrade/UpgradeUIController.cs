@@ -9,6 +9,7 @@ public class UpgradeUIController : MonoBehaviour
 {
     [Header("Containers")]
     [SerializeField] CanvasGroup _canvasGroup;
+    [SerializeField] Image _arrowImage;
     Canvas _canvas;
     public RectTransform nodeContainer; // Where node prefabs are spawned
     public RectTransform lineContainer; // Where lines are drawn (should be behind nodes)
@@ -61,10 +62,18 @@ public class UpgradeUIController : MonoBehaviour
         _canvas.enabled = true;
         DrawingManager.IsDrawingBlocked = true;
 
+        SetVisibleArrow(false);
+
         if (scrollRect != null)
         {
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
         }
+    }
+
+    public void SetVisibleArrow(bool visible)
+    {
+        _arrowImage.DOKill();
+        _arrowImage.DOFade(visible ? 1f : 0f, 0.2f);
     }
 
     public void Close()
@@ -74,6 +83,7 @@ public class UpgradeUIController : MonoBehaviour
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
         _canvas.enabled = false;
+        SetVisibleArrow(true);
         DrawingManager.IsDrawingBlocked = false;
     }
 

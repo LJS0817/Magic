@@ -2,13 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
 {
     [SerializeField] ItemInfoPanel itemInfoPanel;
     [SerializeField] CanvasGroup recipeListGroup;
+    [SerializeField] Image _arrowImage;
     [Header("Detail Panel")]
     public CanvasGroup detailPanel;
+    RectTransform _detailPanelRect;
     public Image detailIcon;
     public Image detailSampleImage;
     public TMP_Text detailNameText;
@@ -19,12 +22,21 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     public TMP_Text detailHintText;
     public TMP_Text detailShapesText;
 
+
+    [Tooltip("Ease.OutBack provides a single bounce (overshoot) effect.")]
+    [SerializeField] private float animationDuration = 0.2f;
+
+    [SerializeField] private Ease openEase = Ease.OutBack;
+    [SerializeField] private Ease closeEase = Ease.InBack;
+
     bool isOpened = false;
     public bool IsOpened => isOpened;
 
     private void Start()
     {
-        Close();
+        _detailPanelRect = detailPanel.GetComponent<RectTransform>();
+        Close(true);
+        _detailPanelRect.anchoredPosition = new Vector2(_detailPanelRect.anchoredPosition.x, 200f);
     }
 
     protected override void OnEnable()
@@ -137,7 +149,7 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
         }
     }
 
-    public void Close()
+    public void Close(bool forceClose = false, bool hideArrow = false)
     {
         if (currentSelectedSlot != null)
         {
@@ -145,29 +157,50 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
             currentSelectedSlot = null;
         }
 
-        detailPanel.alpha = 0f;
+        if(forceClose)
+        {
+            detailPanel.alpha = 0f;
+            recipeListGroup.alpha = 0f;
+        } else
+        {
+            detailPanel.DOKill();
+            detailPanel.DOFade(0f, animationDuration).SetEase(closeEase);
+
+            recipeListGroup.DOKill();
+            recipeListGroup.DOFade(0f, animationDuration).SetEase(closeEase);
+
+            _arrowImage.DOKill();
+            _arrowImage.DOFade(hideArrow ? 0f : 1f, animationDuration).SetEase(openEase);
+        }
+        
         detailPanel.blocksRaycasts = false;
         detailPanel.interactable = false;
 
-        recipeListGroup.alpha = 0f;
         recipeListGroup.blocksRaycasts = false;
         recipeListGroup.interactable = false;
+
         isOpened = false;
         DrawingManager.IsDrawingBlocked = false;
     }
 
     public void Open()
     {
-        detailPanel.alpha = 1f;
+        detailPanel.DOKill();
+        detailPanel.DOFade(1f, animationDuration).SetEase(openEase);
         detailPanel.blocksRaycasts = true;
         detailPanel.interactable = true;
 
-        recipeListGroup.alpha = 1f;
+        recipeListGroup.DOKill();
+        recipeListGroup.DOFade(1f, animationDuration).SetEase(openEase);
         recipeListGroup.blocksRaycasts = true;
         recipeListGroup.interactable = true;
+        
+        _arrowImage.DOKill();
+        _arrowImage.DOFade(0f, animationDuration).SetEase(Ease.Linear);
 
         DrawingManager.IsDrawingBlocked = true;
         isOpened = true;
+
         RefreshList();
     }
 
@@ -175,6 +208,9 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     {
         if (isOpened) Close();
         else Open();
+    
+        _detailPanelRect.DOKill();
+        _detailPanelRect.DOAnchorPosY(isOpened ? 0f : 200f, animationDuration).SetEase(isOpened ? openEase : closeEase);
     }
 }
 
