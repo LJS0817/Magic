@@ -16,6 +16,7 @@ public class OrderUI : MonoBehaviour
     [SerializeField] private TMP_Text elementText;
     [SerializeField] private CurrencyValueUI budgetUI;
     [SerializeField] private TMP_Text stateText;
+    [SerializeField] private TMP_Text deadlineText; // 마감일자 표시용 텍스트
 
     public void Initialize(CustomerOrder order, Action<OrderUI> onClickCallback, Action<OrderUI> onReturnToPoolCallback = null)
     {
@@ -82,6 +83,18 @@ public class OrderUI : MonoBehaviour
             case OrderState.Failed: stateStr = "거래 실패"; break;
         }
         stateText.text = stateStr;
+
+        if (deadlineText != null)
+        {
+            if (OrderData.state == OrderState.Completed || OrderData.state == OrderState.Failed)
+            {
+                deadlineText.text = "";
+            }
+            else
+            {
+                deadlineText.text = $"{OrderData.deadlineDaysLeft}일 남음";
+            }
+        }
     }
 
     private void OnOrderStateChanged(OrderState newState)

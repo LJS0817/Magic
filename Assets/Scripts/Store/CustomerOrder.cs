@@ -51,6 +51,8 @@ public class CustomerOrder
     public float patience;
     public long agreedPrice;
 
+    public int deadlineDaysLeft; // 남은 마감일
+
     public System.Collections.Generic.List<string> chatHistory;
 
     // Use this to display the base reward if needed, or we can just use marketPrice/budget
@@ -73,6 +75,9 @@ public class CustomerOrder
         this.patience = 100f; // default patience
         this.agreedPrice = 0;
         this.chatHistory = new System.Collections.Generic.List<string>();
+
+        // 3일에서 7일 사이의 랜덤한 마감 기한 설정
+        this.deadlineDaysLeft = UnityEngine.Random.Range(3, 8);
     }
 }
 

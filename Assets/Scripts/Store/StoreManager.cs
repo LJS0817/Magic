@@ -31,10 +31,25 @@ public class StoreManager : MonoBehaviour
     [SerializeField] StoreUIController _controller;
     public bool IsOpened => _controller.IsOpened;
 
+    [Header("UI References")]
+    [SerializeField] private CustomSlider satisfactionSlider;
+
     private void Start()
     {
+        // 인스펙터에서 할당되지 않았을 경우에만 코드로 찾기 (가장 좋은 방법은 인스펙터 할당입니다)
+        if (satisfactionSlider == null)
+        {
+            satisfactionSlider = GameObject.Find("Canvas").transform.Find("Satisfaction").GetComponent<CustomSlider>();
+        }
+        
         if (PlayerDataManager.Instance != null)
         {
+            PlayerDataManager.Instance.OnDayChanged += HandleDayChanged;
+            PlayerDataManager.Instance.OnSatisfactionChanged += UpdateSatisfactionUI;
+            
+            // Initial UI Update
+            UpdateSatisfactionUI(PlayerDataManager.Instance.StoreSatisfaction);
+
             if (!PlayerDataManager.Instance.hasGeneratedInitialOrders)
             {
                 PlayerDataManager.Instance.hasGeneratedInitialOrders = true;
@@ -55,6 +70,65 @@ public class StoreManager : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnDayChanged -= HandleDayChanged;
+            PlayerDataManager.Instance.OnSatisfactionChanged -= UpdateSatisfactionUI;
+        }
+    }
+
+    private void UpdateSatisfactionUI(float satisfaction)
+    {
+        if (satisfactionSlider != null)
+        {
+            satisfactionSlider.SetValue(satisfaction, 100f);
+        }
+    }
+
+    private void HandleDayChanged(int newDay)
+    {
+        List<string> expiredOrderIds = new List<string>();
+
+        foreach (var kvp in activeOrders)
+        {
+            var order = kvp.Value;
+            if (order.state == OrderState.Received || order.state == OrderState.Haggling || order.state == OrderState.Pending)
+            {
+                order.deadlineDaysLeft--;
+
+                if (order.deadlineDaysLeft <= 0)
+                {
+                    expiredOrderIds.Add(kvp.Key);
+                }
+                else
+                {
+                    // Update UI if the order is still active
+                    order.OnStateChanged?.Invoke(order.state);
+                }
+            }
+        }
+
+        foreach (var id in expiredOrderIds)
+        {
+            if (activeOrders.TryGetValue(id, out var expiredOrder))
+            {
+                expiredOrder.state = OrderState.Failed;
+                expiredOrder.chatHistory.Add($"[시스템] 주문 기한이 만료되었습니다. 상점 만족도가 하락합니다.");
+                activeOrders.Remove(id);
+                Debug.Log($"<color=red>[Store] 주문 {id} 기한 만료!</color>");
+                PlayerDataManager.Instance.ModifySatisfaction(-5f); // 만료 시 페널티
+            }
+        }
+
+        // 새롭게 10개의 주문 추가
+        for (int i = 0; i < _poolingCount; i++)
+        {
+            GenerateRandomOrder();
         }
     }
 
@@ -249,6 +323,12 @@ public class StoreManager : MonoBehaviour
 
             order.state = OrderState.Completed;
             activeOrders.Remove(orderId);
+            
+            // 주문 성공 시 만족도 상승
+            if (PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.ModifySatisfaction(2f);
+            }
 
             Debug.Log($"<color=green>[Store] 거래 성사! 최종 입금액: {finalPayment} 동화</color>");
             GenerateRandomOrder(); // 새로운 주문 보충

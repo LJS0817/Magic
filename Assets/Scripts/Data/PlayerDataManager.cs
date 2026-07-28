@@ -16,6 +16,36 @@ public class PlayerDataManager : MonoBehaviour
     public Dictionary<string, CustomerOrder> activeOrders = new Dictionary<string, CustomerOrder>();
     public bool hasGeneratedInitialOrders = false;
 
+    [Header("Time and Store Management")]
+    public int currentDay = 1;
+    public event System.Action<int> OnDayChanged;
+
+    [SerializeField, Range(0f, 100f)] 
+    private float _storeSatisfaction = 100f;
+    public float StoreSatisfaction
+    {
+        get => _storeSatisfaction;
+        set
+        {
+            _storeSatisfaction = Mathf.Clamp(value, 0f, 100f);
+            OnSatisfactionChanged?.Invoke(_storeSatisfaction);
+        }
+    }
+    public event System.Action<float> OnSatisfactionChanged;
+
+    public void AdvanceDay()
+    {
+        currentDay++;
+        Debug.Log($"<color=yellow>[시간] 다음 날이 되었습니다. 현재 일차: {currentDay}일</color>");
+        OnDayChanged?.Invoke(currentDay);
+    }
+
+    public void ModifySatisfaction(float amount)
+    {
+        StoreSatisfaction += amount;
+        Debug.Log($"[상점 만족도] {(amount > 0 ? "상승" : "하락")}: {amount}. 현재 만족도: {_storeSatisfaction:F1}/100");
+    }
+
     [Header("Recipe Compendium")]
     public Dictionary<string, RecipeUnlockState> unlockedRecipes = new Dictionary<string, RecipeUnlockState>();
 
