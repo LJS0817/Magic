@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: DivineShield
   Type: 1
   icon: {fileID: 1857833808, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 41ed360279fcc0e40a4558ba59a0b9b5, type: 3}
   manaCost: 20
   Description: "\uC2E0\uC131\uD55C \uBE5B\uC73C\uB85C \uC804\uC2E0\uC744 \uAC10\uC2F8
     \uBAA8\uB4E0 \uC0AC\uC545\uD55C \uACF5\uACA9\uC744 \uC644\uBCBD\uD788 \uCC28\uB2E8\uD569\uB2C8\uB2E4."

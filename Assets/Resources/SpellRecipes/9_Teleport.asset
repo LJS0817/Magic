@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Teleport
   Type: 2
   icon: {fileID: -3160770046920691631, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 7edd153225b986d4fa5b3a4f7f55de0a, type: 3}
   manaCost: 70
   Description: "\uACF5\uAC04\uC744 \uC65C\uACE1\uD558\uC5EC \uC9C0\uC815\uD55C \uC704\uCE58\uB85C
     \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."

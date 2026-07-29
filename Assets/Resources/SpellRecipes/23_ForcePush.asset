@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Force Push
   Type: 0
   icon: {fileID: -1458160581, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 810c6983371d94348b1ffd613dc5ae1d, type: 3}
   manaCost: 40
   Description: "\uAC15\uB825\uD55C \uCDA9\uACA9\uD30C\uB97C \uBC1C\uC0AC\uD558\uC5EC
     \uC801\uB4E4\uC744 \uBA40\uB9AC \uBC00\uCCD0\uB0C5\uB2C8\uB2E4."

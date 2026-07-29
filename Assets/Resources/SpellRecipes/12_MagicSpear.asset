@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Magic Spear
   Type: 0
   icon: {fileID: 464640638312915844, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 4c706100fc676f340b7bd9b49eb9e1d5, type: 3}
   manaCost: 30
   Description: "\uB300\uAE30 \uC911\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC
     \uB0A0\uCE74\uB85C\uC6B4 \uCC3D\uC744 \uC3D8\uC544\uB0C5\uB2C8\uB2E4."

@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Force Spike
   Type: 0
   icon: {fileID: 2068928466, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 19d92ad967053fe4cbacedcfa1c272a7, type: 3}
   manaCost: 35
   Description: "\uAC70\uB300\uD55C \uB9C8\uB825 \uAC00\uC2DC\uB97C \uBC14\uB2E5\uC5D0\uC11C
     \uC19F\uAD6C\uCE58\uAC8C \uD569\uB2C8\uB2E4."

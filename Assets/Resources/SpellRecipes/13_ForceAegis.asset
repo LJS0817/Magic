@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Force Aegis
   Type: 1
   icon: {fileID: -4898285444351859002, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: e9b012e26103f7641aa56487a2e3cf40, type: 3}
   manaCost: 45
   Description: "\uC808\uB300 \uAE68\uC9C0\uC9C0 \uC54A\uB294 \uB9C8\uB825 \uACB0\uACC4\uB97C
     \uBAB8\uC5D0 \uB450\uB985\uB2C8\uB2E4."

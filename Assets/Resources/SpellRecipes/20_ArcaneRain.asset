@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Arcane Rain
   Type: 0
   icon: {fileID: -5814467085041323856, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 6fc7a6b4dc5dc04459bd8b8f1f37b76b, type: 3}
   manaCost: 80
   Description: "\uC218\uB9CE\uC740 \uB9C8\uB825\uC758 \uACB0\uC815\uC744 \uBE44\uCC98\uB7FC
     \uC3DF\uC544\uB0B4\uC5B4 \uB113\uC740 \uBC94\uC704\uB97C \uD0C0\uACA9\uD569\uB2C8\uB2E4."

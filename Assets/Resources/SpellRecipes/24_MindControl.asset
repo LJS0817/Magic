@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Mind Control
   Type: 2
   icon: {fileID: 928931622, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: d13c83f15f4f2d0429d4bc38b9fc29a6, type: 3}
   manaCost: 90
   Description: "\uB300\uC0C1\uC758 \uC815\uC2E0\uC744 \uBD95\uAD34\uC2DC\uD0A4\uACE0
     \uC77C\uC2DC\uC801\uC73C\uB85C \uD63C\uB780\uC5D0 \uBE60\uB728\uB9BD\uB2C8\uB2E4."

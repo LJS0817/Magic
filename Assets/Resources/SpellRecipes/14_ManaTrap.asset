@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Mana Trap
   Type: 2
   icon: {fileID: -1123690004605174068, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 8ed78b5de62c253498b6b6ead6812788, type: 3}
   manaCost: 25
   Description: "\uB545\uC5D0 \uBCF4\uC774\uC9C0 \uC54A\uB294 \uB9C8\uB098 \uC9C0\uB8B0\uB97C
     \uB9E4\uC124\uD569\uB2C8\uB2E4."

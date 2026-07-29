@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Purify
   Type: 2
   icon: {fileID: -1889205205, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 8ce231bc340fe8d4c820c3c44a34f1eb, type: 3}
   manaCost: 40
   Description: "\uB300\uC0C1\uC5D0\uAC8C \uAC78\uB9B0 \uBAA8\uB4E0 \uD574\uB85C\uC6B4
     \uB9C8\uBC95 \uD6A8\uACFC\uB97C \uC815\uD654\uD569\uB2C8\uB2E4."

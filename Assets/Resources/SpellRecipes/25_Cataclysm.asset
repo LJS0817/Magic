@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Cataclysm
   Type: 0
   icon: {fileID: -1274930817551214607, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: bb6f83c29e590bf4fa58e8d5b87b3b96, type: 3}
   manaCost: 120
   Description: "\uC5C4\uCCAD\uB09C \uB9C8\uB098\uB97C \uD3ED\uC8FC\uC2DC\uCF1C \uD654\uBA74
     \uC804\uCCB4\uC5D0 \uAD81\uADF9\uC758 \uD30C\uAD34\uB97C \uC120\uC0AC\uD569\uB2C8\uB2E4."

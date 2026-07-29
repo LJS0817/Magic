@@ -15,7 +15,9 @@ MonoBehaviour:
   SpellName: Trinity
   Type: 0
   icon: {fileID: -1605566116946375665, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  drawingSampleImage: {fileID: 0}
+  statusEffect: 0
+  statusEffectDuration: 0
+  drawingSampleImage: {fileID: 21300000, guid: 55d5d755161da9d41bf6ac9443b4742f, type: 3}
   manaCost: 50
   Description: "\uC138 \uAC00\uC9C0\uC758 \uC808\uB300\uC801\uC778 \uC6D0\uB9AC\uAC00
     \uC77C\uB82C\uB85C \uC815\uB82C\uD560 \uB54C \uBC1C\uB3D9\uB418\uB294 \uC2EC\uD310\uC758
