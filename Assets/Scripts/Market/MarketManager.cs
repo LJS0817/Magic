@@ -1,8 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class MarketManager : MonoBehaviour
 {
     public static MarketManager Instance { get; private set; }
+    
+    public List<ItemQuestSO> activeQuests = new List<ItemQuestSO>();
 
     private void Awake()
     {
@@ -11,6 +14,49 @@ public class MarketManager : MonoBehaviour
             Instance = this;
         }
     }
+
+    private void Start()
+    {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnDayChanged += GenerateDailyQuests;
+        }
+        // 초기 생성
+        GenerateDailyQuests(1);
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnDayChanged -= GenerateDailyQuests;
+        }
+    }
+
+    public void GenerateDailyQuests(int day)
+    {
+        activeQuests.Clear();
+        var db = InventoryManager.Instance != null ? InventoryManager.Instance.itemDatabase : null;
+        if (db == null || db.questTemplates.Count == 0 || db.materials.Count == 0) return;
+
+        // 매일 3개의 랜덤 퀘스트 생성
+        for(int i = 0; i < 3; i++)
+        {
+            var template = db.questTemplates[Random.Range(0, db.questTemplates.Count)];
+            var targetItem = db.materials[Random.Range(0, db.materials.Count)];
+            int amount = Random.Range(3, 15);
+            long reward = (long)Mathf.Round(targetItem.basePriceInCopper * amount * Random.Range(1.5f, 3.0f));
+            int deadline = Random.Range(2, 6);
+            
+            var dynamicQuest = template.CreateDynamicQuest(targetItem, amount, reward, deadline);
+            activeQuests.Add(dynamicQuest);
+        }
+        
+        Debug.Log($"<color=yellow>[MarketManager] {day}일차 새로운 길드 퀘스트 3개가 갱신되었습니다.</color>");
+        
+        // 갱신된 퀘스트를 UI에 반영하고 싶다면, MarketUIController의 Refresh 기능 호출이 필요할 수 있습니다.
+    }
+
 
     /// <summary>
     /// 아이템의 기본 가격에 상점 할인율을 적용한 최종 1개당 단가를 반환합니다.
@@ -116,6 +162,9 @@ public class MarketManager : MonoBehaviour
                 break;
             case ItemType.Pouch:
                 if (itemData is ItemPouchSO pouchSO) return new Item_Pouch(pouchSO);
+                break;
+            case ItemType.Quest:
+                if (itemData is ItemQuestSO questSO) return new Item_Quest(questSO);
                 break;
             case ItemType.Material:
                 return new Item_Material(itemData);

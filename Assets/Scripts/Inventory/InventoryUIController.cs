@@ -182,6 +182,14 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                 Debug.Log($"[Inventory] {slot.Item.ItemName} {_currentSelectedAmount}개 더블클릭 됨.");
             }
         }
+        else if (slot.Item is Item_Quest quest)
+        {
+            if (quest.TryCompleteQuest())
+            {
+                inv.RemoveItem(quest);
+                RefreshList();
+            }
+        }
         else if (slot.Item is Item_Scroll scroll) 
         {
             if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;

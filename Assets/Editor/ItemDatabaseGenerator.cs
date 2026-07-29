@@ -70,6 +70,13 @@ namespace Magic.Editor
             public MaterialDef(string n, long p, int ms, string g, string desc) { name = n; price = p; maxStack = ms; grade = g; description = desc; }
         }
 
+        private struct QuestDef
+        {
+            public string templateName; public string titleFormat; public string descFormat;
+            public QuestDef(string n, string t, string d) { templateName = n; titleFormat = t; descFormat = d; }
+        }
+
+
         private static readonly PenDef[] PenDefs = new PenDef[]
         {
             // 일반 등급 5개
@@ -228,6 +235,21 @@ namespace Magic.Editor
             new MaterialDef("드래곤의 심장 결정", 1000, 10, "전설", "고대 드래곤의 중심에서 거대한 마력을 생성해내던 궁극의 연금술 재료입니다.")
         };
 
+        private static readonly QuestDef[] QuestDefs = new QuestDef[]
+        {
+            new QuestDef("기본 길드 의뢰", "길드 의뢰: {0}", "모험자 길드에서 {0} {1}개를 수집하고 있습니다.\n보상: {2} 동화"),
+            new QuestDef("긴급 납품 의뢰", "긴급! {0} 조달", "{0} {1}개가 당장 필요합니다! 길드의 긴급 요청입니다.\n보상: {2} 동화"),
+            new QuestDef("마법 연구 재료", "마법 연구 재료: {0}", "마도학자의 연구를 위해 {0} {1}개가 필요합니다.\n보상: {2} 동화"),
+            new QuestDef("마을 주민의 부탁", "주민의 부탁: {0}", "마을 주민이 {0} {1}개를 구하고 있습니다. 도와주시겠습니까?\n보상: {2} 동화"),
+            new QuestDef("전리품 매입", "토벌 후처리: {0}", "마물 토벌 후 획득한 {0} {1}개를 길드에서 매입합니다.\n보상: {2} 동화"),
+            new QuestDef("연금술 공방 의뢰", "연금술 재료 조달: {0}", "연금술 공방에서 특별한 비약을 만들기 위해 {0} {1}개를 찾고 있습니다.\n보상: {2} 동화"),
+            new QuestDef("비밀스런 의뢰", "비밀스런 의뢰: {0}", "발주자를 알 수 없는 의뢰입니다. {0} {1}개를 조용히 납품하십시오.\n보상: {2} 동화"),
+            new QuestDef("정기 물자 보충", "길드 정기 물자 보충: {0}", "길드 창고 비축을 위해 {0} {1}개가 필요합니다. 늦지 않게 부탁드립니다.\n보상: {2} 동화"),
+            new QuestDef("상단 매입 의뢰", "상단의 수집 의뢰: {0}", "이웃 도시 상단에서 {0} {1}개를 대량 매입 중입니다. 좋은 기회입니다.\n보상: {2} 동화"),
+            new QuestDef("수배 품목 납품", "수배 품목: {0}", "현재 시장 수요가 폭발적인 {0} {1}개를 길드에서 특별히 매입 중입니다.\n보상: {2} 동화")
+        };
+
+
         [MenuItem("Magic/Tools/Generate Item Database")]
         public static void GenerateDatabase()
         {
@@ -243,6 +265,7 @@ namespace Magic.Editor
             CreateFolderIfNotExists(rootPath, "DrawingTools");
             CreateFolderIfNotExists(rootPath, "Robes");
             CreateFolderIfNotExists(rootPath, "Materials");
+            CreateFolderIfNotExists(rootPath, "Quests");
 
             string dbPath = rootPath + "/ItemDatabase.asset";
             ItemDatabase db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(dbPath);
@@ -263,6 +286,7 @@ namespace Magic.Editor
             db.drawingTools.Clear();
             db.robes.Clear();
             db.materials.Clear();
+            if(db.questTemplates != null) db.questTemplates.Clear();
 
             // Generate Pens
             foreach (var def in PenDefs)
@@ -434,6 +458,24 @@ namespace Magic.Editor
                 db.materials.Add(asset);
             }
 
+            // Generate Quests
+            foreach (var def in QuestDefs)
+            {
+                string assetPath = $"{rootPath}/Quests/QuestTemplate_{def.templateName.Replace(" ", "_")}.asset";
+                ItemQuestSO asset = GetOrCreateAsset<ItemQuestSO>(assetPath);
+
+                asset.itemName = def.templateName;
+                asset.questTitleFormat = def.titleFormat;
+                asset.questDescFormat = def.descFormat;
+                asset.rarity = ItemRarity.Common;
+
+                EditorUtility.SetDirty(asset);
+                if (db.questTemplates != null)
+                {
+                    db.questTemplates.Add(asset);
+                }
+            }
+
             if (isNewDb)
             {
                 AssetDatabase.CreateAsset(db, dbPath);
@@ -446,7 +488,7 @@ namespace Magic.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\n- 망토: {db.cloaks.Count}종\n- 도구(도장): {db.drawingTools.Count}종\n- 로브: {db.robes.Count}종\n- 재료: {db.materials.Count}종\nDB 위치: {dbPath}");
+            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\n- 망토: {db.cloaks.Count}종\n- 도구(도장): {db.drawingTools.Count}종\n- 로브: {db.robes.Count}종\n- 재료: {db.materials.Count}종\n- 퀘스트 템플릿: {(db.questTemplates != null ? db.questTemplates.Count : 0)}종\nDB 위치: {dbPath}");
         }
 
         private static T GetOrCreateAsset<T>(string path) where T : ScriptableObject

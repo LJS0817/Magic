@@ -15,6 +15,8 @@ public class ItemDatabase : ScriptableObject
     public List<ItemCloakSO> cloaks = new List<ItemCloakSO>();
     public List<ItemDrawingToolSO> drawingTools = new List<ItemDrawingToolSO>();
     public List<ItemMaterialSO> materials = new List<ItemMaterialSO>();
+    public List<ItemQuestSO> questTemplates = new List<ItemQuestSO>(); // 동적 생성을 위한 템플릿
+
 
     private Dictionary<string, ItemDataSO> _itemCache;
     private Dictionary<ItemRarity, List<ItemPenSO>> _penGradeCache;
@@ -91,6 +93,13 @@ public class ItemDatabase : ScriptableObject
             if (material != null && !_itemCache.ContainsKey(material.itemName))
                 _itemCache.Add(material.itemName, material);
         }
+
+        foreach (var quest in questTemplates)
+        {
+            // 템플릿의 경우 이름이 중복될 수 있으므로 (Dynamic) 캐시에 넣지 않거나 유의
+            if (quest != null && !_itemCache.ContainsKey(quest.itemName))
+                _itemCache.Add(quest.itemName, quest);
+        }
     }
 
     public T GetItemData<T>(string itemName) where T : ItemDataSO
@@ -160,6 +169,12 @@ public class ItemDatabase : ScriptableObject
     {
         var materialData = GetItemData<ItemMaterialSO>(itemName);
         return materialData != null ? new Item_Material(materialData) : null;
+    }
+
+    public Item_Quest CreateQuestInstance(string itemName)
+    {
+        var questData = GetItemData<ItemQuestSO>(itemName);
+        return questData != null ? new Item_Quest(questData) : null;
     }
 }
 

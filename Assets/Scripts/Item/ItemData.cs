@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch, Robe, Cloak, DrawingTool, Quest }
 
@@ -216,5 +217,70 @@ public class Item_DrawingTool : ItemInstance
 
     public Item_DrawingTool(ItemDrawingToolSO toolData) : base(toolData)
     {
+    }
+}
+
+[System.Serializable]
+public class Item_Quest : ItemInstance
+{
+    public ItemQuestSO QuestData => data as ItemQuestSO;
+    public int remainingDays;
+
+    public Item_Quest(ItemQuestSO questData) : base(questData)
+    {
+        remainingDays = questData != null ? questData.deadlineDays : 0;
+    }
+    
+    // 더블클릭 시 사용할 수 있도록 퀘스트 완료 로직을 포함
+    public bool TryCompleteQuest()
+    {
+        if (QuestData == null || QuestData.targetItem == null) return false;
+
+        // 인벤토리에서 목표 아이템 검색
+        int foundAmount = 0;
+        List<ItemInstance> targetItemsInInv = new List<ItemInstance>();
+        
+        foreach (var item in InventoryManager.Instance.items)
+        {
+            if (item.data == QuestData.targetItem)
+            {
+                foundAmount += item.count;
+                targetItemsInInv.Add(item);
+            }
+        }
+
+        if (foundAmount >= QuestData.targetAmount)
+        {
+            // 아이템 차감
+            int amountToRemove = QuestData.targetAmount;
+            foreach (var item in targetItemsInInv)
+            {
+                if (amountToRemove <= 0) break;
+                
+                if (item.count <= amountToRemove)
+                {
+                    amountToRemove -= item.count;
+                    InventoryManager.Instance.RemoveItem(item);
+                }
+                else
+                {
+                    item.count -= amountToRemove;
+                    amountToRemove = 0;
+                    // 인벤토리 UI 갱신을 위해 이벤트 호출 필요할 수 있음
+                }
+            }
+
+            // 보상 지급
+            CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, QuestData.rewardCopper);
+            CurrencyManager.Instance.CompressCurrency();
+            
+            Debug.Log($"<color=green>[Quest] 퀘스트 완료! 보상 {QuestData.rewardCopper} 동화 지급됨.</color>");
+            return true;
+        }
+        else
+        {
+            Debug.Log($"<color=yellow>[Quest] 조건 미달성: {QuestData.targetItem.itemName} ({foundAmount}/{QuestData.targetAmount})</color>");
+            return false;
+        }
     }
 }

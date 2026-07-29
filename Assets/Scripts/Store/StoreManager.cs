@@ -25,30 +25,21 @@ public class StoreManager : MonoBehaviour
     public Dictionary<string, CustomerOrder> activeOrders => 
         PlayerDataManager.Instance != null ? PlayerDataManager.Instance.activeOrders : _fallbackOrders;
 
-    [SerializeField] private int _poolingCount = 10;
+    [SerializeField] private int _poolingCount = 8;
     public int PoolingCount => _poolingCount;
     
     [SerializeField] StoreUIController _controller;
     public bool IsOpened => _controller.IsOpened;
 
-    [Header("UI References")]
-    [SerializeField] private CustomSlider satisfactionSlider;
-
     private void Start()
     {
-        // 인스펙터에서 할당되지 않았을 경우에만 코드로 찾기 (가장 좋은 방법은 인스펙터 할당입니다)
-        if (satisfactionSlider == null)
-        {
-            satisfactionSlider = GameObject.Find("Canvas").transform.Find("Satisfaction").GetComponent<CustomSlider>();
-        }
+
         
         if (PlayerDataManager.Instance != null)
         {
             PlayerDataManager.Instance.OnDayChanged += HandleDayChanged;
-            PlayerDataManager.Instance.OnSatisfactionChanged += UpdateSatisfactionUI;
-            
-            // Initial UI Update
-            UpdateSatisfactionUI(PlayerDataManager.Instance.StoreSatisfaction);
+            // PlayerDataManager.Instance.OnSatisfactionChanged += UpdateSatisfactionUI;
+
 
             if (!PlayerDataManager.Instance.hasGeneratedInitialOrders)
             {
@@ -78,17 +69,10 @@ public class StoreManager : MonoBehaviour
         if (PlayerDataManager.Instance != null)
         {
             PlayerDataManager.Instance.OnDayChanged -= HandleDayChanged;
-            PlayerDataManager.Instance.OnSatisfactionChanged -= UpdateSatisfactionUI;
+            // PlayerDataManager.Instance.OnSatisfactionChanged -= UpdateSatisfactionUI;
         }
     }
 
-    private void UpdateSatisfactionUI(float satisfaction)
-    {
-        if (satisfactionSlider != null)
-        {
-            satisfactionSlider.SetValue(satisfaction, 100f);
-        }
-    }
 
     private void HandleDayChanged(int newDay)
     {
@@ -125,8 +109,21 @@ public class StoreManager : MonoBehaviour
             }
         }
 
-        // 새롭게 10개의 주문 추가
-        for (int i = 0; i < _poolingCount; i++)
+        // 새롭게 10개의 주문 추가 + 랭크 보너스
+        int orderCount = _poolingCount;
+        if (PlayerDataManager.Instance != null)
+        {
+            switch (PlayerDataManager.Instance.CurrentGuildRank)
+            {
+                case GuildRank.Iron: orderCount -= 5; break;
+                case GuildRank.Bronze: orderCount -= 4; break;
+                case GuildRank.Silver: orderCount -= 3; break;
+                case GuildRank.Gold: orderCount -= 2; break;
+                case GuildRank.Mithril: orderCount -= 1; break;
+            }
+        }
+
+        for (int i = 0; i < orderCount; i++)
         {
             GenerateRandomOrder();
         }
@@ -177,10 +174,58 @@ public class StoreManager : MonoBehaviour
                 }
             }
             
+            // Add Guild Rank Premium
+            if (PlayerDataManager.Instance != null)
+            {
+                switch (PlayerDataManager.Instance.CurrentGuildRank)
+                {
+                    case GuildRank.Silver: marketMultiplier += 0.05f; break;
+                    case GuildRank.Gold: marketMultiplier += 0.10f; break;
+                    case GuildRank.Mithril: marketMultiplier += 0.20f; break;
+                    case GuildRank.Orichalcum: marketMultiplier += 0.30f; break;
+                }
+            }
+            
             long marketPrice = (long)Mathf.Round(baseVal * marketMultiplier);
             
             // Generate Faction and Budget
-            CustomerFaction faction = (CustomerFaction)UnityEngine.Random.Range(0, 5);
+            float factionRoll = UnityEngine.Random.value;
+            CustomerFaction faction = CustomerFaction.Peasant;
+            
+            if (PlayerDataManager.Instance != null)
+            {
+                GuildRank rank = PlayerDataManager.Instance.CurrentGuildRank;
+                // Higher ranks have higher chance for MageGuild and Noble, lower chance for Peasant/Mercenary
+                if (rank >= GuildRank.Gold)
+                {
+                    if (factionRoll < 0.1f) faction = CustomerFaction.Peasant;
+                    else if (factionRoll < 0.2f) faction = CustomerFaction.Mercenary;
+                    else if (factionRoll < 0.5f) faction = CustomerFaction.Noble;
+                    else if (factionRoll < 0.8f) faction = CustomerFaction.MageGuild;
+                    else faction = CustomerFaction.Cultist;
+                }
+                else if (rank >= GuildRank.Silver)
+                {
+                    if (factionRoll < 0.2f) faction = CustomerFaction.Peasant;
+                    else if (factionRoll < 0.5f) faction = CustomerFaction.Mercenary;
+                    else if (factionRoll < 0.7f) faction = CustomerFaction.Noble;
+                    else if (factionRoll < 0.9f) faction = CustomerFaction.MageGuild;
+                    else faction = CustomerFaction.Cultist;
+                }
+                else
+                {
+                    if (factionRoll < 0.4f) faction = CustomerFaction.Peasant;
+                    else if (factionRoll < 0.7f) faction = CustomerFaction.Mercenary;
+                    else if (factionRoll < 0.8f) faction = CustomerFaction.Noble;
+                    else if (factionRoll < 0.9f) faction = CustomerFaction.MageGuild;
+                    else faction = CustomerFaction.Cultist;
+                }
+            }
+            else
+            {
+                faction = (CustomerFaction)UnityEngine.Random.Range(0, 5);
+            }
+
             float trueBudgetMultiplier = 1f;
             bool isBluffing = false;
             
@@ -191,6 +236,14 @@ public class StoreManager : MonoBehaviour
                 case CustomerFaction.Noble: trueBudgetMultiplier = UnityEngine.Random.Range(1.5f, 3.0f); isBluffing = UnityEngine.Random.value < 0.4f; break;
                 case CustomerFaction.MageGuild: trueBudgetMultiplier = UnityEngine.Random.Range(1.2f, 2.0f); isBluffing = UnityEngine.Random.value < 0.1f; break; // 거의 거짓말 안함
                 case CustomerFaction.Cultist: trueBudgetMultiplier = UnityEngine.Random.Range(1.0f, 1.5f); isBluffing = UnityEngine.Random.value < 0.5f; break;
+            }
+
+            // Reduce bluff chance based on high rank
+            if (PlayerDataManager.Instance != null && isBluffing)
+            {
+                GuildRank rank = PlayerDataManager.Instance.CurrentGuildRank;
+                if (rank == GuildRank.Mithril && UnityEngine.Random.value < 0.5f) isBluffing = false;
+                if (rank == GuildRank.Orichalcum && UnityEngine.Random.value < 0.8f) isBluffing = false;
             }
 
             long trueBudget = (long)Mathf.Round(marketPrice * trueBudgetMultiplier);

@@ -8,6 +8,16 @@ public enum RecipeUnlockState
     Unlocked = 2
 }
 
+public enum GuildRank
+{
+    Iron,       // 0 ~ 19
+    Bronze,     // 20 ~ 39
+    Silver,     // 40 ~ 69
+    Gold,       // 70 ~ 89
+    Mithril,    // 90 ~ 99
+    Orichalcum  // 100
+}
+
 public class PlayerDataManager : MonoBehaviour
 {
     public static PlayerDataManager Instance { get; private set; }
@@ -27,11 +37,31 @@ public class PlayerDataManager : MonoBehaviour
         get => _storeSatisfaction;
         set
         {
+            var oldRank = CurrentGuildRank;
             _storeSatisfaction = Mathf.Clamp(value, 0f, 100f);
             OnSatisfactionChanged?.Invoke(_storeSatisfaction);
+            var newRank = CurrentGuildRank;
+            if (oldRank != newRank)
+            {
+                OnGuildRankChanged?.Invoke(newRank);
+            }
         }
     }
     public event System.Action<float> OnSatisfactionChanged;
+
+    public GuildRank CurrentGuildRank
+    {
+        get
+        {
+            if (_storeSatisfaction >= 100f) return GuildRank.Orichalcum;
+            if (_storeSatisfaction >= 90f) return GuildRank.Mithril;
+            if (_storeSatisfaction >= 70f) return GuildRank.Gold;
+            if (_storeSatisfaction >= 40f) return GuildRank.Silver;
+            if (_storeSatisfaction >= 20f) return GuildRank.Bronze;
+            return GuildRank.Iron;
+        }
+    }
+    public event System.Action<GuildRank> OnGuildRankChanged;
 
     public void AdvanceDay()
     {
