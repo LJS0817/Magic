@@ -50,7 +50,12 @@ public class MarketItemSlotUI : MonoBehaviour
         }
 
         long price = 100;
-        if (MarketManager.Instance != null)
+        
+        if (_itemData is ItemQuestSO quest)
+        {
+            price = quest.rewardCopper;
+        }
+        else if (MarketManager.Instance != null)
         {
             price = MarketManager.Instance.GetItemPrice(_itemData);
         }

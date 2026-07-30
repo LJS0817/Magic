@@ -13,6 +13,7 @@ public class MarketManager : MonoBehaviour
         {
             Instance = this;
         }
+        GenerateDailyQuests(1);
     }
 
     private void Start()
@@ -21,8 +22,6 @@ public class MarketManager : MonoBehaviour
         {
             PlayerDataManager.Instance.OnDayChanged += GenerateDailyQuests;
         }
-        // 초기 생성
-        GenerateDailyQuests(1);
     }
 
     private void OnDestroy()

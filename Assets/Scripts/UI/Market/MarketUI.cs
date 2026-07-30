@@ -129,6 +129,7 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
         {
             if (item == null) continue;
 
+            Debug.Log(item);
             if (isAll)
             {
                 _filteredItems.Add(item);

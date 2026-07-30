@@ -73,10 +73,7 @@ public class MarketUIController : MonoBehaviour
                     break;
                 case MarketType.AdventurerGuild:
                     if (db.materials != null) items.AddRange(db.materials);
-                    if (MarketManager.Instance != null && MarketManager.Instance.activeQuests != null)
-                    {
-                        items.AddRange(MarketManager.Instance.activeQuests);
-                    }
+                    items.AddRange(MarketManager.Instance.activeQuests);
                     break;
             }
             market.Setup(items);

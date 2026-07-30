@@ -131,3 +131,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 199c7534616aa0b4dae917a01ee9647a, type: 2}
   - {fileID: 11400000, guid: 53e2a5bfe85fbf54ebbd694c7f52433b, type: 2}
   - {fileID: 11400000, guid: d8297fe2f1309124f86acb90b06330a0, type: 2}
+  questTemplates:
+  - {fileID: 11400000, guid: 017623888a4909f4ea4cf72877245796, type: 2}
+  - {fileID: 11400000, guid: cee71cd670ef49646940f65da793d706, type: 2}
+  - {fileID: 11400000, guid: 2adcaacb206afa04fb3d11995440fe64, type: 2}
+  - {fileID: 11400000, guid: 0d22bd3e52103ff49aa853f7b96b7e0d, type: 2}
+  - {fileID: 11400000, guid: dc353e8dd3ead9a45a9f4cf38144d445, type: 2}
+  - {fileID: 11400000, guid: 72aaa78ca3610ed45b977596bb377e83, type: 2}
+  - {fileID: 11400000, guid: 4adfa8d1b178bd84c8920853f282bbb9, type: 2}
+  - {fileID: 11400000, guid: 6c7a51597102728449670ea5014f79d0, type: 2}
+  - {fileID: 11400000, guid: 70b80ee99194bfb4ba848aa485217daa, type: 2}
+  - {fileID: 11400000, guid: 18e1cf01030c1e14a8e414a4257b6058, type: 2}
