@@ -44,7 +44,7 @@ public class TimeUIController : MonoBehaviour
     {
         if (dayText != null)
         {
-            dayText.text = $"Day {day}";
+            dayText.text = $"Day\n{day}";
         }
     }
 }
