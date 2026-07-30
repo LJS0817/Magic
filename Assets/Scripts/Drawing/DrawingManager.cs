@@ -12,6 +12,7 @@ public class DrawingManager : MonoBehaviour
 
     [Header("Resources (UI Only)")]
     public CustomSlider manaSlider;
+    public CustomSlider healthSlider;
 
     [Header("References")]
     public RectTransform drawingArea; // 스크롤 UI 영역
@@ -77,12 +78,23 @@ public class DrawingManager : MonoBehaviour
             PlayerDataManager.Instance.OnManaChanged += HandleManaChanged;
         }
 
+        if (healthSlider != null && PlayerDataManager.Instance != null)
+        {
+            healthSlider.SetValue(PlayerDataManager.Instance.currentHealth, PlayerDataManager.Instance.GetMaxHealth());
+            PlayerDataManager.Instance.OnHealthChanged += HandleHealthChanged;
+        }
+
         penController.OnResourceConsumed += HandleResourceConsumed;
     }
 
     private void HandleManaChanged(float currentMana, float maxMana)
     {
         if (manaSlider != null) manaSlider.SetValue(currentMana, maxMana);
+    }
+
+    private void HandleHealthChanged(float currentHealth, float maxHealth)
+    {
+        if (healthSlider != null) healthSlider.SetValue(currentHealth, maxHealth);
     }
 
     private void HandleResourceConsumed(PlayerDataManager pMan)
@@ -150,6 +162,7 @@ public class DrawingManager : MonoBehaviour
         if (PlayerDataManager.Instance != null)
         {
             PlayerDataManager.Instance.OnManaChanged -= HandleManaChanged;
+            PlayerDataManager.Instance.OnHealthChanged -= HandleHealthChanged;
         }
     }
 

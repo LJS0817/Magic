@@ -44,10 +44,7 @@ public class StoreManager : MonoBehaviour
             if (!PlayerDataManager.Instance.hasGeneratedInitialOrders)
             {
                 PlayerDataManager.Instance.hasGeneratedInitialOrders = true;
-                for (int i = 0; i < _poolingCount; i++)
-                {
-                    GenerateRandomOrder();
-                }
+                GenerateRandomOrders();
             }
             else
             {
@@ -109,32 +106,36 @@ public class StoreManager : MonoBehaviour
             }
         }
 
-        // 새롭게 10개의 주문 추가 + 랭크 보너스
-        int orderCount = _poolingCount;
-        if (PlayerDataManager.Instance != null)
-        {
-            switch (PlayerDataManager.Instance.CurrentGuildRank)
-            {
-                case GuildRank.Iron: orderCount -= 5; break;
-                case GuildRank.Bronze: orderCount -= 4; break;
-                case GuildRank.Silver: orderCount -= 3; break;
-                case GuildRank.Gold: orderCount -= 2; break;
-                case GuildRank.Mithril: orderCount -= 1; break;
-            }
-        }
+    }
+
+    public void GenerateRandomOrders()
+    {
+        int orderCount = PlayerDataManager.Instance.GetOrderCount(_poolingCount);
 
         for (int i = 0; i < orderCount; i++)
         {
-            GenerateRandomOrder();
+            GenerateOrder();
         }
     }
 
-    public void GenerateRandomOrder()
+    public void GenerateOrder()
     {
         var db = DrawingDatabase.Instance;
         if (db != null && db.recipes != null && db.recipes.Length > 0)
         {
-            var randomRecipe = db.recipes[UnityEngine.Random.Range(0, db.recipes.Length)];
+            List<SpellRecipeAsset> availableRecipes = null;
+            if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.unlockedRecipeObjects.Count > 0)
+            {
+                availableRecipes = PlayerDataManager.Instance.unlockedRecipeObjects;
+            }
+
+            // 만약 해금된 마법이 전혀 없다면, 임시로 전체 레시피 중 하나를 선택하도록 폴백 처리
+            if (availableRecipes == null || availableRecipes.Count == 0)
+            {
+                availableRecipes = new List<SpellRecipeAsset>(db.recipes);
+            }
+
+            var randomRecipe = availableRecipes[UnityEngine.Random.Range(0, availableRecipes.Count)];
             
             // Element generation based on Max Mana
             SpellElement reqElement = SpellElement.None;
@@ -231,11 +232,26 @@ public class StoreManager : MonoBehaviour
             
             switch(faction)
             {
-                case CustomerFaction.Peasant: trueBudgetMultiplier = UnityEngine.Random.Range(0.8f, 1.1f); isBluffing = UnityEngine.Random.value < 0.2f; break;
-                case CustomerFaction.Mercenary: trueBudgetMultiplier = UnityEngine.Random.Range(0.9f, 1.3f); isBluffing = UnityEngine.Random.value < 0.8f; break; // 거짓말쟁이
-                case CustomerFaction.Noble: trueBudgetMultiplier = UnityEngine.Random.Range(1.5f, 3.0f); isBluffing = UnityEngine.Random.value < 0.4f; break;
-                case CustomerFaction.MageGuild: trueBudgetMultiplier = UnityEngine.Random.Range(1.2f, 2.0f); isBluffing = UnityEngine.Random.value < 0.1f; break; // 거의 거짓말 안함
-                case CustomerFaction.Cultist: trueBudgetMultiplier = UnityEngine.Random.Range(1.0f, 1.5f); isBluffing = UnityEngine.Random.value < 0.5f; break;
+                case CustomerFaction.Peasant: 
+                    trueBudgetMultiplier = UnityEngine.Random.Range(0.7f, 0.9f); 
+                    isBluffing = UnityEngine.Random.value < 0.2f; 
+                    break;
+                case CustomerFaction.Mercenary: 
+                    trueBudgetMultiplier = UnityEngine.Random.Range(0.8f, 1.0f); 
+                    isBluffing = UnityEngine.Random.value < 0.6f; // 용병은 자주 후려침
+                    break;
+                case CustomerFaction.Noble: 
+                    trueBudgetMultiplier = 1.0f; // 귀족은 정가 선호
+                    isBluffing = UnityEngine.Random.value < 0.1f; 
+                    break;
+                case CustomerFaction.MageGuild: 
+                    trueBudgetMultiplier = 1.0f; // 마법사 길드는 시장가를 정확히 앎
+                    isBluffing = false; 
+                    break;
+                case CustomerFaction.Cultist: 
+                    trueBudgetMultiplier = UnityEngine.Random.Range(0.9f, 1.0f); 
+                    isBluffing = UnityEngine.Random.value < 0.3f; 
+                    break;
             }
 
             // Reduce bluff chance based on high rank
@@ -251,14 +267,14 @@ public class StoreManager : MonoBehaviour
 
             if (isBluffing)
             {
-                // 거짓말을 하면 진짜 예산보다 낮게 부름 (30% ~ 70% 수준)
-                claimedBudget = (long)Mathf.Round(trueBudget * UnityEngine.Random.Range(0.3f, 0.7f));
+                // 거짓말을 하면 진짜 예산보다 낮게 부름 (50% ~ 80% 수준)
+                claimedBudget = (long)Mathf.Round(trueBudget * UnityEngine.Random.Range(0.5f, 0.8f));
             }
 
             var order = new CustomerOrder(desc, randomRecipe.SpellName, reqElement, marketPrice, trueBudget, claimedBudget, isBluffing, faction);
             activeOrders.Add(order.orderID, order);
             
-            order.chatHistory.Add($"[{faction}] {desc} (예산: 약 {CurrencyManager.FormatCurrency(claimedBudget)} 생각합니다.)");
+            order.chatHistory.Add($"[{faction}] {desc} (제시 가격: {CurrencyManager.FormatCurrency(claimedBudget)})");
 
             Debug.Log($"<color=cyan>[Store] 새 주문 도착! ID:{order.orderID} {elementText} {randomRecipe.SpellName} (Market: {marketPrice}, TrueBudget: {trueBudget}, Claimed: {claimedBudget}, Bluff: {isBluffing})</color>");
             
@@ -344,31 +360,9 @@ public class StoreManager : MonoBehaviour
                 return false;
             }
 
-            // A. 초과 달성 및 B. 부분 성공 판정
-            bool isOverachievement = scroll.ScrollData.accuracyScore >= 1.2f; 
-            bool isPartialSuccess = scroll.ScrollData.accuracyScore < 1.0f;
-
+            // 맞게 판매하기만 하면 제값(agreedPrice)을 줌
             long finalPayment = order.agreedPrice;
-
-            if (isOverachievement)
-            {
-                long maxTip = order.trueBudget - order.agreedPrice;
-                long actualTip = (long)Mathf.Round(order.agreedPrice * 0.2f); // 20% 팁
-                if (actualTip > maxTip) actualTip = maxTip;
-                
-                finalPayment += actualTip;
-                order.chatHistory.Add($"손님: 기대 이상의 퀄리티군요! 팁을 {CurrencyManager.FormatCurrency(actualTip)} 더 얹어 드리겠습니다.");
-            }
-            else if (isPartialSuccess)
-            {
-                long discount = (long)Mathf.Round(order.agreedPrice * 0.3f); // 30% 강제 할인
-                finalPayment -= discount;
-                order.chatHistory.Add($"손님: 품질이 생각보다 별로네요. {CurrencyManager.FormatCurrency(discount)}만큼은 빼고 드리겠습니다.");
-            }
-            else
-            {
-                order.chatHistory.Add($"손님: 거래 감사합니다.");
-            }
+            order.chatHistory.Add($"손님: 주문한 마법이 맞군요. 거래 감사합니다.");
 
             InventoryManager.Instance.RemoveItem(item);
             CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, finalPayment);
@@ -384,7 +378,6 @@ public class StoreManager : MonoBehaviour
             }
 
             Debug.Log($"<color=green>[Store] 거래 성사! 최종 입금액: {finalPayment} 동화</color>");
-            GenerateRandomOrder(); // 새로운 주문 보충
             return true;
         }
         

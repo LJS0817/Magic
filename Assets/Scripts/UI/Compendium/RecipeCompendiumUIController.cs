@@ -36,6 +36,8 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     {
         _detailPanelRect = detailPanel.GetComponent<RectTransform>();
         Close(true);
+        PlayerDataManager.Instance.UnlockRecipe("Orb");
+
         _detailPanelRect.anchoredPosition = new Vector2(_detailPanelRect.anchoredPosition.x, 200f);
     }
 
@@ -49,19 +51,10 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
 
     public override void RefreshList()
     {
-        var database = DrawingDatabase.Instance;
-        if (database == null || database.recipes == null) return;
-
         _visibleRecipes.Clear();
-        foreach (var recipe in database.recipes)
+        if (PlayerDataManager.Instance != null)
         {
-            PlayerDataManager.Instance.UnlockRecipe(recipe.SpellName);
-            RecipeUnlockState state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
-            Debug.Log(recipe.SpellName + "     " + state);
-            if (state != RecipeUnlockState.Locked)
-            {
-                _visibleRecipes.Add(recipe);
-            }
+            _visibleRecipes.AddRange(PlayerDataManager.Instance.visibleRecipeObjects);
         }
 
         base.RefreshList();

@@ -159,6 +159,16 @@ public class InventoryManager : MonoBehaviour
     public void InitInstance()
     {
         Instance = this;
+
+        if (items.Count == 0 && itemDatabase != null)
+        {
+            if (itemDatabase.pens.Count > 0) AddItem(new Item_Pen(itemDatabase.pens[0]));
+            if (itemDatabase.inks.Count > 0) AddItem(new Item_Ink(itemDatabase.inks[0]));
+            if (itemDatabase.scrolls.Count > 0) AddItem(new Item_Scroll(itemDatabase.scrolls[0]));
+            if (itemDatabase.wands.Count > 0) AddItem(new Item_Wand(itemDatabase.wands[0]));
+            
+            Debug.Log("[InventoryManager] 빈 인벤토리 감지: 기본 아이템(펜, 잉크, 양피지, 지팡이)을 지급했습니다.");
+        }
     }
 
     public int baseCombatLoadoutCapacity = 5;

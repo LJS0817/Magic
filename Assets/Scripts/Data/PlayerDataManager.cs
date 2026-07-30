@@ -26,12 +26,12 @@ public class PlayerDataManager : MonoBehaviour
     public Dictionary<string, CustomerOrder> activeOrders = new Dictionary<string, CustomerOrder>();
     public bool hasGeneratedInitialOrders = false;
 
-    [Header("Time and Store Management")]
+    [Header("Time and Store Management")]   
     public int currentDay = 1;
     public event System.Action<int> OnDayChanged;
 
     [SerializeField, Range(0f, 100f)] 
-    private float _storeSatisfaction = 100f;
+    private float _storeSatisfaction = 0f;
     public float StoreSatisfaction
     {
         get => _storeSatisfaction;
@@ -78,36 +78,74 @@ public class PlayerDataManager : MonoBehaviour
 
     [Header("Recipe Compendium")]
     public Dictionary<string, RecipeUnlockState> unlockedRecipes = new Dictionary<string, RecipeUnlockState>();
+    
+    [Header("Recipe Objects Cache")]
+    public List<SpellRecipeAsset> unlockedRecipeObjects = new List<SpellRecipeAsset>();
+    public List<SpellRecipeAsset> visibleRecipeObjects = new List<SpellRecipeAsset>();
+
+    public void RebuildRecipeCache()
+    {
+        unlockedRecipeObjects.Clear();
+        visibleRecipeObjects.Clear();
+
+        var db = DrawingDatabase.Instance;
+        if (db != null && db.recipes != null)
+        {
+            foreach (var recipe in db.recipes)
+            {
+                RecipeUnlockState state = GetRecipeState(recipe.SpellName);
+                if (state == RecipeUnlockState.Unlocked)
+                {
+                    unlockedRecipeObjects.Add(recipe);
+                    visibleRecipeObjects.Add(recipe);
+                }
+                else if (state == RecipeUnlockState.Hinted)
+                {
+                    visibleRecipeObjects.Add(recipe);
+                }
+            }
+        }
+    }
 
     public void UnlockRecipe(string spellName)
     {
+        bool changed = false;
         if (unlockedRecipes.ContainsKey(spellName))
         {
             if (unlockedRecipes[spellName] != RecipeUnlockState.Unlocked)
             {
                 unlockedRecipes[spellName] = RecipeUnlockState.Unlocked;
+                changed = true;
                 Debug.Log($"[도감] '{spellName}' 레시피가 완전히 해금되었습니다!");
             }
         }
         else
         {
             unlockedRecipes.Add(spellName, RecipeUnlockState.Unlocked);
+            changed = true;
             Debug.Log($"[도감] '{spellName}' 레시피가 도감에 새롭게 등록되었습니다!");
         }
+
+        if (changed) RebuildRecipeCache();
     }
 
     public void UnlockHint(string spellName)
     {
+        bool changed = false;
         if (!unlockedRecipes.ContainsKey(spellName))
         {
             unlockedRecipes.Add(spellName, RecipeUnlockState.Hinted);
+            changed = true;
             Debug.Log($"[도감] '{spellName}' 레시피의 힌트를 얻었습니다!");
         }
         else if (unlockedRecipes[spellName] == RecipeUnlockState.Locked)
         {
             unlockedRecipes[spellName] = RecipeUnlockState.Hinted;
+            changed = true;
             Debug.Log($"[도감] '{spellName}' 레시피의 힌트를 얻었습니다!");
         }
+        
+        if (changed) RebuildRecipeCache();
     }
 
     public RecipeUnlockState GetRecipeState(string spellName)
@@ -198,15 +236,22 @@ public class PlayerDataManager : MonoBehaviour
     public Item_DrawingTool equippedDrawingTool;
 
     public event System.Action<float, float> OnManaChanged;
+    public event System.Action<float, float> OnHealthChanged;
 
     public void NotifyManaChanged()
     {
         OnManaChanged?.Invoke(currentMana, GetMaxMana());
     }
 
+    public void NotifyHealthChanged()
+    {
+        OnHealthChanged?.Invoke(currentHealth, GetMaxHealth());
+    }
+
     public void InitInstance()
     {
         Instance = this;
+        RebuildRecipeCache();
     }
 
     public bool IsInit => Instance != null;
@@ -216,6 +261,7 @@ public class PlayerDataManager : MonoBehaviour
         if (UpgradeManager.Instance != null)
         {
             UpgradeManager.Instance.OnUpgradeUnlocked += NotifyManaChanged;
+            UpgradeManager.Instance.OnUpgradeUnlocked += NotifyHealthChanged;
         }
     }
 
@@ -224,6 +270,7 @@ public class PlayerDataManager : MonoBehaviour
         if (UpgradeManager.Instance != null)
         {
             UpgradeManager.Instance.OnUpgradeUnlocked -= NotifyManaChanged;
+            UpgradeManager.Instance.OnUpgradeUnlocked -= NotifyHealthChanged;
         }
     }
 
@@ -237,6 +284,7 @@ public class PlayerDataManager : MonoBehaviour
         if (hpRegen > 0f && currentHealth < GetMaxHealth())
         {
             currentHealth = Mathf.Min(GetMaxHealth(), currentHealth + hpRegen * Time.deltaTime);
+            NotifyHealthChanged();
         }
 
         if (mpRegen > 0f && currentMana < GetMaxMana())
@@ -258,6 +306,19 @@ public class PlayerDataManager : MonoBehaviour
                     Debug.Log($"<color=gray>[물약] {key} 속성 내성 효과가 종료되었습니다.</color>");
                 }
             }
+        }
+    }
+
+    public int GetOrderCount(int poolCount)
+    {
+        switch (CurrentGuildRank)
+        {
+            case GuildRank.Iron: return poolCount - 5;
+            case GuildRank.Bronze: return poolCount - 4;
+            case GuildRank.Silver: return poolCount - 3;
+            case GuildRank.Gold: return poolCount - 2;
+            case GuildRank.Mithril: return poolCount - 1;
+            default: return poolCount;
         }
     }
 }
