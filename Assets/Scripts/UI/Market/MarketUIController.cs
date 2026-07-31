@@ -90,7 +90,6 @@ public class MarketUIController : MonoBehaviour
         _marketIndex = index;
 
         _markets[_marketIndex].Show(goLeft);
-        _markets[_marketIndex].RefreshList();
     }
 
     public void NextMarket()

@@ -63,6 +63,11 @@ public class CombatDrawingManager : DrawingManager
         }
     }
 
+    protected override bool RequiresScrollToDraw()
+    {
+        return false;
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -86,11 +91,6 @@ public class CombatDrawingManager : DrawingManager
     public void CastSpellFromScroll(Item_Scroll scroll)
     {
         if (scroll == null || scroll.isEmpty || scroll.ScrollData == null) return;
-        
-        if (InventoryManager.Instance != null)
-        {
-            InventoryManager.Instance.EquippedScroll = scroll;
-        }
         
         _isCastingFromScroll = true;
         _castingScroll = scroll;

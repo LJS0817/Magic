@@ -29,6 +29,8 @@ public class PreparationInventoryUI : PagedUIController<InventorySlot>
             InventoryManager.Instance.OnInventoryChanged += RefreshList;
             InventoryManager.Instance.OnLoadoutChanged += RefreshList; // 로드아웃 변경 시 선택 표시 동기화
         }
+
+        RefreshList();
     }
 
     private void OnDestroy()
@@ -43,7 +45,6 @@ public class PreparationInventoryUI : PagedUIController<InventorySlot>
     protected override void OnEnable()
     {
         base.OnEnable();
-        RefreshList();
     }
 
     public override void RefreshList()

@@ -12,7 +12,7 @@ public class WindowController : MonoBehaviour
 
     [SerializeField] UpgradeUIController _upgrade;
     [SerializeField] CanvasGroup _menu;
-    [SerializeField] CanvasGroup _order;
+    //[SerializeField] CanvasGroup _order;
     [SerializeField] RectTransform _frame;
 
     [SerializeField] MapUIController _map;
@@ -36,10 +36,11 @@ public class WindowController : MonoBehaviour
 
     void Update()
     {
-        if (_order == null) return;
-        if (_order.interactable && Input.GetKeyDown(KeyCode.A))
+        if (_recipe != null)
         {
-            ToggleStoreUI();
+            if ((_store.IsOpened || !RecipeDeveloper.IsDrawingBlocked) && Input.GetKeyDown(KeyCode.A)) ToggleStoreUI();
+            if (!RecipeDeveloper.IsDrawingBlocked && Input.GetKeyDown(KeyCode.D)) OpenUpgrade();
+            if ((_recipe.IsOpened || !RecipeDeveloper.IsDrawingBlocked) && Input.GetKeyDown(KeyCode.W)) ToggleRecipeUI();
         }
     }
     
@@ -75,6 +76,8 @@ public class WindowController : MonoBehaviour
         _store.ToggleUI();
         if (_store.IsOpened) HideDrawingArea();
         else ShowDrawingArea();
+        _recipe.Close(false, _store.IsOpened);
+        _upgrade.SetVisibleArrow(!_store.IsOpened);
     }
 
     public void ToggleRecipeUI()
@@ -87,9 +90,10 @@ public class WindowController : MonoBehaviour
 
         _inventory.DOKill();
         _inventory.DOFade(_recipe.IsOpened ? 0f : 1f, _animDuration);
-        RecipeDeveloper.IsDrawingBlocked = true;
+        _inventory.blocksRaycasts = !_recipe.IsOpened;
+        _inventory.interactable = !_recipe.IsOpened;
         if (_store.IsOpened) ToggleStoreUI();
-        SetStoreVisibie(!_recipe.IsOpened);
+        _store.SetVisibleArrow(!_recipe.IsOpened);
         _upgrade.SetVisibleArrow(!_recipe.IsOpened);
         //_drawing.blocksRaycasts = !_recipe.IsOpened;
         //_drawing.interactable = !_recipe.IsOpened;
@@ -107,6 +111,7 @@ public class WindowController : MonoBehaviour
         SetMenuVisible(false);
         _recipe.Close(false, true);
         _upgrade.SetVisibleArrow(false);
+        _store.SetVisibleArrow(false);
         HideDrawingArea();
     }
 
@@ -122,6 +127,7 @@ public class WindowController : MonoBehaviour
         SetMenuVisible(true);
         _recipe.Close(false, false);
         _upgrade.SetVisibleArrow(true);
+        _store.SetVisibleArrow(true);
         ShowDrawingArea();
     }
 
@@ -132,17 +138,6 @@ public class WindowController : MonoBehaviour
         _menu.DOFade(show ? 1f : 0f, _animDuration);
         _menu.blocksRaycasts = show;
         _menu.interactable = show;
-        SetStoreVisibie(show);
-    }
-
-    void SetStoreVisibie(bool show)
-    {
-        if (_order == null || _order.interactable == show) return;
-
-        _order.DOKill();
-        _order.DOFade(show ? 1f : 0f, _animDuration);
-        _order.blocksRaycasts = show;
-        _order.interactable = show;
     }
 
     public void OpenUpgrade()

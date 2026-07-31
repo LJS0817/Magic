@@ -1038,7 +1038,6 @@ MonoBehaviour:
   _store: {fileID: 0}
   _upgrade: {fileID: 0}
   _menu: {fileID: 5898570794194683056}
-  _order: {fileID: 0}
   _frame: {fileID: 4579092293547031235}
   _map: {fileID: 7957653085771824361}
   _animDuration: 0.3
@@ -4262,7 +4261,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 899881752865385389, guid: 0a643aa696258df419bb580c91a9f4c4, type: 3}
       propertyPath: _sceneName
-      value: 
+      value: CombatGameScene
       objectReference: {fileID: 0}
     - target: {fileID: 899881752865385389, guid: 0a643aa696258df419bb580c91a9f4c4, type: 3}
       propertyPath: _onClickEvent.m_PersistentCalls.m_Calls.Array.size
@@ -4275,7 +4274,7 @@ PrefabInstance:
     - target: {fileID: 899881752865385389, guid: 0a643aa696258df419bb580c91a9f4c4, type: 3}
       propertyPath: _onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 3881377138813015224}
     - target: {fileID: 899881752865385389, guid: 0a643aa696258df419bb580c91a9f4c4, type: 3}
       propertyPath: _onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2

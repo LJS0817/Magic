@@ -162,11 +162,17 @@ public class PenController : MonoBehaviour
     /// </summary>
     public void TrackMouse(Camera mainCamera)
     {
-        if (CurrentTool == null) return;
+        if (CurrentTool == null) 
+        {
+            return;
+        }
         
         if (CurrentTool is Item_Pen)
         {
-            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null) return;
+            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null) 
+            {
+                return;
+            }
         }
         
         penVisual.position = GetMouseWorldPosition(mainCamera);

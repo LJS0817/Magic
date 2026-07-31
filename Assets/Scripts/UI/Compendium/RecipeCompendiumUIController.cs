@@ -9,6 +9,8 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     [SerializeField] ItemInfoPanel itemInfoPanel;
     [SerializeField] CanvasGroup recipeListGroup;
     [SerializeField] Image _arrowImage;
+    [SerializeField] CanvasGroup _recipeDefault;
+    [SerializeField] CanvasGroup _recipeInfo;
     [Header("Detail Panel")]
     public CanvasGroup detailPanel;
     RectTransform _detailPanelRect;
@@ -21,7 +23,6 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
     public TMP_Text detailConditionText;
     public TMP_Text detailHintText;
     public TMP_Text detailShapesText;
-
 
     [Tooltip("Ease.OutBack provides a single bounce (overshoot) effect.")]
     [SerializeField] private float animationDuration = 0.2f;
@@ -39,6 +40,20 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
         PlayerDataManager.Instance.UnlockRecipe("Orb");
 
         _detailPanelRect.anchoredPosition = new Vector2(_detailPanelRect.anchoredPosition.x, 200f);
+        
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnRecipeUpdated += RefreshList;
+        }
+        RefreshList();
+    }
+
+    private void OnDestroy()
+    {
+        if (PlayerDataManager.Instance != null)
+        {
+            PlayerDataManager.Instance.OnRecipeUpdated -= RefreshList;
+        }
     }
 
     protected override void OnEnable()
@@ -96,6 +111,12 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
 
     public void SelectRecipe(RecipeEntryUI slot, SpellRecipeAsset recipe, RecipeUnlockState state)
     {
+        if (_recipeDefault.alpha == 1f)
+        {
+            _recipeDefault.alpha = 0f;
+            _recipeInfo.alpha = 1f;
+        }
+
         if (currentSelectedSlot != null)
             currentSelectedSlot.SetSelected(false);
 
@@ -140,6 +161,10 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
             
             if (detailIcon != null) detailIcon.color = Color.black;
         }
+
+        if (detailConditionText != null) LayoutRebuilder.ForceRebuildLayoutImmediate(detailConditionText.rectTransform);
+        if (detailHintText != null) LayoutRebuilder.ForceRebuildLayoutImmediate(detailHintText.rectTransform);
+        if (detailShapesText != null) LayoutRebuilder.ForceRebuildLayoutImmediate(detailShapesText.rectTransform);
     }
 
     public void Close(bool forceClose = false, bool hideArrow = false)
@@ -194,7 +219,8 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
         DrawingManager.IsDrawingBlocked = true;
         isOpened = true;
 
-        RefreshList();
+        _recipeDefault.alpha = 1f;
+        _recipeInfo.alpha = 0f;
     }
 
     public void ToggleWindow()

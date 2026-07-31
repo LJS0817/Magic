@@ -83,6 +83,8 @@ public class PlayerDataManager : MonoBehaviour
     public List<SpellRecipeAsset> unlockedRecipeObjects = new List<SpellRecipeAsset>();
     public List<SpellRecipeAsset> visibleRecipeObjects = new List<SpellRecipeAsset>();
 
+    public event System.Action OnRecipeUpdated;
+
     public void RebuildRecipeCache()
     {
         unlockedRecipeObjects.Clear();
@@ -105,6 +107,8 @@ public class PlayerDataManager : MonoBehaviour
                 }
             }
         }
+
+        OnRecipeUpdated?.Invoke();
     }
 
     public void UnlockRecipe(string spellName)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
 public class OrderContainerUI : MonoBehaviour
@@ -9,6 +10,7 @@ public class OrderContainerUI : MonoBehaviour
     [SerializeField] private float animationDuration = 0.4f;
     [SerializeField] GameObject clickBlock;
     [SerializeField] RectTransform arrowImage;
+    Image arrow;
     [Tooltip("Ease.OutBack provides a single bounce (overshoot) effect.")]
     [SerializeField] private Ease openEase = Ease.OutBack;
     [SerializeField] private float bounceOvershoot = 1.5f; // Control the strength of the 1-time bounce
@@ -20,6 +22,7 @@ public class OrderContainerUI : MonoBehaviour
 
     private void Awake()
     {
+        arrow = arrowImage.GetComponent<Image>();
         _rectTransform = GetComponent<RectTransform>();
         _closedPosition = _rectTransform.anchoredPosition;
         openPosition = _closedPosition + openPosition; // Adjust open position relative to closed position
@@ -49,6 +52,12 @@ public class OrderContainerUI : MonoBehaviour
 
         arrowImage.DOKill();
         arrowImage.DOScaleX(-1f, animationDuration).SetEase(closeEase);
+    }
+
+    public void SetVisibleArrow(bool visible)
+    {
+        arrow.DOKill();
+        arrow.DOFade(visible ? 1f : 0f, 0.2f);
     }
 }
 

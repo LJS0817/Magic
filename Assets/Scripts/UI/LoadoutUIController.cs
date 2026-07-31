@@ -108,10 +108,17 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
         var inv = InventoryManager.Instance;
-        if (slot.Item is Item_Scroll scroll) 
+        if (slot.Item is Item_Scroll scroll && !scroll.isEmpty && scroll.ScrollData != null) 
         {
-            if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
-            else inv.EquippedScroll = scroll;
+            var combatManager = FindAnyObjectByType<CombatManager>();
+            if (combatManager != null && combatManager.CurrentState != CombatState.BattleEnd)
+            {
+                var drawingManager = FindAnyObjectByType<CombatDrawingManager>();
+                if (drawingManager != null)
+                {
+                    drawingManager.CastSpellFromScroll(scroll);
+                }
+            }
         }
         else if (slot.Item is Item_Ink ink)
         {

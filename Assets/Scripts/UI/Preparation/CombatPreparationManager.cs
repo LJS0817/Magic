@@ -13,13 +13,11 @@ public class CombatPreparationManager : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button _startCombatButton;
     [SerializeField] private Button _clearAllButton;
-    [SerializeField] private Button _cancelButton;
 
     private void Start()
     {
         if (_startCombatButton != null) _startCombatButton.onClick.AddListener(StartCombat);
         if (_clearAllButton != null) _clearAllButton.onClick.AddListener(ClearLoadout);
-        if (_cancelButton != null) _cancelButton.onClick.AddListener(Close);
         
         Close();
     }
@@ -29,8 +27,6 @@ public class CombatPreparationManager : MonoBehaviour
         _window.alpha = 1;
         _window.blocksRaycasts = true;
         _window.interactable = true;
-        _inventoryUI.RefreshList();
-        _loadoutUI.RefreshList();
     }
 
     public void Close()

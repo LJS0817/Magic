@@ -39,6 +39,7 @@ public class DrawingManager : MonoBehaviour
     protected virtual void Awake()
     {
         ShapeRecognizer.EnsureInitialized();
+        IsDrawingBlocked = false;
     }
 
     protected virtual void Start()
@@ -54,6 +55,10 @@ public class DrawingManager : MonoBehaviour
             penController.GoToInkBottle(inkController.inkBottleVisual, null, () => {
                 isPenReady = true;
             }, instant: true);
+        }
+        else
+        {
+            isPenReady = true;
         }
         isOutsideArea = true;
 
@@ -171,6 +176,11 @@ public class DrawingManager : MonoBehaviour
         HandleDrawingInput();
     }
 
+    protected virtual bool RequiresScrollToDraw()
+    {
+        return true;
+    }
+
     protected virtual void HandleDrawingInput()
     {
         if (IsDrawingBlocked)
@@ -179,7 +189,7 @@ public class DrawingManager : MonoBehaviour
             return;
         }
 
-        if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
+        if (RequiresScrollToDraw() && InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == null)
         {
             if (isDrawing) EndStroke();
             return;

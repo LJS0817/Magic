@@ -14,7 +14,7 @@ public class DefaultSpellGenerator
             AssetDatabase.CreateFolder("Assets/Resources", "SpellRecipes");
 
         // --- [1~11: 기존 도형 스펠] ---
-        CreateSpell(folderPath, "1_Orb", "Orb", SpellType.Attack, 50f,
+        CreateSpell(folderPath, "1_Orb", "Orb", SpellType.Attack, 25f,
             "가장 기초적인 마법 구체. 대기의 마나를 응축하여 적에게 날려보냅니다.",
             "원 1개", "둥근 구체를 형상화하여 단순한 원을 그리세요.",
             new string[] { "Circle" },

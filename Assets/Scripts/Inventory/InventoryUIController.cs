@@ -73,7 +73,6 @@ public class InventoryUIController : PagedUIController<InventorySlot>
     protected override void OnEnable()
     {
         // UI 창이 켜질 때마다 제일 첫 페이지로 가고 싶다면 _currentPage = 0; 추가 가능
-        RefreshList();
     }
 
     public override void RefreshList()

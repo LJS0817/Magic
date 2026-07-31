@@ -26,7 +26,8 @@ public abstract class PagedUIController<TSlot> : MonoBehaviour where TSlot : Mon
 
     protected virtual void OnEnable()
     {
-        RefreshList();
+        // UI 창이 켜질 때마다 강제로 전체 목록을 갱신하지 않고, 
+        // 데이터가 변경되었을 때 이벤트(event)를 통해서만 갱신하도록 구조 변경
     }
 
     public virtual void RefreshList()

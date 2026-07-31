@@ -30,6 +30,8 @@ public class PreparationLoadoutUI : PagedUIController<InventorySlot>
         {
             InventoryManager.Instance.OnLoadoutChanged += RefreshList;
         }
+
+        RefreshList();
     }
 
     private void OnDestroy()
@@ -43,7 +45,6 @@ public class PreparationLoadoutUI : PagedUIController<InventorySlot>
     protected override void OnEnable()
     {
         base.OnEnable();
-        RefreshList();
     }
 
     public override void RefreshList()

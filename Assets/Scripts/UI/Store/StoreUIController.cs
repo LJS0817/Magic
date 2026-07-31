@@ -122,9 +122,6 @@ public class StoreUIController : MonoBehaviour
     public void Open()
     {
         orderContainer.Open();
-
-        if (StoreManager.Instance != null) StoreManager.Instance.IsOrderContainerOpen = true;
-        if (InventoryManager.Instance != null) InventoryManager.Instance.NotifyInventoryChanged();
     }
 
     public void Close()
@@ -132,12 +129,12 @@ public class StoreUIController : MonoBehaviour
         chatUI.CloseChat();
         orderContainer.Close();
 
-        if (StoreManager.Instance != null)
-        {
-            StoreManager.Instance.IsOrderContainerOpen = false;
-            StoreManager.Instance.SelectedOrderItem = null;
-        }
-        if (InventoryManager.Instance != null) InventoryManager.Instance.NotifyInventoryChanged();
+        StoreManager.Instance.SelectedOrderItem = null;
+    }
+
+    public void SetVisibleArrow(bool visible)
+    {
+        orderContainer.SetVisibleArrow(visible);
     }
 
     public bool SelectItem(ItemInstance item)
