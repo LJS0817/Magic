@@ -13,7 +13,6 @@ public class ItemDatabase : ScriptableObject
     public List<ItemPouchSO> pouches = new List<ItemPouchSO>();
     public List<ItemRobeSO> robes = new List<ItemRobeSO>();
     public List<ItemCloakSO> cloaks = new List<ItemCloakSO>();
-    public List<ItemDrawingToolSO> drawingTools = new List<ItemDrawingToolSO>();
     public List<ItemMaterialSO> materials = new List<ItemMaterialSO>();
     public List<ItemQuestSO> questTemplates = new List<ItemQuestSO>(); // 동적 생성을 위한 템플릿
 
@@ -23,7 +22,7 @@ public class ItemDatabase : ScriptableObject
 
     public void InitializeCache()
     {
-        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count + robes.Count + cloaks.Count + drawingTools.Count + materials.Count)) return;
+        if (_itemCache != null && _itemCache.Count == (pens.Count + inks.Count + scrolls.Count + wands.Count + potions.Count + pouches.Count + robes.Count + cloaks.Count + materials.Count)) return;
 
         _itemCache = new Dictionary<string, ItemDataSO>();
         _penGradeCache = new Dictionary<ItemRarity, List<ItemPenSO>>();
@@ -80,12 +79,6 @@ public class ItemDatabase : ScriptableObject
         {
             if (cloak != null && !_itemCache.ContainsKey(cloak.itemName))
                 _itemCache.Add(cloak.itemName, cloak);
-        }
-
-        foreach (var tool in drawingTools)
-        {
-            if (tool != null && !_itemCache.ContainsKey(tool.itemName))
-                _itemCache.Add(tool.itemName, tool);
         }
 
         foreach (var material in materials)
@@ -157,12 +150,6 @@ public class ItemDatabase : ScriptableObject
     {
         var cloakData = GetItemData<ItemCloakSO>(itemName);
         return cloakData != null ? new Item_Cloak(cloakData) : null;
-    }
-
-    public Item_DrawingTool CreateDrawingToolInstance(string itemName)
-    {
-        var toolData = GetItemData<ItemDrawingToolSO>(itemName);
-        return toolData != null ? new Item_DrawingTool(toolData) : null;
     }
 
     public Item_Material CreateMaterialInstance(string itemName)

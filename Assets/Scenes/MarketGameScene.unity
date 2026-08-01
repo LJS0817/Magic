@@ -617,15 +617,15 @@ PrefabInstance:
       objectReference: {fileID: 6003995176444088795, guid: 76dfa3d422254a545b3492af5af01c65, type: 3}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: _filterNames.Array.size
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: _filterTypes.Array.size
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: _filterElements.Array.size
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterNames.Array.data[0]'
@@ -645,11 +645,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterNames.Array.data[4]'
-      value: "\uB3C4\uAD6C"
+      value: "\uB808\uC2DC\uD53C"
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterNames.Array.data[5]'
-      value: "\uB808\uC2DC"
+      value: "\uB3C4\uAD6C"
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterTypes.Array.data[2]'
@@ -661,11 +661,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterTypes.Array.data[4]'
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5846773551188442621, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: '_filterTypes.Array.data[5]'
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6304804566249716659, guid: 27a0c53fe9c40fb4998a3ea0dee882c2, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2783,6 +2783,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09aa3a5164d1aec44bd6e23cbcc22125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MarketManager
+  activeQuests: []
 --- !u!4 &2081560494
 Transform:
   m_ObjectHideFlags: 0

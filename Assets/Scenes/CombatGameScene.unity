@@ -1576,6 +1576,7 @@ GameObject:
   - component: {fileID: 1512672475}
   - component: {fileID: 1512672473}
   - component: {fileID: 1512672476}
+  - component: {fileID: 1512672477}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1592,9 +1593,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1512672472}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eae2c9288000668408212330f857a5f0, type: 3}
+  m_Script: {fileID: 11500000, guid: aabbdf5fe6bf20447bbd59b3079862bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.PlayerController
+  initialAP: 25
+  currentAP: 0
+  currentPos: {x: 0, y: 0}
+  mapGenerator: {fileID: 1512672477}
+  hexBoardParent: {fileID: 0}
+  apCostReductionBuffTurns: 0
 --- !u!4 &1512672475
 Transform:
   m_ObjectHideFlags: 0
@@ -1636,6 +1643,21 @@ MonoBehaviour:
   _emptySlotIcon: {fileID: 21300000, guid: 9d00330b185ce8b4dad76ddc2aa4bcfc, type: 3}
   _infoPanel: {fileID: 1866847228}
   _inventoryPanel: {fileID: 955633922}
+--- !u!114 &1512672477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512672472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79b88e0cdabac8f44bd9b7ddd2d7e6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonMapGenerator
+  hexTilePrefab: {fileID: 0}
+  radius: 3
+  hexSize: 1
 --- !u!1 &1666065029
 GameObject:
   m_ObjectHideFlags: 0

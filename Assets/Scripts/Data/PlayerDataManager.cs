@@ -227,7 +227,6 @@ public class PlayerDataManager : MonoBehaviour
     public Item_Pouch equippedPouch;
     public Item_Robe equippedRobe;
     public Item_Cloak equippedCloak;
-    public Item_DrawingTool equippedDrawingTool;
 
     public event System.Action<float, float> OnManaChanged;
 

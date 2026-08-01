@@ -11,7 +11,7 @@ public class EventPopupUI : MonoBehaviour
     [SerializeField] private Button btnOptionB; // 즉석 마법 (그리기)
     [SerializeField] private Button btnOptionC; // 맨몸 돌파
 
-    private HexTile currentTile;
+    private HexTileData currentTile;
     private Coroutine drawingTimerRoutine;
 
     private int currentPhaseIndex = 0;
@@ -30,7 +30,7 @@ public class EventPopupUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void ShowPopup(HexTile tile)
+    private void ShowPopup(HexTileData tile)
     {
         currentTile = tile;
         currentPhaseIndex = 0;

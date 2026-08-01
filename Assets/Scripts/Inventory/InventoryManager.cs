@@ -71,7 +71,6 @@ public class InventoryManager : MonoBehaviour
     public event System.Action<Item_Pouch> OnPouchEquipped;
     public event System.Action<Item_Robe> OnRobeEquipped;
     public event System.Action<Item_Cloak> OnCloakEquipped;
-    public event System.Action<Item_DrawingTool> OnDrawingToolEquipped;
 
     public Item_Scroll EquippedScroll
     {
@@ -141,16 +140,6 @@ public class InventoryManager : MonoBehaviour
         {
             _player.equippedCloak = value;
             OnCloakEquipped?.Invoke(value);
-        }
-    }
-
-    public Item_DrawingTool EquippedDrawingTool
-    {
-        get => _player.equippedDrawingTool;
-        set
-        {
-            _player.equippedDrawingTool = value;
-            OnDrawingToolEquipped?.Invoke(value);
         }
     }
 
@@ -338,7 +327,6 @@ public class InventoryManager : MonoBehaviour
         if (EquippedWand == item) EquippedWand = CycleItem<Item_Wand>(null, 1);
         if (EquippedRobe == item) EquippedRobe = CycleItem<Item_Robe>(null, 1);
         if (EquippedCloak == item) EquippedCloak = CycleItem<Item_Cloak>(null, 1);
-        if (EquippedDrawingTool == item) EquippedDrawingTool = CycleItem<Item_DrawingTool>(null, 1);
     }
 
     public void CycleScroll(int dir) { EquippedScroll = CycleItem(EquippedScroll, dir); }
@@ -347,7 +335,6 @@ public class InventoryManager : MonoBehaviour
     public void CycleWand(int dir) { EquippedWand = CycleItem(EquippedWand, dir); }
     public void CycleRobe(int dir) { EquippedRobe = CycleItem(EquippedRobe, dir); }
     public void CycleCloak(int dir) { EquippedCloak = CycleItem(EquippedCloak, dir); }
-    public void CycleDrawingTool(int dir) { EquippedDrawingTool = CycleItem(EquippedDrawingTool, dir); }
 
     private T CycleItem<T>(T currentItem, int dir) where T : ItemInstance
     {

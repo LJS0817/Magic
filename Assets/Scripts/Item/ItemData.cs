@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch, Robe, Cloak, DrawingTool, Quest }
+public enum ItemType { Scroll, Ink, Material, Potion, Pen, RecipeBook, Wand, Pouch, Robe, Cloak, Quest }
 
 [System.Serializable]
 public abstract class ItemInstance
@@ -206,16 +206,6 @@ public class Item_Cloak : ItemInstance
     public ItemCloakSO CloakData => data as ItemCloakSO;
 
     public Item_Cloak(ItemCloakSO cloakData) : base(cloakData)
-    {
-    }
-}
-
-[System.Serializable]
-public class Item_DrawingTool : ItemInstance
-{
-    public ItemDrawingToolSO DrawingToolData => data as ItemDrawingToolSO;
-
-    public Item_DrawingTool(ItemDrawingToolSO toolData) : base(toolData)
     {
     }
 }

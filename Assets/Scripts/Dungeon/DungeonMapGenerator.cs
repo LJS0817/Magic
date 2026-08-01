@@ -1,25 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class DungeonMapGenerator : MonoBehaviour
 {
-    [Header("Prefabs")]
-    public GameObject hexTilePrefab;
+    [Header("Tilemap")]
+    public Tilemap dungeonTilemap;
+    
+    [Header("Tiles")]
+    public TileBase fogTile; // 미탐색 타일
+    public TileBase defaultFloorTile; // Empty, Start 타일용
+    
+    [Header("Event Tiles")]
+    public TileBase normalMonsterTile;
+    public TileBase bossTile;
+    public TileBase trapTile;
+    public TileBase obstacleTile;
+    public TileBase altarTile;
+    public TileBase sightTile;
+    public TileBase randomPortalTile;
+    public TileBase resourceTile;
+    public TileBase merchantTile;
+    public TileBase npcTile;
+    public TileBase exitTile;
     
     [Header("Grid Settings")]
     public int radius = 3;
-    public float hexSize = 1f;
 
-    private Dictionary<Vector2Int, HexTile> tileMap = new Dictionary<Vector2Int, HexTile>();
+    private Dictionary<Vector3Int, HexTileData> tileMapData = new Dictionary<Vector3Int, HexTileData>();
 
-    public Dictionary<Vector2Int, HexTile> GenerateMap(Transform parent)
+    public Dictionary<Vector3Int, HexTileData> GenerateMap()
     {
-        // 기존 타일 삭제
-        foreach (Transform child in parent)
-        {
-            Destroy(child.gameObject);
-        }
-        tileMap.Clear();
+        if (dungeonTilemap != null) dungeonTilemap.ClearAllTiles();
+        tileMapData.Clear();
 
         // 헥사곤 그리드 생성 (육각 형태)
         for (int q = -radius; q <= radius; q++)
@@ -28,21 +41,45 @@ public class DungeonMapGenerator : MonoBehaviour
             int r2 = Mathf.Min(radius, -q + radius);
             for (int r = r1; r <= r2; r++)
             {
-                Vector3 worldPos = HexToWorld(q, r);
-                GameObject tileObj = Instantiate(hexTilePrefab, worldPos, Quaternion.identity, parent);
-                tileObj.name = $"Hex_{q}_{r}";
-                
-                HexTile tile = tileObj.GetComponent<HexTile>();
+                Vector3Int cellPos = new Vector3Int(q, r, 0);
                 
                 // 랜덤 타입 부여 (시작 지점은 0,0)
                 HexTileEventData randomData = GetRandomEventData(q, r);
-                tile.Init(q, r, randomData);
+                HexTileData tileData = new HexTileData(cellPos, randomData);
                 
-                tileMap.Add(new Vector2Int(q, r), tile);
+                tileMapData.Add(cellPos, tileData);
+
+                // 초기 상태는 모두 안개(Fog) 타일로 덮습니다. (단, 시작 지점 제외 로직을 넣으려면 DungeonManager에서 호출 시 처리)
+                if (dungeonTilemap != null && fogTile != null)
+                {
+                    dungeonTilemap.SetTile(cellPos, fogTile);
+                }
             }
         }
         
-        return tileMap;
+        return tileMapData;
+    }
+
+    public TileBase GetRevealedTile(HexTileData tileData)
+    {
+        switch (tileData.Type)
+        {
+            case HexTileType.NormalMonster: return normalMonsterTile != null ? normalMonsterTile : defaultFloorTile;
+            case HexTileType.Boss:          return bossTile != null ? bossTile : defaultFloorTile;
+            case HexTileType.Trap:          return trapTile != null ? trapTile : defaultFloorTile;
+            case HexTileType.Obstacle:      return obstacleTile != null ? obstacleTile : defaultFloorTile;
+            case HexTileType.Altar:         return altarTile != null ? altarTile : defaultFloorTile;
+            case HexTileType.Sight:         return sightTile != null ? sightTile : defaultFloorTile;
+            case HexTileType.RandomPortal:  return randomPortalTile != null ? randomPortalTile : defaultFloorTile;
+            case HexTileType.Resource:      return resourceTile != null ? resourceTile : defaultFloorTile;
+            case HexTileType.Merchant:      return merchantTile != null ? merchantTile : defaultFloorTile;
+            case HexTileType.NPC:           return npcTile != null ? npcTile : defaultFloorTile;
+            case HexTileType.Exit:          return exitTile != null ? exitTile : defaultFloorTile;
+            case HexTileType.Start:
+            case HexTileType.Empty:
+            default:
+                return defaultFloorTile;
+        }
     }
 
     private HexTileEventData GetRandomEventData(int q, int r)
@@ -140,12 +177,5 @@ public class DungeonMapGenerator : MonoBehaviour
         }
         
         return data;
-    }
-
-    private Vector3 HexToWorld(int q, int r)
-    {
-        float x = hexSize * Mathf.Sqrt(3) * (q + r / 2f);
-        float y = hexSize * 3f / 2f * r;
-        return new Vector3(x, y, 0); // 2D 환경 기준
     }
 }

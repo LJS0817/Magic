@@ -69,7 +69,6 @@ public class MarketUIController : MonoBehaviour
                     if (db.inks != null) items.AddRange(db.inks);
                     if (db.pens != null) items.AddRange(db.pens);
                     if (db.scrolls != null) items.AddRange(db.scrolls);
-                    if (db.drawingTools != null) items.AddRange(db.drawingTools);
                     break;
                 case MarketType.AdventurerGuild:
                     if (db.materials != null) items.AddRange(db.materials);

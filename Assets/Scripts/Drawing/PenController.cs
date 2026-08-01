@@ -24,8 +24,6 @@ public class PenController : MonoBehaviour
         {
             if (forcedTool != null) return forcedTool;
             if (InventoryManager.Instance == null) return null;
-            if (InventoryManager.Instance.EquippedDrawingTool != null)
-                return InventoryManager.Instance.EquippedDrawingTool;
             return InventoryManager.Instance.EquippedPen;
         }
     }
@@ -62,13 +60,6 @@ public class PenController : MonoBehaviour
         
         if (tool is Item_Wand) return true;
         
-        if (tool is Item_DrawingTool)
-        {
-            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedInk != null)
-                return InventoryManager.Instance.EquippedInk.currentAmount > 0f;
-            return true;
-        }
-        
         if (tool is Item_Pen pen)
         {
             if (pen.PenData != null && pen.PenData.consumesMana) return true;
@@ -82,19 +73,6 @@ public class PenController : MonoBehaviour
         ItemInstance tool = CurrentTool;
         if (tool == null) return;
         if (tool is Item_Wand) return;
-        
-        if (tool is Item_DrawingTool drawingTool)
-        {
-            if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedInk != null)
-            {
-                float cost = 5f * (drawingTool.DrawingToolData != null ? drawingTool.DrawingToolData.inkConsumptionMultiplier : 1f);
-                InventoryManager.Instance.EquippedInk.currentAmount -= cost * Time.deltaTime;
-                if (InventoryManager.Instance.EquippedInk.currentAmount < 0)
-                    InventoryManager.Instance.EquippedInk.currentAmount = 0;
-            }
-            OnResourceConsumed?.Invoke(playerDataManager);
-            return;
-        }
         
         if (tool is Item_Pen pen)
         {

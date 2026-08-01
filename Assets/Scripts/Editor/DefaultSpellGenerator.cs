@@ -79,7 +79,7 @@ public class DefaultSpellGenerator
             "원 1개, 세모 3개 (원이 중심, 세모가 밖을 둘러쌈)", "마나 결정의 중심(원) 주변으로 날카로운 파편(세모) 3개를 둘러서 그리세요.",
             new string[] { "Circle", "Triangle", "Triangle", "Triangle" },
             new RuleData[] { new RuleData { RuleType = RuleType.Surround, TargetIndices = new int[] { 0, 1, 2, 3 } } },
-            StatusEffectType.Burn, 5f);
+            5f);
 
 
         // --- [12~16: 기본 마름모 스펠] ---
@@ -144,7 +144,7 @@ public class DefaultSpellGenerator
             "네모 3개 (하나의 네모가 나머지 두 개를 둘러쌈)", "큰 감옥(네모) 안에 족쇄(네모 2개)를 채우세요.",
             new string[] { "Square", "Square", "Square" },
             new RuleData[] { new RuleData { RuleType = RuleType.Surround, TargetIndices = new int[] { 0, 1, 2 } } },
-            StatusEffectType.Stun, 3f);
+            3f);
 
         CreateSpell(folderPath, "22_Purify", "Purify", SpellType.Utility, 40f,
             "대상에게 걸린 모든 해로운 마법 효과를 정화합니다.",
@@ -157,21 +157,21 @@ public class DefaultSpellGenerator
             "네모 1개, 원 1개, 네모 1개 (일렬 배치)", "장벽(네모) 사이에 충격파(원)를 압축시키세요.",
             new string[] { "Square", "Circle", "Square" },
             new RuleData[] { new RuleData { RuleType = RuleType.Aligned, TargetIndices = new int[] { 0, 1, 2 } } },
-            StatusEffectType.Stun, 2f);
+            2f);
 
         CreateSpell(folderPath, "24_MindControl", "Mind Control", SpellType.Utility, 90f,
             "대상의 정신을 붕괴시키고 일시적으로 혼란에 빠뜨립니다.",
             "마름모 1개, 원 1개 (마름모 안에 원)", "대상의 정신(마름모) 속에 환상(원)을 주입하세요.",
             new string[] { "Rhombus", "Circle" },
             new RuleData[] { new RuleData { RuleType = RuleType.Inside, TargetIndices = new int[] { 1, 0 } } },
-            StatusEffectType.Confusion, 5f);
+            5f);
 
         CreateSpell(folderPath, "25_Cataclysm", "Cataclysm", SpellType.Attack, 120f,
             "엄청난 마나를 폭주시켜 화면 전체에 궁극의 파괴를 선사합니다.",
             "원 4개 (하나의 원이 세 개의 원을 둘러쌈)", "거대한 세계(원) 안에 파멸의 구체 3개를 가두어 연쇄 폭발을 일으키세요.",
             new string[] { "Circle", "Circle", "Circle", "Circle" },
             new RuleData[] { new RuleData { RuleType = RuleType.Surround, TargetIndices = new int[] { 0, 1, 2, 3 } } },
-            StatusEffectType.Burn, 10f);
+            10f);
 
 
         // Automatically register to Database
@@ -188,7 +188,7 @@ public class DefaultSpellGenerator
         Debug.Log("<color=lime>🎉 총 25종의 마법 스펠(1~25)이 성공적으로 생성 및 갱신되었습니다!</color>");
     }
 
-    private static void CreateSpell(string folderPath, string fileName, string spellName, SpellType type, float mana, string desc, string condition, string hint, string[] shapes, RuleData[] rules, StatusEffectType effectType = StatusEffectType.None, float effectDuration = 0f)
+    private static void CreateSpell(string folderPath, string fileName, string spellName, SpellType type, float mana, string desc, string condition, string hint, string[] shapes, RuleData[] rules, float effectDuration = 0f)
     {
         SpellRecipeAsset asset = ScriptableObject.CreateInstance<SpellRecipeAsset>();
         asset.SpellName = spellName;
@@ -199,8 +199,6 @@ public class DefaultSpellGenerator
         asset.ActivationHint = hint;
         asset.RequiredShapes = shapes;
         asset.SpatialRules = rules;
-        asset.statusEffect = effectType;
-        asset.statusEffectDuration = effectDuration;
 
         string assetPath = $"{folderPath}/{fileName}.asset";
         SpellRecipeAsset existing = AssetDatabase.LoadAssetAtPath<SpellRecipeAsset>(assetPath);

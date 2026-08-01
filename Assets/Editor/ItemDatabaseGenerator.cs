@@ -52,12 +52,6 @@ namespace Magic.Editor
             public CloakDef(string n, int d, int a, float m, SpellElement e, float r, string g, string desc) { name = n; def = d; atk = a; mana = m; element = e; res = r; grade = g; description = desc; }
         }
 
-        private struct DrawingToolDef
-        {
-            public string name; public DrawingToolShape shape; public float accuracy; public float inkMult; public string grade; public string description;
-            public DrawingToolDef(string n, DrawingToolShape s, float a, float i, string g, string desc) { name = n; shape = s; accuracy = a; inkMult = i; grade = g; description = desc; }
-        }
-
         private struct RobeDef
         {
             public string name; public int def; public int atk; public float mana; public SpellElement element; public float res; public string grade; public string description;
@@ -193,20 +187,6 @@ namespace Magic.Editor
             new CloakDef("대마도사의 영광", 25, 15, 100f, SpellElement.None, 0.35f, "전설", "역사상 최고의 대마도사가 둘렀던 전설적인 망토로 완벽에 가까운 마력 보조를 자랑합니다.")
         };
 
-        private static readonly DrawingToolDef[] DrawingToolDefs = new DrawingToolDef[]
-        {
-            new DrawingToolDef("조잡한 나무 원형 도장", DrawingToolShape.Circle, 0.85f, 1.2f, "하급", "나무를 깎아 만든 투박한 원형 도장입니다. 잉크가 많이 낭비됩니다."),
-            new DrawingToolDef("표준 마도 삼각 자", DrawingToolShape.Triangle, 0.88f, 1.1f, "일반", "기하학 마법을 그릴 때 사용하는 기본적인 삼각 도끼 모양 도구입니다."),
-            new DrawingToolDef("단단한 황동 사각 인장", DrawingToolShape.Square, 0.90f, 1.0f, "일반", "사각형 마법진을 빠르고 정확하게 찍어내는 황동 인장입니다."),
-            new DrawingToolDef("정밀한 유리 마름모 도구", DrawingToolShape.Rhombus, 0.92f, 0.95f, "고급", "정밀하게 가공된 유리가 마름모 형태의 술식을 잉크 낭비 없이 그려냅니다."),
-            new DrawingToolDef("마도공학 원형 컴퍼스", DrawingToolShape.Circle, 0.93f, 0.90f, "고급", "완벽한 원을 그리도록 도와주는 마도공학 보조 도구입니다."),
-            new DrawingToolDef("은빛 룬 삼각 도장", DrawingToolShape.Triangle, 0.95f, 0.85f, "희귀", "순은으로 제작된 삼각형 도장으로 룬의 힘이 마법 완성도를 보정해줍니다."),
-            new DrawingToolDef("황금 비율의 사각 틀", DrawingToolShape.Square, 0.96f, 0.80f, "희귀", "황금비로 제작된 사각 인장으로, 안정적인 마술 구조를 직조합니다."),
-            new DrawingToolDef("차원 결정의 마름모 인장", DrawingToolShape.Rhombus, 0.97f, 0.75f, "영웅", "차원 결정이 박혀 있어 마름모 형태의 마법을 극도의 정밀함으로 구현합니다."),
-            new DrawingToolDef("천상의 원형 성상", DrawingToolShape.Circle, 0.98f, 0.70f, "영웅", "천상의 기하학이 담긴 성물로, 원형 마법진의 정확도를 비약적으로 끌어올립니다."),
-            new DrawingToolDef("창조의 기하학 마도구", DrawingToolShape.Circle, 0.99f, 0.50f, "전설", "태초의 기하학적 진리가 담긴 전설의 마도구로 잉크 소모를 최소화하며 완벽에 가까운 도형을 직조합니다.")
-        };
-
         private static readonly RobeDef[] RobeDefs = new RobeDef[]
         {
             new RobeDef("견습생의 낡은 로브", 3, 0, 10f, SpellElement.None, 0f, "하급", "마도학교 입학 시 지급되는 얇고 수수한 견습생용 로브입니다."),
@@ -283,7 +263,6 @@ namespace Magic.Editor
             db.potions.Clear();
             db.pouches.Clear();
             db.cloaks.Clear();
-            db.drawingTools.Clear();
             db.robes.Clear();
             db.materials.Clear();
             if(db.questTemplates != null) db.questTemplates.Clear();
@@ -406,23 +385,6 @@ namespace Magic.Editor
                 db.cloaks.Add(asset);
             }
 
-            // Generate DrawingTools
-            foreach (var def in DrawingToolDefs)
-            {
-                string assetPath = $"{rootPath}/DrawingTools/DrawingTool_{def.name.Replace(" ", "_")}.asset";
-                ItemDrawingToolSO asset = GetOrCreateAsset<ItemDrawingToolSO>(assetPath);
-
-                asset.itemName = def.name;
-                asset.targetShape = def.shape;
-                asset.accuracyBonus = def.accuracy;
-                asset.inkConsumptionMultiplier = def.inkMult;
-                asset.rarity = GetRarityFromString(def.grade);
-                asset.itemDescription = def.description;
-
-                EditorUtility.SetDirty(asset);
-                db.drawingTools.Add(asset);
-            }
-
             // Generate Robes
             foreach (var def in RobeDefs)
             {
@@ -488,7 +450,7 @@ namespace Magic.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\n- 망토: {db.cloaks.Count}종\n- 도구(도장): {db.drawingTools.Count}종\n- 로브: {db.robes.Count}종\n- 재료: {db.materials.Count}종\n- 퀘스트 템플릿: {(db.questTemplates != null ? db.questTemplates.Count : 0)}종\nDB 위치: {dbPath}");
+            Debug.Log($"<color=lime>🎉 ItemDatabase 생성이 완료되었습니다!</color>\n- 펜: {db.pens.Count}종\n- 잉크: {db.inks.Count}종\n- 스크롤: {db.scrolls.Count}종\n- 지팡이: {db.wands.Count}종\n- 물약: {db.potions.Count}종\n- 주머니: {db.pouches.Count}종\n- 망토: {db.cloaks.Count}종\n- 로브: {db.robes.Count}종\n- 재료: {db.materials.Count}종\n- 퀘스트 템플릿: {(db.questTemplates != null ? db.questTemplates.Count : 0)}종\nDB 위치: {dbPath}");
         }
 
         private static T GetOrCreateAsset<T>(string path) where T : ScriptableObject
