@@ -227,7 +227,23 @@ public class InventoryManager : MonoBehaviour
         {
             if (combatLoadout.Count >= GetMaxCombatLoadoutCapacity())
             {
-                Debug.LogWarning("[InventoryManager] 전투 로드아웃이 가득 찼습니다!");
+                Debug.LogWarning("[InventoryManager] 로드아웃이 가득 찼습니다!");
+                return false;
+            }
+            combatLoadout.Add(item);
+            NotifyLoadoutChanged();
+            return true;
+        }
+        return false;
+    }
+
+    public bool AddDungeonLootToLoadout(ItemInstance item)
+    {
+        if (!combatLoadout.Contains(item))
+        {
+            if (combatLoadout.Count >= GetMaxCombatLoadoutCapacity())
+            {
+                Debug.LogWarning("[InventoryManager] 임시 가방(로드아웃)이 가득 차 전리품을 획득할 수 없습니다!");
                 return false;
             }
             combatLoadout.Add(item);

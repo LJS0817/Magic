@@ -96,11 +96,7 @@ public class UpgradeManager : MonoBehaviour
 
         foreach (var effect in node.effects)
         {
-            if (effect.upgradeType == UpgradeType.MaxHealth)
-            {
-                PlayerDataManager.Instance.currentHealth = PlayerDataManager.Instance.GetMaxHealth();
-            }
-            else if (effect.upgradeType == UpgradeType.MaxMana)
+            if (effect.upgradeType == UpgradeType.MaxMana)
             {
                 PlayerDataManager.Instance.currentMana = PlayerDataManager.Instance.GetMaxMana();
             }

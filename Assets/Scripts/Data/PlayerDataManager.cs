@@ -162,19 +162,9 @@ public class PlayerDataManager : MonoBehaviour
     }
 
     [Header("Player Status")]
-    public float baseMaxHealth = 100f;
-    public float currentHealth = 100f;
-
     public float baseMaxMana = 100f;
     public float currentMana = 100f;
 
-    public float GetMaxHealth()
-    {
-        float upgradeBonus = UpgradeManager.Instance != null 
-            ? UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.MaxHealth) 
-            : 0f;
-        return baseMaxHealth + upgradeBonus;
-    }
 
     public float GetMaxMana()
     {
@@ -240,16 +230,10 @@ public class PlayerDataManager : MonoBehaviour
     public Item_DrawingTool equippedDrawingTool;
 
     public event System.Action<float, float> OnManaChanged;
-    public event System.Action<float, float> OnHealthChanged;
 
     public void NotifyManaChanged()
     {
         OnManaChanged?.Invoke(currentMana, GetMaxMana());
-    }
-
-    public void NotifyHealthChanged()
-    {
-        OnHealthChanged?.Invoke(currentHealth, GetMaxHealth());
     }
 
     public void InitInstance()
@@ -265,7 +249,6 @@ public class PlayerDataManager : MonoBehaviour
         if (UpgradeManager.Instance != null)
         {
             UpgradeManager.Instance.OnUpgradeUnlocked += NotifyManaChanged;
-            UpgradeManager.Instance.OnUpgradeUnlocked += NotifyHealthChanged;
         }
     }
 
@@ -274,7 +257,6 @@ public class PlayerDataManager : MonoBehaviour
         if (UpgradeManager.Instance != null)
         {
             UpgradeManager.Instance.OnUpgradeUnlocked -= NotifyManaChanged;
-            UpgradeManager.Instance.OnUpgradeUnlocked -= NotifyHealthChanged;
         }
     }
 
@@ -282,14 +264,7 @@ public class PlayerDataManager : MonoBehaviour
     {
         if (UpgradeManager.Instance == null) return;
         
-        float hpRegen = UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.HealthRegeneration);
         float mpRegen = UpgradeManager.Instance.GetTotalUpgradeValue(UpgradeType.ManaRegeneration);
-
-        if (hpRegen > 0f && currentHealth < GetMaxHealth())
-        {
-            currentHealth = Mathf.Min(GetMaxHealth(), currentHealth + hpRegen * Time.deltaTime);
-            NotifyHealthChanged();
-        }
 
         if (mpRegen > 0f && currentMana < GetMaxMana())
         {

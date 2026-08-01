@@ -27,6 +27,7 @@ public class SpellRecipeAsset : ScriptableObject
 {
     public string SpellName;
     public SpellType Type = SpellType.Attack;
+    public SpellElement Element = SpellElement.None;
     public Sprite icon;
     
     [Header("Status Effect (Utility Only)")]

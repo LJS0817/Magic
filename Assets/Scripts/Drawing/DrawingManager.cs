@@ -6,13 +6,14 @@ using DG.Tweening;
 public class DrawingManager : MonoBehaviour
 {
     public static bool IsDrawingBlocked = false;
+    public static bool IsDungeonDrawingMode = false;
+    public static event System.Action<SpellRecipeAsset, float> OnDungeonSpellDrawn;
 
     [Header("Magic Combo Stats")]
     public List<DrawnShape> drawnShapes = new List<DrawnShape>();
 
     [Header("Resources (UI Only)")]
     public CustomSlider manaSlider;
-    public CustomSlider healthSlider;
 
     [Header("References")]
     public RectTransform drawingArea; // 스크롤 UI 영역
@@ -83,11 +84,7 @@ public class DrawingManager : MonoBehaviour
             PlayerDataManager.Instance.OnManaChanged += HandleManaChanged;
         }
 
-        if (healthSlider != null && PlayerDataManager.Instance != null)
-        {
-            healthSlider.SetValue(PlayerDataManager.Instance.currentHealth, PlayerDataManager.Instance.GetMaxHealth());
-            PlayerDataManager.Instance.OnHealthChanged += HandleHealthChanged;
-        }
+
 
         penController.OnResourceConsumed += HandleResourceConsumed;
     }
@@ -97,10 +94,7 @@ public class DrawingManager : MonoBehaviour
         if (manaSlider != null) manaSlider.SetValue(currentMana, maxMana);
     }
 
-    private void HandleHealthChanged(float currentHealth, float maxHealth)
-    {
-        if (healthSlider != null) healthSlider.SetValue(currentHealth, maxHealth);
-    }
+
 
     private void HandleResourceConsumed(PlayerDataManager pMan)
     {
@@ -167,7 +161,6 @@ public class DrawingManager : MonoBehaviour
         if (PlayerDataManager.Instance != null)
         {
             PlayerDataManager.Instance.OnManaChanged -= HandleManaChanged;
-            PlayerDataManager.Instance.OnHealthChanged -= HandleHealthChanged;
         }
     }
 
@@ -556,6 +549,7 @@ public class DrawingManager : MonoBehaviour
         else
         {
             Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+            SpellRecipeAsset matchedRecipe = null;
             float spellManaCost = 30f;
             if (drawingDatabase != null && drawingDatabase.recipes != null)
             {
@@ -563,10 +557,18 @@ public class DrawingManager : MonoBehaviour
                 {
                     if (r.SpellName == matchedSpell)
                     {
+                        matchedRecipe = r;
                         spellManaCost = r.manaCost;
                         break;
                     }
                 }
+            }
+
+            if (IsDungeonDrawingMode)
+            {
+                // 던전 즉석 그리기 모드일 경우 스크롤을 소모/생성하지 않고 이벤트 콜백만 보냄
+                OnDungeonSpellDrawn?.Invoke(matchedRecipe, averageScore);
+                return;
             }
 
             if (currentScroll != null && currentScroll.isEmpty)

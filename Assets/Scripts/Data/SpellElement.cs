@@ -6,4 +6,3 @@ public enum SpellElement
     Lightning,
     Earth
 }
-

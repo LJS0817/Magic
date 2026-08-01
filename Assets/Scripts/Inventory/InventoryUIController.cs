@@ -148,18 +148,12 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                 var pData = PlayerDataManager.Instance;
                 if (pData != null && potion.PotionData != null)
                 {
-                    if (potion.PotionData.potionType == PotionType.Health)
-                    {
-                        pData.currentHealth += potion.PotionData.recoveryAmount;
-                        if (pData.currentHealth > pData.GetMaxHealth()) pData.currentHealth = pData.GetMaxHealth();
-                        Debug.Log($"<color=green>[아이템] {potion.ItemName}을(를) 사용해 체력을 회복했습니다!</color>");
-                    }
-                    else if (potion.PotionData.potionType == PotionType.Mana)
+                    if (potion.PotionData.potionType == PotionType.Mana)
                     {
                         pData.currentMana += potion.PotionData.recoveryAmount;
                         if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();
                         
-                        var drawingMgr = FindObjectOfType<CombatDrawingManager>();
+                        var drawingMgr = FindObjectOfType<DrawingManager>();
                         if (drawingMgr != null && drawingMgr.manaSlider != null)
                         {
                             drawingMgr.manaSlider.SetValue(pData.currentMana, pData.GetMaxMana());

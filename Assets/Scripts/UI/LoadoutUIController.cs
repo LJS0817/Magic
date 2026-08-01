@@ -108,19 +108,7 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
         var inv = InventoryManager.Instance;
-        if (slot.Item is Item_Scroll scroll && !scroll.isEmpty && scroll.ScrollData != null) 
-        {
-            var combatManager = FindAnyObjectByType<CombatManager>();
-            if (combatManager != null && combatManager.CurrentState != CombatState.BattleEnd)
-            {
-                var drawingManager = FindAnyObjectByType<CombatDrawingManager>();
-                if (drawingManager != null)
-                {
-                    drawingManager.CastSpellFromScroll(scroll);
-                }
-            }
-        }
-        else if (slot.Item is Item_Ink ink)
+        if (slot.Item is Item_Ink ink)
         {
             if (inv.EquippedInk == ink) inv.EquippedInk = null;
             else inv.EquippedInk = ink;
@@ -135,18 +123,12 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
             var pData = PlayerDataManager.Instance;
             if (pData != null && potion.PotionData != null)
             {
-                if (potion.PotionData.potionType == PotionType.Health)
-                {
-                    pData.currentHealth += potion.PotionData.recoveryAmount;
-                    if (pData.currentHealth > pData.GetMaxHealth()) pData.currentHealth = pData.GetMaxHealth();
-                    Debug.Log($"<color=green>[아이템] {potion.ItemName}을(를) 사용해 체력을 회복했습니다!</color>");
-                }
-                else if (potion.PotionData.potionType == PotionType.Mana)
+                if (potion.PotionData.potionType == PotionType.Mana)
                 {
                     pData.currentMana += potion.PotionData.recoveryAmount;
                     if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();
                     
-                    var drawingMgr = FindObjectOfType<CombatDrawingManager>();
+                    var drawingMgr = FindObjectOfType<DrawingManager>();
                     if (drawingMgr != null && drawingMgr.manaSlider != null)
                     {
                         drawingMgr.manaSlider.SetValue(pData.currentMana, pData.GetMaxMana());
@@ -181,19 +163,7 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
     {
         if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
-        // 스크롤 아이템인 경우 '사용' (전투 중 완성된 마법 발사)
-        if (slot.Item is Item_Scroll scroll && !scroll.isEmpty && scroll.ScrollData != null)
-        {
-            var combatManager = FindAnyObjectByType<CombatManager>();
-            if (combatManager != null && combatManager.CurrentState != CombatState.BattleEnd)
-            {
-                var drawingManager = FindAnyObjectByType<CombatDrawingManager>();
-                if (drawingManager != null)
-                {
-                    drawingManager.CastSpellFromScroll(scroll);
-                }
-            }
-        }
+        // 던전 전투 시 사용하는 기능은 EventPopupUI로 이관됨.
         
         // 잉크나 펜 등 다른 아이템은 우클릭 기능(로드아웃 해제 등)을 사용하지 않음
     }
