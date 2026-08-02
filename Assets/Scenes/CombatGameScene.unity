@@ -494,17 +494,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4130015468636769038, guid: ae2251a2720e97a41b6fa17da6de4efb, type: 3}
   m_PrefabInstance: {fileID: 982021005}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &562220427 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8432725496897313752, guid: ae2251a2720e97a41b6fa17da6de4efb, type: 3}
-  m_PrefabInstance: {fileID: 982021005}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26910018aa0016b49a12dd7fba64ec1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.UI.CustomSlider
 --- !u!1 &580821418
 GameObject:
   m_ObjectHideFlags: 0
@@ -804,27 +793,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0130d9f316428a24b9dc530e19dec71d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.CombatManager
-  currentFloor: 1
-  currentWave: 1
-  maxATB: 100
-  playerATBFillRate: 20
-  enemyATBFillRate: 15
-  currentPlayerATB: 0
-  currentEnemyATB: 0
-  playerTurnTimeLimit: 1000
-  currentPlayerTurnTimer: 0
-  parryWindowDuration: 1.5
-  currentParryTimer: 0
-  normalEnemies:
-  - {fileID: 11400000, guid: 26a31b8fe80c22f47894468ff21d6264, type: 2}
-  - {fileID: 11400000, guid: a9a32ef5a7af8b04bacd020375198dd4, type: 2}
-  - {fileID: 11400000, guid: 01c4327586d93cc45abde9425ee03f65, type: 2}
-  - {fileID: 11400000, guid: 0f415e34304d4b64aa527b01214b8959, type: 2}
-  - {fileID: 11400000, guid: 8a3aaf26ecbf7b04f8c8371431d166f8, type: 2}
-  bossEnemies:
-  - {fileID: 11400000, guid: 0bddc0776f0ea414f88173d6b6806625, type: 2}
-  player: {fileID: 1512672473}
-  enemy: {fileID: 1068636474}
 --- !u!4 &670511620
 Transform:
   m_ObjectHideFlags: 0
@@ -920,7 +888,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -939,15 +907,43 @@ Tilemap:
   m_Enabled: 1
   m_Tiles: {}
   m_AnimatedTiles: {}
-  m_TileAssetArray: []
-  m_TileSpriteArray: []
-  m_TileMatrixArray: []
-  m_TileColorArray: []
+  m_TileAssetArray:
+  - serializedVersion: 2
+    m_RefCount: 0
+    m_Data: {fileID: 11400000, guid: 65a27e076449e4a479b2971a08bb70b9, type: 2}
+  m_TileSpriteArray:
+  - serializedVersion: 2
+    m_RefCount: 0
+    m_Data: {fileID: 21300000, guid: 70fb563f3cdf11047a309c7a1d3b71ba, type: 3}
+  m_TileMatrixArray:
+  - serializedVersion: 2
+    m_RefCount: 0
+    m_Data:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+  m_TileColorArray:
+  - serializedVersion: 2
+    m_RefCount: 0
+    m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: 0, y: 0, z: 0}
-  m_Size: {x: 0, y: 0, z: 1}
+  m_Origin: {x: -3, y: -4, z: 0}
+  m_Size: {x: 6, y: 10, z: 1}
   m_TileAnchor: {x: 0, y: 0, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -1242,7 +1238,7 @@ Grid:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961010989}
   m_Enabled: 1
-  m_CellSize: {x: 0.8659766, y: 1, z: 1}
+  m_CellSize: {x: 1.565977, y: 1.7, z: 1.7}
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 1
   m_CellSwizzle: 2
@@ -1389,16 +1385,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac4daf7c865d13f46be825c45bb8ac2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.EnemyController
-  enemyData: {fileID: 0}
-  maxHealth: 100
-  health: 100
-  attackDamage: 15
-  currentAttackElement: 0
-  nameText: {fileID: 0}
-  spriteRenderer: {fileID: 1068636476}
-  hpSlider: {fileID: 1469125954}
-  activeEffects: []
-  statusEffectUI: {fileID: 0}
 --- !u!4 &1068636475
 Transform:
   m_ObjectHideFlags: 0
@@ -1726,17 +1712,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4130015468636769038, guid: ae2251a2720e97a41b6fa17da6de4efb, type: 3}
   m_PrefabInstance: {fileID: 1469125952}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1469125954 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8432725496897313752, guid: ae2251a2720e97a41b6fa17da6de4efb, type: 3}
-  m_PrefabInstance: {fileID: 1469125952}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26910018aa0016b49a12dd7fba64ec1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.UI.CustomSlider
 --- !u!1 &1512672472
 GameObject:
   m_ObjectHideFlags: 0
@@ -1826,20 +1801,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79b88e0cdabac8f44bd9b7ddd2d7e6c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonMapGenerator
-  dungeonTilemap: {fileID: 0}
-  fogTile: {fileID: 0}
-  defaultFloorTile: {fileID: 0}
-  normalMonsterTile: {fileID: 0}
-  bossTile: {fileID: 0}
-  trapTile: {fileID: 0}
-  obstacleTile: {fileID: 0}
-  altarTile: {fileID: 0}
-  sightTile: {fileID: 0}
-  randomPortalTile: {fileID: 0}
-  resourceTile: {fileID: 0}
-  merchantTile: {fileID: 0}
-  npcTile: {fileID: 0}
-  exitTile: {fileID: 0}
+  dungeonTilemap: {fileID: 920165126}
+  fogTile: {fileID: 11400000, guid: 9381a46aec628cb48b7e2b0697336ac8, type: 2}
+  defaultFloorTile: {fileID: 11400000, guid: 65a27e076449e4a479b2971a08bb70b9, type: 2}
+  normalMonsterTile: {fileID: 11400000, guid: 30885c80e2319444d9a148e55b01f578, type: 2}
+  bossTile: {fileID: 11400000, guid: 1309e9b2357ca5f4f8bcdbb78e306d69, type: 2}
+  trapTile: {fileID: 11400000, guid: eb5751019a6c4a54fb18a0b1f4c6a444, type: 2}
+  obstacleTile: {fileID: 11400000, guid: d71cbfa065123e94188dd8e2caf756fd, type: 2}
+  altarTile: {fileID: 11400000, guid: c42cfe2d3edf5ec4bafaf65b337cc862, type: 2}
+  sightTile: {fileID: 11400000, guid: a62af87270bffe1428a4fb19629dad24, type: 2}
+  randomPortalTile: {fileID: 11400000, guid: faa22a8c553b259448fea92e65459341, type: 2}
+  resourceTile: {fileID: 11400000, guid: 7592c63e4c2b20b40849ea60a7256425, type: 2}
+  merchantTile: {fileID: 11400000, guid: 51ab811358fd50446b7af898e135d7bd, type: 2}
+  npcTile: {fileID: 11400000, guid: 9e8f92b3d760ce0418df6f992c95698f, type: 2}
+  exitTile: {fileID: 11400000, guid: aa45af7c6cf11e8438db923c11325cef, type: 2}
   radius: 3
 --- !u!1 &1666065029
 GameObject:
@@ -2132,24 +2107,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f087b2aee41cd2e47bea2dc99310b051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Combat.CombatDrawingManager
-  manaSlider: {fileID: 562220427}
-  drawingArea: {fileID: 5819462616237291563}
-  mainCamera: {fileID: 519420031}
-  penController: {fileID: 348378736447424036}
-  inkController: {fileID: 0}
-  player: {fileID: 1512672473}
-  chantRecipes: []
-  currentChantInput: 
-  currentElement: 0
-  chantTimeLimit: 1.5
-  currentChantTimer: 0
-  isChantingPhase: 0
-  scrollCanvasRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 0
-    height: 0
 --- !u!1 &2083450373
 GameObject:
   m_ObjectHideFlags: 0

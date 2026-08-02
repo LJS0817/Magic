@@ -27,6 +27,7 @@ public class DungeonManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        EnterDungeon();
     }
 
     private void Update()
