@@ -36,9 +36,6 @@ public class DungeonManager : MonoBehaviour
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
-        if (tileMap == null || mapGenerator == null || mapGenerator.dungeonTilemap == null)
-            return;
-
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -47,7 +44,8 @@ public class DungeonManager : MonoBehaviour
             
             if (tileMap.ContainsKey(cellPos))
             {
-                MoveTo(cellPos);
+                Debug.Log("Move");
+                //MoveTo(cellPos);
             }
         }
         else if (Input.GetMouseButtonDown(1))
