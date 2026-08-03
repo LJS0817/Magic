@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
 public class DungeonManager : MonoBehaviour
 {
@@ -26,27 +27,179 @@ public class DungeonManager : MonoBehaviour
     public event System.Action<int> OnAPChanged;
     public event System.Action<HexTileData> OnTileEventTriggered;
 
+    [Header("Peek Settings")]
+    public int peekAPCost = 1;
+    private Vector3Int? peekedTilePos;
+    private AnimatedTile prePeekTile;
+
+    [Header("Input & Camera Settings")]
+    public RectTransform mapRenderRect; 
+    public Camera dungeonCamera;
+    
+    private Vector3 dragStartCameraPos;
+    private Vector3 dragStartMousePos;
+    private bool isDraggingMap = false;
+
+    public bool IsEventActive { get; private set; }
+
     private void Awake()
     {
         Instance = this;
         EnterDungeon();
     }
 
+    private Camera GetUICamera()
+    {
+        if (mapRenderRect == null) return null;
+        Canvas canvas = mapRenderRect.GetComponentInParent<Canvas>();
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            return canvas.worldCamera;
+        }
+        return null;
+    }
+
     private void Update()
     {
-        // UI 클릭 무시
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        // 1. 마우스 우클릭을 떼면 무조건 Peek 상태 해제 (UI 밖으로 마우스가 나가더라도 처리)
+        if (Input.GetMouseButtonUp(1))
+        {
+            if (peekedTilePos.HasValue)
+            {
+                RevertPeek();
+            }
+        }
+
+        // 이벤트 팝업이 떠있는 등 이벤트 진행 중일 때는 맵 상호작용(이동, Peek 등) 차단
+        if (IsEventActive) return;
+
+        bool isPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        bool isPointerInRenderRect = false;
+        
+        Camera uiCamera = GetUICamera();
+
+        if (mapRenderRect != null)
+        {
+            isPointerInRenderRect = RectTransformUtility.RectangleContainsScreenPoint(mapRenderRect, Input.mousePosition, uiCamera);
+        }
+
+        // 다른 UI 위에 마우스가 있는데 렌더 영역이 아니면 무시
+        if (isPointerOverUI && mapRenderRect != null && !isPointerInRenderRect)
+            return;
+        if (isPointerOverUI && mapRenderRect == null)
             return;
 
+        // 드래그 시작 (좌클릭)
         if (Input.GetMouseButtonDown(0))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = tileManager.dungeonTilemap.WorldToCell(mousePos);
-            cellPos.z = 0;
+            if (mapRenderRect == null || isPointerInRenderRect)
+            {
+                isDraggingMap = true;
+                dragStartMousePos = Input.mousePosition;
+                
+                Camera targetCam = dungeonCamera != null ? dungeonCamera : Camera.main;
+                if (targetCam != null)
+                    dragStartCameraPos = targetCam.transform.position;
+            }
+        }
+        
+        // 드래그 중
+        if (Input.GetMouseButton(0) && isDraggingMap)
+        {
+            Camera targetCam = dungeonCamera != null ? dungeonCamera : Camera.main;
+            if (targetCam != null)
+            {
+                Vector3 currentMousePos = Input.mousePosition;
+                
+                float screenHeight = mapRenderRect != null ? mapRenderRect.rect.height : Screen.height;
+                float screenToWorldRatio = (targetCam.orthographicSize * 2f) / screenHeight;
+                
+                Vector3 delta = (dragStartMousePos - currentMousePos) * screenToWorldRatio;
+                targetCam.transform.position = dragStartCameraPos + delta;
+            }
+        }
 
+        // 클릭(이동) 처리
+        if (Input.GetMouseButtonUp(0) && isDraggingMap)
+        {
+            isDraggingMap = false;
+            
+            if (Vector3.Distance(dragStartMousePos, Input.mousePosition) < 10f)
+            {
+                ProcessLeftClick(Input.mousePosition);
+            }
+            else
+            {
+                // 드래그가 끝났어도 혹시 Peek 중이면 해제 (선택사항)
+                if (peekedTilePos.HasValue) RevertPeek();
+            }
+        }
+
+        // 우클릭 (Peek) 처리
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (mapRenderRect == null || isPointerInRenderRect)
+            {
+                ProcessRightClick(Input.mousePosition);
+            }
+        }
+    }
+
+    private bool GetTargetCell(Vector2 screenPos, out Vector3Int cellPos)
+    {
+        cellPos = Vector3Int.zero;
+        Vector3 worldPos = Vector3.zero;
+
+        if (mapRenderRect != null && dungeonCamera != null)
+        {
+            Camera uiCamera = GetUICamera();
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(mapRenderRect, screenPos, uiCamera, out Vector2 localPoint))
+            {
+                Rect rect = mapRenderRect.rect;
+                float normalizedX = (localPoint.x - rect.xMin) / rect.width;
+                float normalizedY = (localPoint.y - rect.yMin) / rect.height;
+
+                if (normalizedX >= 0 && normalizedX <= 1 && normalizedY >= 0 && normalizedY <= 1)
+                {
+                    Vector3 viewportPos = new Vector3(normalizedX, normalizedY, Mathf.Abs(dungeonCamera.transform.position.z));
+                    worldPos = dungeonCamera.ViewportToWorldPoint(viewportPos);
+                }
+                else return false;
+            }
+            else return false;
+        }
+        else
+        {
+            Camera targetCam = dungeonCamera != null ? dungeonCamera : Camera.main;
+            if (targetCam != null)
+            {
+                worldPos = targetCam.ScreenToWorldPoint(screenPos);
+            }
+            else return false;
+        }
+
+        worldPos.z = 0;
+        if (tileManager.dungeonTilemap != null)
+        {
+            cellPos = tileManager.dungeonTilemap.WorldToCell(worldPos);
+            cellPos.z = 0;
+            return true;
+        }
+        
+        return false;
+    }
+
+    private void ProcessLeftClick(Vector2 screenPos)
+    {
+        if (peekedTilePos.HasValue)
+        {
+            RevertPeek();
+        }
+
+        if (GetTargetCell(screenPos, out Vector3Int cellPos))
+        {
             if (tileMap.ContainsKey(cellPos))
             {
-                Debug.Log("Move");
                 if (HexPathfinding.GetNeighbors(currentPos).Contains(cellPos))
                 {
                     if (moveCoroutine != null) StopCoroutine(moveCoroutine);
@@ -59,17 +212,22 @@ public class DungeonManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetMouseButtonDown(1))
+    }
+
+    private void ProcessRightClick(Vector2 screenPos)
+    {
+        if (GetTargetCell(screenPos, out Vector3Int cellPos))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = tileManager.dungeonTilemap.WorldToCell(mousePos);
-            cellPos.z = 0;
-            
+            if (peekedTilePos.HasValue)
+            {
+                RevertPeek();
+            }
+
             if (tileMap.ContainsKey(cellPos))
             {
-                InspectTile(cellPos);
+                PeekTile(cellPos);
             }
-        }
+        } 
     }
 
     public void EnterDungeon()
@@ -90,6 +248,7 @@ public class DungeonManager : MonoBehaviour
         {
             startTile.Discover();
             tileManager.dungeonTilemap.SetTile(currentPos, tileManager.defaultFloorTile);
+            tileManager.dungeonTilemap.SetAnimationFrame(currentPos, 0);
         }
 
         UpdateFogOfWar();
@@ -136,7 +295,7 @@ public class DungeonManager : MonoBehaviour
             currentPos = targetPos;
             UpdateFogOfWar();
             
-            //CheckTileEvent(targetPos);
+            CheckTileEvent(targetPos);
             SetPlayerTile(currentPos);
             
             if (currentAP <= 0)
@@ -206,9 +365,6 @@ public class DungeonManager : MonoBehaviour
             MoveTo(nextPos);
             
             // 이벤트 타일을 밟았을 때 이동을 멈추는 로직입니다.
-            // 현재 맵의 70%가 이벤트 타일이므로, 이 조건 때문에 한 칸만 이동하고 멈추게 됩니다.
-            // 길찾기 테스트를 위해 임시로 주석 처리합니다.
-            /*
             if (tileMap.TryGetValue(nextPos, out HexTileData tile))
             {
                 if (!tile.IsEventCleared && tile.Type != HexTileType.Empty && tile.Type != HexTileType.Start)
@@ -216,7 +372,6 @@ public class DungeonManager : MonoBehaviour
                     break;
                 }
             }
-            */
 
             yield return new WaitForSeconds(1f); 
         }
@@ -255,6 +410,7 @@ public class DungeonManager : MonoBehaviour
                 }
                 else
                 {
+                    IsEventActive = true;
                     OnTileEventTriggered?.Invoke(tile);
                 }
             }
@@ -286,6 +442,11 @@ public class DungeonManager : MonoBehaviour
 
     public void ResolveEvent(HexTileData tile, bool success, int rewardMultiplier = 1)
     {
+        IsEventActive = false;
+        
+        // 어떤 방식으로든(성공이든 맨몸 돌파로 인한 실패든) 이벤트가 처리되었으므로 타일에서 이벤트를 지웁니다.
+        // tile.ClearEvent();
+        
         if (success)
         {
             tile.ClearEvent();
@@ -317,7 +478,7 @@ public class DungeonManager : MonoBehaviour
 
     private void UpdateFogOfWar()
     {
-        RevealSight(currentPos, 1);
+        RevealSight(currentPos, 0);
     }
 
     private void RevealSight(Vector3Int center, int rad)
@@ -425,37 +586,63 @@ public class DungeonManager : MonoBehaviour
         Debug.Log("<color=yellow>[제단] 5턴 동안 이동 시 AP가 소모되지 않습니다!</color>");
     }
 
-    public void InspectTile(Vector3Int targetPos)
+    public void PeekTile(Vector3Int targetPos)
     {
+        if (currentAP < peekAPCost)
+        {
+            Debug.LogWarning("<color=yellow>[Peek] AP가 부족합니다.</color>");
+            return;
+        }
+
         if (HexPathfinding.GetNeighbors(currentPos).Contains(targetPos))
         {
             if (tileMap.TryGetValue(targetPos, out HexTileData tile))
             {
-                if (!tile.IsDiscovered)
+                if (tile.IsDiscovered)
                 {
-                    Debug.Log("<color=yellow>[탐색] 타일이 아직 밝혀지지 않았습니다.</color>");
+                    Debug.Log("<color=yellow>[Peek] 이미 밝혀진 타일은 Peek할 수 없습니다.</color>");
+                    return;
                 }
-                else
+
+                // 이동 중이면 멈춤
+                if (moveCoroutine != null)
                 {
-                    if (tile.Type == HexTileType.Trap && !tile.isTrapRevealed)
-                    {
-                        tile.RevealTrap();
-                        Debug.Log("<color=red>[탐색] 숨겨진 함정을 발견했습니다!</color>");
-                        if (tileManager.dungeonTilemap != null)
-                        {
-                            tileManager.FlipToTile(targetPos, tileManager.GetRevealedTile(tile));
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log($"<color=cyan>[탐색] 정찰 결과: {tile.EventData.eventTitle} 입니다.</color>");
-                    }
+                    StopCoroutine(moveCoroutine);
+                    moveCoroutine = null;
+                    ClearPathTiles();
+                    Debug.Log("<color=yellow>[Peek] 이동을 멈추고 탐색합니다.</color>");
                 }
+
+                // AP 소모
+                // currentAP -= peekAPCost;
+                OnAPChanged?.Invoke(currentAP);
+
+                prePeekTile = tileManager.dungeonTilemap.GetTile<UnityEngine.Tilemaps.AnimatedTile>(targetPos);
+                peekedTilePos = targetPos;
+
+                Debug.Log($"[Peek] Start Peek at {targetPos}. prePeekTile is {(prePeekTile == null ? "NULL" : prePeekTile.name)}");
+
+                AnimatedTile revealedTile = tileManager.GetRevealedTile(tile);
+                tileManager.FlipToTile(targetPos, revealedTile);
             }
         }
         else
         {
-            Debug.LogWarning("[탐색] 인접한 1칸 거리의 타일만 정찰할 수 있습니다.");
+            Debug.LogWarning("[Peek] 인접한 1칸 거리의 타일만 Peek할 수 있습니다.");
+        }
+    }
+
+    private void RevertPeek()
+    {
+        Debug.Log($"[Peek] RevertPeek called. peekedTilePos.HasValue: {peekedTilePos.HasValue}, prePeekTile: {(prePeekTile == null ? "NULL" : prePeekTile.name)}");
+        
+        if (peekedTilePos.HasValue && prePeekTile != null)
+        {
+            Vector3Int pos = peekedTilePos.Value;
+            tileManager.FlipToTile(pos, prePeekTile);
+            
+            peekedTilePos = null;
+            prePeekTile = null;
         }
     }
 

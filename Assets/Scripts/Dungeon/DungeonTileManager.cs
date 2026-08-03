@@ -57,6 +57,7 @@ public class DungeonTileManager : MonoBehaviour
                 if (dungeonTilemap != null && fogTile != null)
                 {
                     dungeonTilemap.SetTile(cellPos, fogTile);
+                    dungeonTilemap.SetAnimationFrame(cellPos, 0);
                 }
             }
         }
@@ -188,15 +189,17 @@ public class DungeonTileManager : MonoBehaviour
         if (dungeonTilemap == null || targetAnimTile == null) return;
 
         AnimatedTile currentAnimTile = dungeonTilemap.GetTile<AnimatedTile>(pos);
-        if (currentAnimTile == targetAnimTile)
+        bool isAnimating = flipCoroutines.ContainsKey(pos) && flipCoroutines[pos] != null;
+
+        if (!isAnimating && currentAnimTile == targetAnimTile)
         {
             onComplete?.Invoke();
             return;
         }
 
-        if (flipCoroutines.ContainsKey(pos))
+        if (isAnimating)
         {
-            if (flipCoroutines[pos] != null) StopCoroutine(flipCoroutines[pos]);
+            StopCoroutine(flipCoroutines[pos]);
             flipCoroutines.Remove(pos);
         }
         

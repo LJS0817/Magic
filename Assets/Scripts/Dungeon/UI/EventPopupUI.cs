@@ -4,8 +4,9 @@ using TMPro;
 
 public class EventPopupUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI descText;
+    private CanvasGroup canvasGroup;
+    [SerializeField] private TMP_Text titleText;
+    [SerializeField] private TMP_Text descText;
     
     [SerializeField] private Button btnOptionA; // 스크롤 사용
     [SerializeField] private Button btnOptionB; // 즉석 마법 (그리기)
@@ -18,24 +19,53 @@ public class EventPopupUI : MonoBehaviour
 
     private void Start()
     {
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
         if (DungeonManager.Instance != null)
         {
             DungeonManager.Instance.OnTileEventTriggered += ShowPopup;
+            Debug.Log("[EventPopupUI] Successfully subscribed to OnTileEventTriggered.");
+        }
+        else
+        {
+            Debug.LogError("[EventPopupUI] DungeonManager.Instance is NULL during Start()!");
         }
         
         if (btnOptionA != null) btnOptionA.onClick.AddListener(OnOptionAClicked);
         if (btnOptionB != null) btnOptionB.onClick.AddListener(OnOptionBClicked);
         if (btnOptionC != null) btnOptionC.onClick.AddListener(OnOptionCClicked);
         
-        gameObject.SetActive(false);
+        HidePopupUI();
+    }
+
+    private void ShowPopupUI()
+    {
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+        }
+    }
+
+    private void HidePopupUI()
+    {
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void ShowPopup(HexTileData tile)
     {
+        Debug.Log($"[EventPopupUI] ShowPopup called for tile {tile.EventData.eventTitle}");
         currentTile = tile;
         currentPhaseIndex = 0;
         UpdatePopupUI();
-        gameObject.SetActive(true);
+        ShowPopupUI();
     }
 
     private void UpdatePopupUI()
@@ -114,7 +144,7 @@ public class EventPopupUI : MonoBehaviour
                 Debug.Log("<color=yellow>[상인] 교환할 소재가 부족합니다!</color>");
             }
             DungeonManager.Instance.ResolveEvent(currentTile, true);
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
         else if (currentTile.Type == HexTileType.Altar)
@@ -131,13 +161,13 @@ public class EventPopupUI : MonoBehaviour
             {
                 Debug.LogWarning("[제단] 바칠 완성된 스크롤이 없습니다!");
             }
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
         else if (currentTile.Type == HexTileType.Exit)
         {
             DungeonManager.Instance.ResolveEvent(currentTile, true);
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
 
@@ -200,7 +230,7 @@ public class EventPopupUI : MonoBehaviour
         }
         
         DungeonManager.Instance.ResolveEvent(currentTile, true, rewardMultiplier);
-        gameObject.SetActive(false);
+        HidePopupUI();
     }
 
     private void OnOptionBClicked()
@@ -208,7 +238,7 @@ public class EventPopupUI : MonoBehaviour
         if (currentTile.Type == HexTileType.Merchant)
         {
             DungeonManager.Instance.ResolveEvent(currentTile, true);
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
         else if (currentTile.Type == HexTileType.Altar)
@@ -225,7 +255,7 @@ public class EventPopupUI : MonoBehaviour
             {
                 Debug.LogWarning("[제단] 마나가 부족합니다!");
             }
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
 
@@ -235,7 +265,7 @@ public class EventPopupUI : MonoBehaviour
             PlayerDataManager.Instance.NotifyManaChanged();
             
             Debug.Log("<color=yellow>[이벤트] 즉석 그리기 모드로 전환합니다! (10초 내에 그리세요)</color>");
-            gameObject.SetActive(false);
+            HidePopupUI();
             
             DrawingManager.IsDungeonDrawingMode = true;
             DrawingManager.OnDungeonSpellDrawn += HandleDrawnSpell;
@@ -306,7 +336,7 @@ public class EventPopupUI : MonoBehaviour
         {
             Debug.Log("<color=red>[이벤트] 돌파 실패! 데미지를 입었습니다.</color>");
             DungeonManager.Instance.ResolveEvent(currentTile, false);
-            gameObject.SetActive(false);
+            HidePopupUI();
         }
     }
 
@@ -315,7 +345,7 @@ public class EventPopupUI : MonoBehaviour
         if (currentTile.Type == HexTileType.Altar || currentTile.Type == HexTileType.Merchant)
         {
             DungeonManager.Instance.ResolveEvent(currentTile, true);
-            gameObject.SetActive(false);
+            HidePopupUI();
             return;
         }
         
@@ -335,6 +365,6 @@ public class EventPopupUI : MonoBehaviour
         }
         
         DungeonManager.Instance.ResolveEvent(currentTile, false);
-        gameObject.SetActive(false);
+        HidePopupUI();
     }
 }
