@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
-  m_Name: FogTile
+  m_Name: PathTile
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
   m_AnimatedSprites:
-  - {fileID: 21300000, guid: 7e042822367ec6a4c8cedfe40bee9b6b, type: 3}
-  - {fileID: 21300000, guid: 42b41f65ff23cf74cbaad7e2ce6c7939, type: 3}
-  - {fileID: 21300000, guid: 2a778f879e8578b42b43c1d13f9e71e1, type: 3}
-  - {fileID: 21300000, guid: 67e19f463bc9b9d4a93ce86ec47ec81f, type: 3}
-  - {fileID: 21300000, guid: 5a1a7aebd40e8a140aa7caa5b888845b, type: 3}
-  - {fileID: 21300000, guid: f7d93677902e7db46bb9f35de9b8799b, type: 3}
+  - {fileID: 21300000, guid: e047a95b5bf1cca488f74111273b3b9d, type: 3}
+  - {fileID: 21300000, guid: 5338125a748628246b9263d359f92e8d, type: 3}
+  - {fileID: 21300000, guid: 84932374dc6d0414590c40f219d573fa, type: 3}
+  - {fileID: 21300000, guid: 77c75f70f1431a94fb02bddd367b3830, type: 3}
+  - {fileID: 21300000, guid: bc32843eca646ae40b10a41a2e7338f5, type: 3}
+  - {fileID: 21300000, guid: 9a9f26d176514c0439ed0be210c73fa4, type: 3}
   m_MinSpeed: 0
   m_MaxSpeed: 0
   m_AnimationStartTime: 0

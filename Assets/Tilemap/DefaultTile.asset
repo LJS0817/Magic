@@ -9,11 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55f747e8af38fbe4d8819f37be6fd5aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
   m_Name: DefaultTile
-  m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.HexagonalRuleTile
-  m_DefaultSprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_DefaultGameObject: {fileID: 0}
-  m_DefaultColliderType: 1
-  m_TilingRules: []
-  m_FlatTop: 1
+  m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
+  m_AnimatedSprites:
+  - {fileID: 21300000, guid: b3f3ea917dd625b4c9fd268ff6976caf, type: 3}
+  - {fileID: 21300000, guid: 34a648db3c47ac940aa62b4d11f6539b, type: 3}
+  - {fileID: 21300000, guid: 6155bdfc48c68f74bae48beb09a4ca1d, type: 3}
+  - {fileID: 21300000, guid: 4fe66ff228266c9439173364b675425d, type: 3}
+  - {fileID: 21300000, guid: 6b0428b669ff6a74b9b15797085a6f89, type: 3}
+  - {fileID: 21300000, guid: 721af8ac29ba64a4a89e737608e84dcf, type: 3}
+  m_MinSpeed: 0
+  m_MaxSpeed: 0
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
+  m_TileAnimationFlags: 0

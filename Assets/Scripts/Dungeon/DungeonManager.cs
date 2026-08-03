@@ -14,12 +14,14 @@ public class DungeonManager : MonoBehaviour
     public Vector3Int currentPos;
     
     [Header("References")]
-    public DungeonMapGenerator mapGenerator;
+    public DungeonTileManager tileManager;
     
     private Dictionary<Vector3Int, HexTileData> tileMap;
     private HashSet<ItemInstance> dungeonLoot = new HashSet<ItemInstance>();
     
     public int apCostReductionBuffTurns = 0;
+    private Coroutine moveCoroutine;
+    private List<Vector3Int> currentPath = new List<Vector3Int>();
     
     public event System.Action<int> OnAPChanged;
     public event System.Action<HexTileData> OnTileEventTriggered;
@@ -39,19 +41,28 @@ public class DungeonManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = mapGenerator.dungeonTilemap.WorldToCell(mousePos);
+            Vector3Int cellPos = tileManager.dungeonTilemap.WorldToCell(mousePos);
             cellPos.z = 0;
-            
+
             if (tileMap.ContainsKey(cellPos))
             {
                 Debug.Log("Move");
-                //MoveTo(cellPos);
+                if (HexPathfinding.GetNeighbors(currentPos).Contains(cellPos))
+                {
+                    if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+                    ClearPathTiles();
+                    MoveTo(cellPos);
+                }
+                else
+                {
+                    MoveAlongPath(cellPos);
+                }
             }
         }
         else if (Input.GetMouseButtonDown(1))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPos = mapGenerator.dungeonTilemap.WorldToCell(mousePos);
+            Vector3Int cellPos = tileManager.dungeonTilemap.WorldToCell(mousePos);
             cellPos.z = 0;
             
             if (tileMap.ContainsKey(cellPos))
@@ -68,12 +79,21 @@ public class DungeonManager : MonoBehaviour
         
         dungeonLoot.Clear();
         
-        tileMap = mapGenerator.GenerateMap();
+        tileMap = tileManager.GenerateMap();
         
         // 시작 위치 0,0,0
         currentPos = Vector3Int.zero;
         apCostReductionBuffTurns = 0;
+        
+        // 시작 지점은 애니메이션 없이 즉시 밝히고 플레이어 배치
+        if (tileMap.TryGetValue(currentPos, out HexTileData startTile))
+        {
+            startTile.Discover();
+            tileManager.dungeonTilemap.SetTile(currentPos, tileManager.defaultFloorTile);
+        }
+
         UpdateFogOfWar();
+        SetPlayerTile(currentPos);
         
         Debug.Log("<color=green>[던전] 던전에 입장했습니다!</color>");
     }
@@ -91,7 +111,7 @@ public class DungeonManager : MonoBehaviour
     {
         if (currentAP <= 0) return;
         
-        if (GetDistance(currentPos, targetPos) == 1)
+        if (HexPathfinding.GetNeighbors(currentPos).Contains(targetPos))
         {
             int moveCost = 1;
             if (apCostReductionBuffTurns > 0)
@@ -102,7 +122,7 @@ public class DungeonManager : MonoBehaviour
                     Debug.Log("<color=yellow>[버프] AP 소모 감소(공중부양) 효과가 끝났습니다.</color>");
             }
             
-            currentAP -= moveCost;
+            // currentAP -= moveCost;
             OnAPChanged?.Invoke(currentAP);
             
             // MP 회복
@@ -111,16 +131,98 @@ public class DungeonManager : MonoBehaviour
                 PlayerDataManager.Instance.currentMana = PlayerDataManager.Instance.GetMaxMana();
             PlayerDataManager.Instance.NotifyManaChanged();
 
+            RestoreTile(currentPos);
+
             currentPos = targetPos;
             UpdateFogOfWar();
             
-            CheckTileEvent(targetPos);
+            //CheckTileEvent(targetPos);
+            SetPlayerTile(currentPos);
             
             if (currentAP <= 0)
             {
                 DieInDungeon();
             }
         }
+    }
+
+    private void ClearPathTiles()
+    {
+        if (currentPath != null)
+        {
+            foreach (Vector3Int p in currentPath)
+            {
+                if (p != currentPos)
+                {
+                    RestoreTile(p);
+                }
+            }
+            currentPath.Clear();
+        }
+    }
+
+    public void MoveAlongPath(Vector3Int targetPos)
+    {
+        List<Vector3Int> path = HexPathfinding.FindPath(currentPos, targetPos, tileMap);
+        
+        if (path != null && path.Count > 0)
+        {
+            ClearPathTiles();
+            currentPath = new List<Vector3Int>(path);
+
+            string pathLog = $"경로 탐색: {currentPos}";
+            foreach(Vector3Int p in path)
+            {
+                pathLog += $" -> {p}";
+                if (p != currentPos && tileManager.dungeonTilemap != null && tileManager.pathTile != null)
+                {
+                    tileManager.FlipToTile(p, tileManager.pathTile);
+                }
+            }
+            Debug.Log(pathLog);
+
+            if (moveCoroutine != null)
+            {
+                StopCoroutine(moveCoroutine);
+            }
+            moveCoroutine = StartCoroutine(MoveCoroutine(path));
+        }
+        else
+        {
+            Debug.LogWarning("갈 수 없는 경로입니다.");
+        }
+    }
+
+    private System.Collections.IEnumerator MoveCoroutine(List<Vector3Int> path)
+    {
+        foreach (Vector3Int nextPos in path)
+        {
+            if (currentAP <= 0) 
+            {
+                Debug.LogWarning("AP가 부족하여 이동을 멈춥니다.");
+                break;
+            }
+            
+            MoveTo(nextPos);
+            
+            // 이벤트 타일을 밟았을 때 이동을 멈추는 로직입니다.
+            // 현재 맵의 70%가 이벤트 타일이므로, 이 조건 때문에 한 칸만 이동하고 멈추게 됩니다.
+            // 길찾기 테스트를 위해 임시로 주석 처리합니다.
+            /*
+            if (tileMap.TryGetValue(nextPos, out HexTileData tile))
+            {
+                if (!tile.IsEventCleared && tile.Type != HexTileType.Empty && tile.Type != HexTileType.Start)
+                {
+                    break;
+                }
+            }
+            */
+
+            yield return new WaitForSeconds(1f); 
+        }
+        
+        ClearPathTiles();
+        moveCoroutine = null;
     }
 
     private void CheckTileEvent(Vector3Int pos)
@@ -134,9 +236,9 @@ public class DungeonManager : MonoBehaviour
                     tile.RevealTrap();
                     Debug.Log("<color=red>[이벤트] 숨겨진 기습 함정이 정체를 드러냈습니다!</color>");
                     // 함정 타일로 시각적 업데이트 필요 시 이 부분에서 SetTile을 다시 호출할 수 있습니다.
-                    if (mapGenerator.dungeonTilemap != null)
+                    if (tileManager.dungeonTilemap != null)
                     {
-                        mapGenerator.dungeonTilemap.SetTile(pos, mapGenerator.GetRevealedTile(tile));
+                        tileManager.FlipToTile(pos, tileManager.GetRevealedTile(tile));
                     }
                 }
                 
@@ -155,6 +257,29 @@ public class DungeonManager : MonoBehaviour
                 {
                     OnTileEventTriggered?.Invoke(tile);
                 }
+            }
+        }
+    }
+
+    private void SetPlayerTile(Vector3Int pos)
+    {
+        if (tileManager.dungeonTilemap != null && tileManager.playerTile != null)
+        {
+            tileManager.FlipToTile(pos, tileManager.playerTile);
+        }
+    }
+
+    private void RestoreTile(Vector3Int pos)
+    {
+        if (tileManager.dungeonTilemap != null && tileMap.TryGetValue(pos, out HexTileData tile))
+        {
+            if (tile.IsDiscovered)
+            {
+                tileManager.FlipToTile(pos, tileManager.GetRevealedTile(tile));
+            }
+            else
+            {
+                tileManager.FlipToTile(pos, tileManager.fogTile);
             }
         }
     }
@@ -197,23 +322,46 @@ public class DungeonManager : MonoBehaviour
 
     private void RevealSight(Vector3Int center, int rad)
     {
-        for (int q = -rad; q <= rad; q++)
+        HashSet<Vector3Int> visited = new HashSet<Vector3Int>();
+        Queue<KeyValuePair<Vector3Int, int>> queue = new Queue<KeyValuePair<Vector3Int, int>>();
+        
+        queue.Enqueue(new KeyValuePair<Vector3Int, int>(center, 0));
+        visited.Add(center);
+
+        while (queue.Count > 0)
         {
-            int r1 = Mathf.Max(-rad, -q - rad);
-            int r2 = Mathf.Min(rad, -q + rad);
-            for (int r = r1; r <= r2; r++)
+            var current = queue.Dequeue();
+            Vector3Int p = current.Key;
+            int dist = current.Value;
+
+            if (tileMap.TryGetValue(p, out HexTileData t))
             {
-                Vector3Int p = new Vector3Int(center.x + q, center.y + r, 0);
-                if (tileMap.TryGetValue(p, out HexTileData t))
+                if (!t.IsDiscovered)
                 {
-                    if (!t.IsDiscovered)
+                    t.Discover();
+                    if (tileManager.dungeonTilemap != null)
                     {
-                        t.Discover();
-                        if (mapGenerator.dungeonTilemap != null)
+                        // 경로 상에 있는 타일이라면 pathTile을 시각적으로 유지하기 위해 덮어씌우지 않습니다.
+                        if (currentPath != null && currentPath.Contains(p) && p != currentPos)
                         {
-                            // 안개 타일 대신 탐색 완료된 타일(기본 바닥, 이벤트 아이콘 등)로 교체합니다.
-                            mapGenerator.dungeonTilemap.SetTile(p, mapGenerator.GetRevealedTile(t));
+                            // do nothing
                         }
+                        else
+                        {
+                            tileManager.FlipToTile(p, tileManager.GetRevealedTile(t));
+                        }
+                    }
+                }
+            }
+
+            if (dist < rad)
+            {
+                foreach (Vector3Int neighbor in HexPathfinding.GetNeighbors(p))
+                {
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue(new KeyValuePair<Vector3Int, int>(neighbor, dist + 1));
                     }
                 }
             }
@@ -231,8 +379,10 @@ public class DungeonManager : MonoBehaviour
         if (unknowns.Count > 0)
         {
             Vector3Int target = unknowns[Random.Range(0, unknowns.Count)];
+            RestoreTile(currentPos);
             currentPos = target;
             UpdateFogOfWar();
+            SetPlayerTile(currentPos);
             Debug.Log($"<color=magenta>[이벤트] 알 수 없는 텔레포트에 의해 다른 곳으로 이동되었습니다!</color>");
             CheckTileEvent(target);
         }
@@ -269,13 +419,6 @@ public class DungeonManager : MonoBehaviour
         InventoryManager.Instance.NotifyLoadoutChanged();
     }
 
-    private int GetDistance(Vector3Int a, Vector3Int b)
-    {
-        return (Mathf.Abs(a.x - b.x) 
-              + Mathf.Abs(a.x + a.y - b.x - b.y) 
-              + Mathf.Abs(a.y - b.y)) / 2;
-    }
-
     public void ApplyAltarBuff()
     {
         apCostReductionBuffTurns = 5;
@@ -284,7 +427,7 @@ public class DungeonManager : MonoBehaviour
 
     public void InspectTile(Vector3Int targetPos)
     {
-        if (GetDistance(currentPos, targetPos) == 1)
+        if (HexPathfinding.GetNeighbors(currentPos).Contains(targetPos))
         {
             if (tileMap.TryGetValue(targetPos, out HexTileData tile))
             {
@@ -298,9 +441,9 @@ public class DungeonManager : MonoBehaviour
                     {
                         tile.RevealTrap();
                         Debug.Log("<color=red>[탐색] 숨겨진 함정을 발견했습니다!</color>");
-                        if (mapGenerator.dungeonTilemap != null)
+                        if (tileManager.dungeonTilemap != null)
                         {
-                            mapGenerator.dungeonTilemap.SetTile(targetPos, mapGenerator.GetRevealedTile(tile));
+                            tileManager.FlipToTile(targetPos, tileManager.GetRevealedTile(tile));
                         }
                     }
                     else
