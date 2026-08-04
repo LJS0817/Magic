@@ -24,6 +24,7 @@ public class PenController : MonoBehaviour
         {
             if (forcedTool != null) return forcedTool;
             if (InventoryManager.Instance == null) return null;
+            if (InventoryManager.Instance.EquippedWand != null) return InventoryManager.Instance.EquippedWand;
             return InventoryManager.Instance.EquippedPen;
         }
     }

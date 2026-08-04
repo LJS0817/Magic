@@ -8,6 +8,7 @@ public class ItemScrollSO : ItemDataSO
     public int maxDurability = 5;
     public float accuracyScore = 1.0f; // 마법 완성 시 평균 점수 (기본 1.0)
     public SpellElement scrollElement = SpellElement.None;
+    public bool isPreCompleted = false;
 
     private void OnEnable()
     {

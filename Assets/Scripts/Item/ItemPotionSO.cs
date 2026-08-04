@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum PotionType { Health, Mana, ElementalResistance }
+public enum PotionType { AP, Mana, ElementalResistance }
 public enum PotionGrade { Lesser, Medium, Greater }
 
 [CreateAssetMenu(fileName = "New Potion", menuName = "Magic/Items/Potion")]
@@ -10,7 +10,7 @@ public class ItemPotionSO : ItemDataSO
     public PotionGrade potionGrade;
     
     [Header("Recovery Settings")]
-    [Tooltip("Amount of Health or Mana to recover")]
+    [Tooltip("Amount of AP or Mana to recover")]
     public float recoveryAmount;
 
     [Header("Resistance Settings")]
@@ -35,7 +35,19 @@ public class ItemPotionSO : ItemDataSO
     {
         type = ItemType.Potion;
         
-        if (potionType == PotionType.Health || potionType == PotionType.Mana)
+        if (potionType == PotionType.AP)
+        {
+            if (recoveryAmount == 0)
+            {
+                switch (potionGrade)
+                {
+                    case PotionGrade.Lesser: recoveryAmount = 5f; break;
+                    case PotionGrade.Medium: recoveryAmount = 10f; break;
+                    case PotionGrade.Greater: recoveryAmount = 20f; break;
+                }
+            }
+        }
+        else if (potionType == PotionType.Mana)
         {
             if (recoveryAmount == 0)
             {

@@ -10,19 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50102fe69a6739c4cb5b4c4982093845, type: 3}
-  m_Name: "Potion_\uD558\uAE09_\uCCB4\uB825_\uBB3C\uC57D"
+  m_Name: "Potion_하급_AP_물약"
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.ItemPotionSO
   type: 3
   rarity: 0
-  itemName: "\uD558\uAE09 \uCCB4\uB825 \uBB3C\uC57D"
-  itemDescription: "\uC791\uC740 \uC0C1\uCC98\uB97C \uCE58\uB8CC\uD560 \uC218 \uC788\uB294
-    \uBD89\uC740\uC0C9 \uBB3C\uC57D\uC785\uB2C8\uB2E4."
+  itemName: "하급 AP 물약"
+  itemDescription: "약간의 피로를 회복시켜주는 녹색 물약입니다."
   itemIcon: {fileID: 0}
   basePriceInCopper: 0
   maxStack: 99
   potionType: 0
   potionGrade: 0
-  recoveryAmount: 25
+  recoveryAmount: 5
   resistanceElement: 0
   resistanceDuration: 30
   resistancePercentage: 0.25

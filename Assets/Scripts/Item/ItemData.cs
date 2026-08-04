@@ -82,7 +82,14 @@ public class Item_Scroll : ItemInstance
 
     public Item_Scroll(ItemScrollSO scrollData, bool isEmpty = true, int currentDurability = -1) : base(scrollData)
     {
-        this.isEmpty = isEmpty;
+        if (scrollData != null && scrollData.isPreCompleted)
+        {
+            this.isEmpty = false;
+        }
+        else
+        {
+            this.isEmpty = isEmpty;
+        }
         this.currentDurability = currentDurability < 0 ? (scrollData != null ? scrollData.maxDurability : 5) : currentDurability;
     }
 }

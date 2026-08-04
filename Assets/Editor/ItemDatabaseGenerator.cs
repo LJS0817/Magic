@@ -139,9 +139,9 @@ namespace Magic.Editor
 
         private static readonly PotionDef[] PotionDefs = new PotionDef[]
         {
-            new PotionDef("하급 체력 물약", PotionType.Health, PotionGrade.Lesser, 25f, "일반", "작은 상처를 치료할 수 있는 붉은색 물약입니다."),
-            new PotionDef("중급 체력 물약", PotionType.Health, PotionGrade.Medium, 50f, "고급", "보통의 상처를 순식간에 아물게 하는 물약입니다."),
-            new PotionDef("상급 체력 물약", PotionType.Health, PotionGrade.Greater, 100f, "희귀", "치명적인 부상도 빠르게 회복시켜 주는 고농축 물약입니다."),
+            new PotionDef("하급 체력 물약", PotionType.AP, PotionGrade.Lesser, 25f, "일반", "작은 상처를 치료할 수 있는 붉은색 물약입니다."),
+            new PotionDef("중급 체력 물약", PotionType.AP, PotionGrade.Medium, 50f, "고급", "보통의 상처를 순식간에 아물게 하는 물약입니다."),
+            new PotionDef("상급 체력 물약", PotionType.AP, PotionGrade.Greater, 100f, "희귀", "치명적인 부상도 빠르게 회복시켜 주는 고농축 물약입니다."),
             new PotionDef("하급 마나 물약", PotionType.Mana, PotionGrade.Lesser, 25f, "일반", "소모된 마나를 조금 보충해 주는 푸른색 물약입니다."),
             new PotionDef("중급 마나 물약", PotionType.Mana, PotionGrade.Medium, 50f, "고급", "마나를 꽤 많이 회복시켜 주어 전투 중 유용합니다."),
             new PotionDef("상급 마나 물약", PotionType.Mana, PotionGrade.Greater, 100f, "희귀", "순수한 마력의 정수가 담겨 있어 마나를 대량으로 회복합니다."),

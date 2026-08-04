@@ -6,8 +6,6 @@ using DG.Tweening;
 public class DrawingManager : MonoBehaviour
 {
     public static bool IsDrawingBlocked = false;
-    public static bool IsDungeonDrawingMode = false;
-    public static event System.Action<SpellRecipeAsset, float> OnDungeonSpellDrawn;
 
     [Header("Magic Combo Stats")]
     public List<DrawnShape> drawnShapes = new List<DrawnShape>();
@@ -28,7 +26,6 @@ public class DrawingManager : MonoBehaviour
     protected bool isRefilling = false;
     protected bool isOutsideArea = false;
     protected bool isPenReady = false;
-    protected bool isStamping = false;
 
     protected DrawingDatabase drawingDatabase;
 
@@ -234,7 +231,6 @@ public class DrawingManager : MonoBehaviour
         }
         else if (Input.GetMouseButton(0))
         {
-            if (isStamping) return;
             if (!isDrawing && isPenReady)
             {
                 StartStroke();
@@ -246,16 +242,17 @@ public class DrawingManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            isStamping = false;
             EndStroke();
         }
+        MatchComboUseKey();
+    }
 
-        // 일반 그리기 모드에서의 마법 조합 (스페이스바)
+    protected virtual void MatchComboUseKey()
+    {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             MatchCombo();
         }
-
         // 개발자 도구: 현재 그려진 선을 'Star' 템플릿으로 저장 (엔터 키)
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
@@ -281,8 +278,8 @@ public class DrawingManager : MonoBehaviour
 
         ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
         
-        // 지팡이나 도장이 아니라면(펜이라면) 빈 스크롤이 장착되어 있어야 함
-        if (!(currentTool is Item_Wand))
+        // 스크롤이 필요한 경우에만 빈 스크롤 장착 여부 확인 (지팡이 등은 예외)
+        if (RequiresScrollToDraw() && !(currentTool is Item_Wand))
         {
             Item_Scroll currentScroll = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
             if (currentScroll == null || !currentScroll.isEmpty)
@@ -440,7 +437,25 @@ public class DrawingManager : MonoBehaviour
             return;
         }
 
-        var matchResult = ComboMatcher.Match(drawnShapes, drawingDatabase.recipes);
+        // 힌트가 있거나 이미 해금된 레시피만 매칭 대상으로 필터링 (Locked 상태는 아무리 잘 그려도 실패 처리)
+        List<SpellRecipeAsset> matchableRecipes = new List<SpellRecipeAsset>();
+        if (PlayerDataManager.Instance != null)
+        {
+            foreach (var recipe in drawingDatabase.recipes)
+            {
+                var state = PlayerDataManager.Instance.GetRecipeState(recipe.SpellName);
+                if (state != RecipeUnlockState.Locked)
+                {
+                    matchableRecipes.Add(recipe);
+                }
+            }
+        }
+        else
+        {
+            matchableRecipes.AddRange(drawingDatabase.recipes);
+        }
+
+        var matchResult = ComboMatcher.Match(drawnShapes, matchableRecipes.ToArray());
         OnSpellMatched(matchResult.Item1, matchResult.Item2);
     }
 
@@ -466,13 +481,6 @@ public class DrawingManager : MonoBehaviour
                         break;
                     }
                 }
-            }
-
-            if (IsDungeonDrawingMode)
-            {
-                // 던전 즉석 그리기 모드일 경우 스크롤을 소모/생성하지 않고 이벤트 콜백만 보냄
-                OnDungeonSpellDrawn?.Invoke(matchedRecipe, averageScore);
-                return;
             }
 
             if (currentScroll != null && currentScroll.isEmpty)

@@ -39,6 +39,7 @@ public class DungeonManager : MonoBehaviour
     private Vector3 dragStartCameraPos;
     private Vector3 dragStartMousePos;
     private bool isDraggingMap = false;
+    private float dragAccumulatedDistance = 0f;
 
     public bool IsEventActive { get; private set; }
 
@@ -96,6 +97,7 @@ public class DungeonManager : MonoBehaviour
             {
                 isDraggingMap = true;
                 dragStartMousePos = Input.mousePosition;
+                dragAccumulatedDistance = 0f;
                 
                 Camera targetCam = dungeonCamera != null ? dungeonCamera : Camera.main;
                 if (targetCam != null)
@@ -109,13 +111,27 @@ public class DungeonManager : MonoBehaviour
             Camera targetCam = dungeonCamera != null ? dungeonCamera : Camera.main;
             if (targetCam != null)
             {
-                Vector3 currentMousePos = Input.mousePosition;
+                float mouseX = Input.GetAxis("Mouse X");
+                float mouseY = Input.GetAxis("Mouse Y");
+                
+                dragAccumulatedDistance += Mathf.Abs(mouseX) + Mathf.Abs(mouseY);
+                
+                // 드래그가 일정 수준 이상 진행되면 커서를 숨기고 잠금
+                if (dragAccumulatedDistance >= 1.0f && Cursor.lockState != CursorLockMode.Locked)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
                 
                 float screenHeight = mapRenderRect != null ? mapRenderRect.rect.height : Screen.height;
                 float screenToWorldRatio = (targetCam.orthographicSize * 2f) / screenHeight;
                 
-                Vector3 delta = (dragStartMousePos - currentMousePos) * screenToWorldRatio;
-                targetCam.transform.position = dragStartCameraPos + delta;
+                // Input.GetAxis는 해상도에 직접 비례하지 않으므로 적절한 배율(예: 50f)을 곱해줍니다. 
+                // 스크롤 감도가 너무 빠르거나 느리면 이 값을 조절하세요.
+                float dragSensitivity = 50f; 
+                Vector3 delta = new Vector3(-mouseX, -mouseY, 0) * screenToWorldRatio * dragSensitivity;
+                
+                targetCam.transform.position += delta;
             }
         }
 
@@ -124,9 +140,16 @@ public class DungeonManager : MonoBehaviour
         {
             isDraggingMap = false;
             
-            if (Vector3.Distance(dragStartMousePos, Input.mousePosition) < 10f)
+            if (Cursor.lockState == CursorLockMode.Locked)
             {
-                ProcessLeftClick(Input.mousePosition);
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            
+            // 마우스가 잠겨있을 때는 화면 상의 좌표 이동이 없으므로 누적 이동량을 기준으로 클릭 여부를 판별
+            if (dragAccumulatedDistance < 1.0f)
+            {
+                ProcessLeftClick(dragStartMousePos); // 잠금이 풀리면서 위치가 변할 수 있으므로 처음 클릭한 위치 사용
             }
             else
             {

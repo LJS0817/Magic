@@ -108,7 +108,12 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
 
         var inv = InventoryManager.Instance;
-        if (slot.Item is Item_Ink ink)
+        if (slot.Item is Item_Scroll scroll)
+        {
+            if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
+            else inv.EquippedScroll = scroll;
+        }
+        else if (slot.Item is Item_Ink ink)
         {
             if (inv.EquippedInk == ink) inv.EquippedInk = null;
             else inv.EquippedInk = ink;
@@ -123,7 +128,20 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
             var pData = PlayerDataManager.Instance;
             if (pData != null && potion.PotionData != null)
             {
-                if (potion.PotionData.potionType == PotionType.Mana)
+                if (potion.PotionData.potionType == PotionType.AP)
+                {
+                    if (DungeonManager.Instance != null)
+                    {
+                        DungeonManager.Instance.currentAP += (int)potion.PotionData.recoveryAmount;
+                        Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 행동력(AP)을 회복했습니다! 현재 AP: {DungeonManager.Instance.currentAP}</color>");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[아이템] 던전 밖에서는 AP 물약을 사용할 수 없습니다.");
+                        return; // 아이템 소모 방지
+                    }
+                }
+                else if (potion.PotionData.potionType == PotionType.Mana)
                 {
                     pData.currentMana += potion.PotionData.recoveryAmount;
                     if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();

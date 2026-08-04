@@ -5,6 +5,7 @@ using TMPro;
 public class EventPopupUI : MonoBehaviour
 {
     private CanvasGroup canvasGroup;
+    [SerializeField] CanvasGroup content;
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text descText;
     
@@ -12,9 +13,10 @@ public class EventPopupUI : MonoBehaviour
     [SerializeField] private Button btnOptionB; // 즉석 마법 (그리기)
     [SerializeField] private Button btnOptionC; // 맨몸 돌파
 
-    private HexTileData currentTile;
-    private Coroutine drawingTimerRoutine;
+    [SerializeField] CanvasGroup drawingContent;
+    [SerializeField] private EventDrawingManager eventDrawingManager;
 
+    private HexTileData currentTile;
     private int currentPhaseIndex = 0;
 
     private void Start()
@@ -35,8 +37,24 @@ public class EventPopupUI : MonoBehaviour
         if (btnOptionA != null) btnOptionA.onClick.AddListener(OnOptionAClicked);
         if (btnOptionB != null) btnOptionB.onClick.AddListener(OnOptionBClicked);
         if (btnOptionC != null) btnOptionC.onClick.AddListener(OnOptionCClicked);
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnScrollEquipped += HandleScrollEquipped;
+        }
         
         HidePopupUI();
+    }
+
+    private void OnDestroy()
+    {
+        if (DungeonManager.Instance != null)
+        {
+            DungeonManager.Instance.OnTileEventTriggered -= ShowPopup;
+        }
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.OnScrollEquipped -= HandleScrollEquipped;
+        }
     }
 
     private void ShowPopupUI()
@@ -57,6 +75,7 @@ public class EventPopupUI : MonoBehaviour
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
         }
+        if (eventDrawingManager != null) eventDrawingManager.enabled = false;
     }
 
     private void ShowPopup(HexTileData tile)
@@ -64,6 +83,21 @@ public class EventPopupUI : MonoBehaviour
         Debug.Log($"[EventPopupUI] ShowPopup called for tile {tile.EventData.eventTitle}");
         currentTile = tile;
         currentPhaseIndex = 0;
+        
+        if (content != null)
+        {
+            content.alpha = 1f;
+            content.interactable = true;
+            content.blocksRaycasts = true;
+        }
+        if (drawingContent != null)
+        {
+            drawingContent.alpha = 0f;
+            drawingContent.interactable = false;
+            drawingContent.blocksRaycasts = false;
+        }
+        if (eventDrawingManager != null) eventDrawingManager.enabled = false;
+        
         UpdatePopupUI();
         ShowPopupUI();
     }
@@ -101,31 +135,85 @@ public class EventPopupUI : MonoBehaviour
             if (txtA != null) txtA.text = "가진 소재 모두 팔기";
             if (txtB != null) txtB.text = "무시하고 지나가기";
             if (btnOptionC != null) btnOptionC.gameObject.SetActive(false);
+            if (btnOptionA != null) btnOptionA.interactable = true;
         }
         else if (currentTile.Type == HexTileType.Altar)
         {
             if (txtA != null) txtA.text = "스크롤 제물 바치기 (AP +5)";
             if (txtB != null) txtB.text = "마나 20 바치기 (AP +5)";
             if (txtC != null) txtC.text = "무시하고 지나가기";
+            if (btnOptionA != null) btnOptionA.interactable = true;
         }
         else if (currentTile.Type == HexTileType.Exit)
         {
             if (txtA != null) txtA.text = "탈출하기";
             if (btnOptionB != null) btnOptionB.gameObject.SetActive(false);
             if (btnOptionC != null) btnOptionC.gameObject.SetActive(false);
+            if (btnOptionA != null) btnOptionA.interactable = true;
         }
         else if (currentTile.Type == HexTileType.Resource)
         {
-            if (txtA != null) txtA.text = "채집 마법 스크롤 사용 (보너스)";
             if (txtB != null) txtB.text = "즉석 그리기 (10초, 보너스)";
             if (txtC != null) txtC.text = "기본 채집 (돌파)";
+            UpdateScrollButtonState();
         }
         else
         {
-            if (txtA != null) txtA.text = "스크롤 사용";
             if (txtB != null) txtB.text = "즉석 그리기 (10초)";
             if (txtC != null) txtC.text = "맨몸 돌파 (피해 감수)";
+            UpdateScrollButtonState();
         }
+    }
+
+    private void HandleScrollEquipped(Item_Scroll scroll)
+    {
+        if (canvasGroup != null && canvasGroup.alpha > 0f && currentTile != null)
+        {
+            if (currentTile.Type == HexTileType.Boss || currentTile.Type == HexTileType.NormalMonster ||
+                currentTile.Type == HexTileType.Trap || currentTile.Type == HexTileType.Obstacle || 
+                currentTile.Type == HexTileType.NPC || currentTile.Type == HexTileType.Resource)
+            {
+                UpdateScrollButtonState();
+            }
+        }
+    }
+
+    private void UpdateScrollButtonState()
+    {
+        if (btnOptionA == null) return;
+        var txtA = btnOptionA.GetComponentInChildren<TextMeshProUGUI>();
+
+        Item_Scroll equipped = InventoryManager.Instance != null ? InventoryManager.Instance.EquippedScroll : null;
+        
+        if (equipped != null && !equipped.isEmpty)
+        {
+            bool meetsRequirement = CheckSpellRequirementSilent(equipped.ScrollData.spellName, equipped.ScrollData.scrollElement);
+            if (meetsRequirement)
+            {
+                if (txtA != null) txtA.text = $"스크롤 사용 ({equipped.ScrollData.spellName})";
+                btnOptionA.interactable = true;
+            }
+            else
+            {
+                if (txtA != null) txtA.text = "조건 불일치 스크롤";
+                btnOptionA.interactable = false;
+            }
+        }
+        else
+        {
+            if (txtA != null) txtA.text = currentTile.Type == HexTileType.Resource ? "채집 마법 스크롤 사용 (보너스)" : "스크롤 사용";
+            btnOptionA.interactable = false;
+        }
+    }
+
+    private bool CheckSpellRequirementSilent(string spellName, SpellElement element)
+    {
+        if (currentTile.Type == HexTileType.Boss || currentTile.Type == HexTileType.NormalMonster)
+        {
+            SpellElement req = currentTile.EventData.requiredElements[currentPhaseIndex];
+            if (element != req) return false;
+        }
+        return true;
     }
 
     private void OnOptionAClicked()
@@ -178,11 +266,8 @@ public class EventPopupUI : MonoBehaviour
             
             scroll.isEmpty = true;
             Debug.Log($"<color=cyan>[이벤트] 스크롤({scroll.ScrollData?.spellName})을 사용하여 돌파했습니다!</color>");
+            if (InventoryManager.Instance != null) InventoryManager.Instance.NotifyInventoryChanged();
             ProceedPhase(true);
-        }
-        else
-        {
-            Debug.LogWarning("[이벤트] 적절한 완성 스크롤이 없습니다!");
         }
     }
 
@@ -259,30 +344,55 @@ public class EventPopupUI : MonoBehaviour
             return;
         }
 
-        if (PlayerDataManager.Instance.currentMana >= 10f)
+        // 이벤트 즉석 그리기는 마나를 소모하지 않음
+        Debug.Log("<color=yellow>[이벤트] 즉석 그리기 모드로 전환합니다!</color>");
+        
+        if (drawingContent != null)
         {
-            PlayerDataManager.Instance.currentMana -= 10f;
-            PlayerDataManager.Instance.NotifyManaChanged();
-            
-            Debug.Log("<color=yellow>[이벤트] 즉석 그리기 모드로 전환합니다! (10초 내에 그리세요)</color>");
-            HidePopupUI();
-            
-            DrawingManager.IsDungeonDrawingMode = true;
-            DrawingManager.OnDungeonSpellDrawn += HandleDrawnSpell;
-            
-            if (drawingTimerRoutine != null) StopCoroutine(drawingTimerRoutine);
-            drawingTimerRoutine = StartCoroutine(DrawingTimerRoutine(10f));
+            drawingContent.alpha = 1f;
+            drawingContent.interactable = true;
+            drawingContent.blocksRaycasts = true;
         }
-        else
+        if (content != null)
         {
-            Debug.LogWarning("[이벤트] 마나가 부족합니다!");
+            content.alpha = 0f;
+            content.interactable = false;
+            content.blocksRaycasts = false;
+        }
+        
+        if (eventDrawingManager != null)
+        {
+            eventDrawingManager.enabled = true;
+            eventDrawingManager.OnEventSpellMatched -= HandleDrawnSpell;
+            eventDrawingManager.OnEventSpellMatched += HandleDrawnSpell;
+            
+            eventDrawingManager.OnCancelDrawing -= CancelDrawingMode;
+            eventDrawingManager.OnCancelDrawing += CancelDrawingMode;
         }
     }
 
-    private System.Collections.IEnumerator DrawingTimerRoutine(float duration)
+    private void CancelDrawingMode()
     {
-        yield return new WaitForSeconds(duration);
-        EndDrawingMode(false, null);
+        if (eventDrawingManager != null)
+        {
+            eventDrawingManager.enabled = false;
+            eventDrawingManager.OnEventSpellMatched -= HandleDrawnSpell;
+            eventDrawingManager.OnCancelDrawing -= CancelDrawingMode;
+            eventDrawingManager.ClearDrawing();
+        }
+        
+        if (content != null)
+        {
+            content.alpha = 1f;
+            content.interactable = true;
+            content.blocksRaycasts = true;
+        }
+        if (drawingContent != null)
+        {
+            drawingContent.alpha = 0f;
+            drawingContent.interactable = false;
+            drawingContent.blocksRaycasts = false;
+        }
     }
 
     private void HandleDrawnSpell(SpellRecipeAsset recipe, float score)
@@ -292,6 +402,18 @@ public class EventPopupUI : MonoBehaviour
             EndDrawingMode(false, null);
             return;
         }
+        
+        // 해당 마법을 발동하기 위한 마나 체크 및 소비
+        if (PlayerDataManager.Instance.currentMana < recipe.manaCost)
+        {
+            Debug.LogWarning($"[이벤트] 마나가 부족하여 마법({recipe.SpellName})을 발동할 수 없습니다! (필요: {recipe.manaCost})");
+            EndDrawingMode(false, recipe);
+            return;
+        }
+        
+        PlayerDataManager.Instance.currentMana -= recipe.manaCost;
+        PlayerDataManager.Instance.NotifyManaChanged();
+        Debug.Log($"<color=cyan>[이벤트] {recipe.SpellName} 발동! 마나 {recipe.manaCost}을 소모했습니다.</color>");
         
         if (currentTile.Type == HexTileType.Boss || currentTile.Type == HexTileType.NormalMonster)
         {
@@ -318,14 +440,26 @@ public class EventPopupUI : MonoBehaviour
 
     private void EndDrawingMode(bool success, SpellRecipeAsset recipe)
     {
-        if (drawingTimerRoutine != null)
+        if (eventDrawingManager != null)
         {
-            StopCoroutine(drawingTimerRoutine);
-            drawingTimerRoutine = null;
+            eventDrawingManager.enabled = false;
+            eventDrawingManager.OnEventSpellMatched -= HandleDrawnSpell;
+            eventDrawingManager.OnCancelDrawing -= CancelDrawingMode;
+            eventDrawingManager.ClearDrawing();
         }
         
-        DrawingManager.OnDungeonSpellDrawn -= HandleDrawnSpell;
-        DrawingManager.IsDungeonDrawingMode = false;
+        if (content != null)
+        {
+            content.alpha = 1f;
+            content.interactable = true;
+            content.blocksRaycasts = true;
+        }
+        if (drawingContent != null)
+        {
+            drawingContent.alpha = 0f;
+            drawingContent.interactable = false;
+            drawingContent.blocksRaycasts = false;
+        }
         
         if (success)
         {
