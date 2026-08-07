@@ -9,6 +9,7 @@ public class DungeonManager : MonoBehaviour
 
     [Header("Dungeon Settings")]
     public int initialAP = 20;
+    public float monsterMoveInterval = 3f;
     
     [Header("Current State")]
     public int currentAP;
@@ -26,11 +27,16 @@ public class DungeonManager : MonoBehaviour
     
     public event System.Action<int> OnAPChanged;
     public event System.Action<HexTileData> OnTileEventTriggered;
+    public event System.Action<HexTileData> OnTileHovered;
+    
+    private Vector3Int? lastHoveredTilePos = null;
 
     [Header("Peek Settings")]
     public int peekAPCost = 1;
     private Vector3Int? peekedTilePos;
+    public Vector3Int? PeekedTilePos => peekedTilePos;
     private AnimatedTile prePeekTile;
+    private float lastRevertTime = 0f;
 
     [Header("Input & Camera Settings")]
     public RectTransform mapRenderRect; 
@@ -47,6 +53,11 @@ public class DungeonManager : MonoBehaviour
     {
         Instance = this;
         EnterDungeon();
+    }
+
+    private void Start()
+    {
+        StartCoroutine(MonsterMoveRoutine());
     }
 
     private Camera GetUICamera()
@@ -166,6 +177,61 @@ public class DungeonManager : MonoBehaviour
                 ProcessRightClick(Input.mousePosition);
             }
         }
+
+        // 호버 처리
+        if (!isDraggingMap && !IsEventActive)
+        {
+            if (peekedTilePos.HasValue)
+            {
+                // Peek 중일 때는 마우스 위치와 무관하게 Peek 중인 타일의 정보를 고정 표시
+                if (tileMap.TryGetValue(peekedTilePos.Value, out HexTileData peekTile))
+                {
+                    if (!lastHoveredTilePos.HasValue || lastHoveredTilePos.Value != peekedTilePos.Value)
+                    {
+                        lastHoveredTilePos = peekedTilePos.Value;
+                        OnTileHovered?.Invoke(peekTile);
+                    }
+                }
+            }
+            else if (mapRenderRect == null || isPointerInRenderRect)
+            {
+                if (GetTargetCell(Input.mousePosition, out Vector3Int hoverCellPos))
+                {
+                    if (tileMap.TryGetValue(hoverCellPos, out HexTileData hoverTile))
+                    {
+                        if (!lastHoveredTilePos.HasValue || lastHoveredTilePos.Value != hoverCellPos)
+                        {
+                            lastHoveredTilePos = hoverCellPos;
+                            OnTileHovered?.Invoke(hoverTile);
+                        }
+                    }
+                    else
+                    {
+                        if (lastHoveredTilePos.HasValue)
+                        {
+                            lastHoveredTilePos = null;
+                            OnTileHovered?.Invoke(null);
+                        }
+                    }
+                }
+                else
+                {
+                    if (lastHoveredTilePos.HasValue)
+                    {
+                        lastHoveredTilePos = null;
+                        OnTileHovered?.Invoke(null);
+                    }
+                }
+            }
+            else
+            {
+                if (lastHoveredTilePos.HasValue)
+                {
+                    lastHoveredTilePos = null;
+                    OnTileHovered?.Invoke(null);
+                }
+            }
+        }
     }
 
     private bool GetTargetCell(Vector2 screenPos, out Vector3Int cellPos)
@@ -212,6 +278,41 @@ public class DungeonManager : MonoBehaviour
         return false;
     }
 
+    [HideInInspector] public bool isTeleportTargeting = false;
+
+    public bool CastFieldSpell(string spellName, SpellElement element)
+    {
+        if (spellName.Contains("Teleport") || spellName.Contains("Thunder Blink") || spellName.Contains("Blink"))
+        {
+            isTeleportTargeting = true;
+            Debug.Log("<color=cyan>[마법 시전] Teleport 발동! 이동할 탐험된 타일을 클릭하세요.</color>");
+            return true;
+        }
+        else if (spellName.Contains("Haste") || spellName.Contains("Lightning Speed"))
+        {
+            currentAP += 5;
+            OnAPChanged?.Invoke(currentAP);
+            Debug.Log($"<color=cyan>[마법 시전] Haste 발동! AP가 5 회복되었습니다. 현재 AP: {currentAP}</color>");
+            return true;
+        }
+        else if (spellName.Contains("Mana Trap") || spellName.Contains("Trap"))
+        {
+            PlayerDataManager.Instance.currentMana += 50f;
+            if(PlayerDataManager.Instance.currentMana > PlayerDataManager.Instance.GetMaxMana()) PlayerDataManager.Instance.currentMana = PlayerDataManager.Instance.GetMaxMana();
+            PlayerDataManager.Instance.NotifyManaChanged();
+            Debug.Log($"<color=cyan>[마법 시전] Mana Trap 발동! 마나 50 회복.</color>");
+            return true;
+        }
+        else if (spellName.Contains("Heal") || spellName.Contains("Purify"))
+        {
+            Debug.Log($"<color=cyan>[마법 시전] {spellName} 발동! (임시 처리: 상태이상 회복 등급 적용)</color>");
+            return true;
+        }
+        
+        Debug.LogWarning($"<color=yellow>[마법 시전] {spellName}은(는) 비전투 상황(이벤트 없음)에서 사용할 수 있는 필드 효과가 없습니다.</color>");
+        return false;
+    }
+
     private void ProcessLeftClick(Vector2 screenPos)
     {
         if (peekedTilePos.HasValue)
@@ -221,8 +322,29 @@ public class DungeonManager : MonoBehaviour
 
         if (GetTargetCell(screenPos, out Vector3Int cellPos))
         {
-            if (tileMap.ContainsKey(cellPos))
+            if (tileMap.TryGetValue(cellPos, out HexTileData tile))
             {
+                if (isTeleportTargeting)
+                {
+                    if (tile.IsDiscovered)
+                    {
+                        isTeleportTargeting = false;
+                        if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+                        ClearPathTiles();
+                        
+                        RestoreTile(currentPos);
+                        currentPos = cellPos;
+                        UpdateFogOfWar();
+                        SetPlayerTile(currentPos);
+                        Debug.Log($"<color=cyan>[순간이동] {cellPos} 타일로 순간이동했습니다!</color>");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[순간이동 실패] 이미 탐험한 타일로만 순간이동할 수 있습니다.");
+                    }
+                    return;
+                }
+
                 if (HexPathfinding.GetNeighbors(currentPos).Contains(cellPos))
                 {
                     if (moveCoroutine != null) StopCoroutine(moveCoroutine);
@@ -239,6 +361,9 @@ public class DungeonManager : MonoBehaviour
 
     private void ProcessRightClick(Vector2 screenPos)
     {
+        // 트랙패드나 민감한 마우스에서 우클릭을 뗄 때 미세한 바운스로 인해 다시 클릭이 인식되는 현상 방지
+        if (Time.unscaledTime - lastRevertTime < 0.15f) return;
+
         if (GetTargetCell(screenPos, out Vector3Int cellPos))
         {
             if (peekedTilePos.HasValue)
@@ -495,6 +620,10 @@ public class DungeonManager : MonoBehaviour
             // 실패 페널티 (AP 감소 등)
             currentAP -= 5;
             OnAPChanged?.Invoke(currentAP);
+            
+            // 맨몸 돌파 시 몬스터가 사라지도록 클리어 처리
+            tile.ClearEvent();
+            
             if (currentAP <= 0) DieInDungeon();
         }
     }
@@ -640,13 +769,17 @@ public class DungeonManager : MonoBehaviour
                 // currentAP -= peekAPCost;
                 OnAPChanged?.Invoke(currentAP);
 
-                prePeekTile = tileManager.dungeonTilemap.GetTile<UnityEngine.Tilemaps.AnimatedTile>(targetPos);
+                // 애니메이션 도중 GetTile을 호출하면 엉뚱한 타일이 반환될 수 있으므로, 미탐험 타일의 기본 상태인 fogTile로 고정
+                prePeekTile = tileManager.fogTile;
                 peekedTilePos = targetPos;
 
                 Debug.Log($"[Peek] Start Peek at {targetPos}. prePeekTile is {(prePeekTile == null ? "NULL" : prePeekTile.name)}");
 
                 AnimatedTile revealedTile = tileManager.GetRevealedTile(tile);
                 tileManager.FlipToTile(targetPos, revealedTile);
+                
+                // Peek 상태가 변했으므로 다음 프레임에 호버 UI가 갱신되도록 초기화
+                lastHoveredTilePos = null;
             }
         }
         else
@@ -666,6 +799,10 @@ public class DungeonManager : MonoBehaviour
             
             peekedTilePos = null;
             prePeekTile = null;
+            
+            // Peek 상태가 해제되었으므로 다음 프레임에 호버 UI가 갱신되도록 초기화
+            lastHoveredTilePos = null;
+            lastRevertTime = Time.unscaledTime;
         }
     }
 
@@ -696,6 +833,73 @@ public class DungeonManager : MonoBehaviour
             RevealSight(secretPos, 0); // 핀포인트 시야 확보
             
             Debug.Log("<color=cyan>[NPC] 감사의 표시로 맵 어딘가에 있는 비밀 보물 방의 위치를 알려주었습니다!</color>");
+        }
+    }
+
+    private System.Collections.IEnumerator MonsterMoveRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(monsterMoveInterval);
+
+            if (IsEventActive) continue;
+            if (tileMap == null) continue;
+
+            // 현재 지도에 있는 모든 몬스터 타일 수집 (반복 중 딕셔너리 변경 방지를 위해 리스트로 복사)
+            List<HexTileData> monsterTiles = new List<HexTileData>();
+            foreach (var kvp in tileMap)
+            {
+                if (kvp.Value.Type == HexTileType.NormalMonster)
+                {
+                    monsterTiles.Add(kvp.Value);
+                }
+            }
+
+            foreach (var monsterTile in monsterTiles)
+            {
+                // 주변 이웃 구하기
+                List<Vector3Int> neighbors = HexPathfinding.GetNeighbors(monsterTile.position);
+                List<Vector3Int> validMoves = new List<Vector3Int>();
+
+                foreach (var n in neighbors)
+                {
+                    // 비어있는 곳이고 플레이어가 없는 곳이면 이동 가능
+                    if (tileMap.TryGetValue(n, out HexTileData neighborTile))
+                    {
+                        if (neighborTile.Type == HexTileType.Empty && n != currentPos)
+                        {
+                            validMoves.Add(n);
+                        }
+                    }
+                }
+
+                if (validMoves.Count > 0)
+                {
+                    Vector3Int targetPos = validMoves[Random.Range(0, validMoves.Count)];
+                    HexTileData targetTile = tileMap[targetPos];
+
+                    // 데이터 변경
+                    monsterTile.ChangeType(HexTileType.Empty);
+                    targetTile.ChangeType(HexTileType.NormalMonster);
+
+                    // 시각적 연출 (탐험된 지역에서만 애니메이션)
+                    if (monsterTile.IsDiscovered)
+                    {
+                        tileManager.FlipToTile(monsterTile.position, tileManager.defaultFloorTile);
+                    }
+                    if (targetTile.IsDiscovered)
+                    {
+                        tileManager.FlipToTile(targetTile.position, tileManager.normalMonsterTile);
+                    }
+
+                    // Hover UI 갱신이 필요하다면 처리 (현재 마우스가 해당 타일 위에 있을 때)
+                    if (lastHoveredTilePos.HasValue && 
+                        (lastHoveredTilePos.Value == monsterTile.position || lastHoveredTilePos.Value == targetTile.position))
+                    {
+                        lastHoveredTilePos = null; // 다음 프레임에 갱신되도록 유도
+                    }
+                }
+            }
         }
     }
 }

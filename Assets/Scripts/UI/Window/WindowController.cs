@@ -50,7 +50,7 @@ public class WindowController : MonoBehaviour
         _drawing.DOFade(1f, _animDuration);
         _drawing.blocksRaycasts = true;
         _drawing.interactable = true;
-        RecipeDeveloper.IsDrawingBlocked = false;
+        if(_recipe != null) RecipeDeveloper.IsDrawingBlocked = false;
     }
 
     public void HideDrawingArea()
@@ -60,7 +60,7 @@ public class WindowController : MonoBehaviour
         _drawing.DOFade(0f, _animDuration);
         _drawing.blocksRaycasts = false;
         _drawing.interactable = false;
-        RecipeDeveloper.IsDrawingBlocked = true;
+        if(_recipe != null) RecipeDeveloper.IsDrawingBlocked = true;
     }
 
     public void CloseStoreUI()
@@ -181,6 +181,19 @@ public class WindowController : MonoBehaviour
     {
         _preparation.Close();
         _map.Open(true);
+    }
+
+    public void ToggleInventoryAndDrawing()
+    {
+        if (_inventory == null || _drawing == null) return;
+        bool isInventoryVisible = _inventory.blocksRaycasts;
+        _inventory.DOKill();
+        _inventory.DOFade(isInventoryVisible ? 0f : 1f, _animDuration);
+        _inventory.blocksRaycasts = !isInventoryVisible;
+        _inventory.interactable = !isInventoryVisible;
+
+        if (isInventoryVisible) ShowDrawingArea();
+        else HideDrawingArea();
     }
 }
 

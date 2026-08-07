@@ -198,8 +198,56 @@ public class InventoryUIController : PagedUIController<InventorySlot>
         }
         else if (slot.Item is Item_Scroll scroll) 
         {
-            if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
-            else inv.EquippedScroll = scroll;
+            if (scroll.isEmpty)
+            {
+                if (DungeonManager.Instance != null)
+                {
+                    Debug.LogWarning("[인벤토리] 던전 탐험 중에는 스크롤에 새로운 마법을 새길 수 없습니다.");
+                    return;
+                }
+
+                if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
+                else inv.EquippedScroll = scroll;
+                RefreshList();
+                return;
+            }
+
+            // 이벤트가 활성화되어 있다면 이벤트 해결 시도
+            if (DungeonManager.Instance != null && DungeonManager.Instance.IsEventActive)
+            {
+                var popupUI = FindObjectOfType<EventPopupUI>();
+                if (popupUI != null && popupUI.TrySolveEvent(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement))
+                {
+                    scroll.currentDurability -= 1;
+                    if (scroll.currentDurability <= 0)
+                    {
+                        inv.RemoveItem(scroll, 1);
+                        Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
+                    }
+                    inv.NotifyInventoryChanged();
+                    RefreshList();
+                    return;
+                }
+            }
+            else
+            {
+                // 이벤트가 없을 때 필드 마법으로 사용
+                if (DungeonManager.Instance != null)
+                {
+                    bool used = DungeonManager.Instance.CastFieldSpell(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement);
+                    if (used)
+                    {
+                        scroll.currentDurability -= 1;
+                        if (scroll.currentDurability <= 0)
+                        {
+                            inv.RemoveItem(scroll, 1);
+                            Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
+                        }
+                        inv.NotifyInventoryChanged();
+                        RefreshList();
+                    }
+                }
+            }
         }
         else if (slot.Item is Item_Ink ink)
         {

@@ -529,8 +529,48 @@ public class DrawingManager : MonoBehaviour
             }
             else
             {
-                string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
-                Debug.Log($"<color=cyan>✨ [마법 발동 / 완성] {rank} {matchedSpell} (Score: {averageScore:F2}) ✨</color>");
+                float castCost = spellManaCost;
+                if (PlayerDataManager.Instance != null && PlayerDataManager.Instance.currentMana >= castCost)
+                {
+                    bool magicUsed = false;
+                    
+                    if (DungeonManager.Instance != null && DungeonManager.Instance.IsEventActive)
+                    {
+                        var popupUI = FindObjectOfType<EventPopupUI>();
+                        if (popupUI != null && popupUI.TrySolveEvent(matchedSpell, matchedRecipe != null ? matchedRecipe.Element : SpellElement.None))
+                        {
+                            magicUsed = true;
+                        }
+                    }
+                    else
+                    {
+                        if (DungeonManager.Instance != null)
+                        {
+                            magicUsed = DungeonManager.Instance.CastFieldSpell(matchedSpell, matchedRecipe != null ? matchedRecipe.Element : SpellElement.None);
+                            if (magicUsed)
+                            {
+                                var windowController = FindObjectOfType<WindowController>();
+                                if (windowController != null) windowController.ToggleInventoryAndDrawing();
+                            }
+                        }
+                    }
+                    
+                    if (magicUsed)
+                    {
+                        PlayerDataManager.Instance.currentMana -= castCost;
+                        PlayerDataManager.Instance.NotifyManaChanged();
+                        string rank = averageScore >= 0.85f ? "[대성공]" : "[성공]";
+                        Debug.Log($"<color=cyan>✨ [마법 발동] {rank} {matchedSpell} (마나 소모: {castCost:F1}) ✨</color>");
+                    }
+                    else
+                    {
+                        Debug.Log($"<color=orange>[시전 취소] 대상이나 필드 효과가 없어 마법이 취소되었습니다. (마나 보존됨)</color>");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"<color=red>[발동 실패] 마나가 부족하여 마법을 시전할 수 없습니다. (필요 마나: {castCost:F1})</color>");
+                }
             }
         }
         ClearDrawing();

@@ -35,4 +35,16 @@ public class HexTileData
     {
         isTrapRevealed = true;
     }
+
+    public void ChangeType(HexTileType newType)
+    {
+        Type = newType;
+        
+        HexTileEventData modifiedData = EventData;
+        modifiedData.type = newType;
+        EventData = modifiedData;
+
+        // 새로운 타입에 따라 이벤트 클리어 상태 초기화
+        IsEventCleared = (Type == HexTileType.Start || Type == HexTileType.Empty || Type == HexTileType.Exit);
+    }
 }

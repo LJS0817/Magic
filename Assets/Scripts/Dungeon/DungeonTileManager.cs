@@ -38,6 +38,8 @@ public class DungeonTileManager : MonoBehaviour
         if (dungeonTilemap != null) dungeonTilemap.ClearAllTiles();
         tileMapData.Clear();
 
+        List<Vector3Int> bossCandidates = new List<Vector3Int>();
+
         // 헥사곤 그리드 생성 (육각 형태)
         for (int q = -radius; q <= radius; q++)
         {
@@ -53,6 +55,11 @@ public class DungeonTileManager : MonoBehaviour
                 
                 tileMapData.Add(cellPos, tileData);
 
+                if (randomData.type != HexTileType.Start && randomData.type != HexTileType.Exit)
+                {
+                    bossCandidates.Add(cellPos);
+                }
+
                 // 초기 상태는 모두 안개(Fog) 타일로 덮습니다. (단, 시작 지점 제외 로직을 넣으려면 DungeonManager에서 호출 시 처리)
                 if (dungeonTilemap != null && fogTile != null)
                 {
@@ -62,6 +69,22 @@ public class DungeonTileManager : MonoBehaviour
             }
         }
         
+        if (bossCandidates.Count > 0)
+        {
+            Vector3Int bossPos = bossCandidates[Random.Range(0, bossCandidates.Count)];
+            HexTileEventData bossData = new HexTileEventData();
+            bossData.type = HexTileType.Boss;
+            bossData.requiredElements = new System.Collections.Generic.List<SpellElement>() { 
+                (SpellElement)Random.Range(1, 5), 
+                (SpellElement)Random.Range(1, 5) 
+            };
+            bossData.eventTitle = "수문장";
+            bossData.eventDescription = "강력한 몬스터가 길을 막고 있습니다. 연속으로 마법을 맞혀야 합니다.";
+            bossData.rewardAmount = 5;
+
+            tileMapData[bossPos] = new HexTileData(bossPos, bossData);
+        }
+
         return tileMapData;
     }
 
@@ -104,18 +127,7 @@ public class DungeonTileManager : MonoBehaviour
             data.eventTitle = "탈출구";
             data.eventDescription = "무사히 상점으로 귀환할 수 있습니다.";
         }
-        else if (rand < 0.1f)
-        {
-            data.type = HexTileType.Boss;
-            data.requiredElements = new System.Collections.Generic.List<SpellElement>() { 
-                (SpellElement)Random.Range(1, 5), 
-                (SpellElement)Random.Range(1, 5) 
-            };
-            data.eventTitle = "수문장";
-            data.eventDescription = "강력한 몬스터가 길을 막고 있습니다. 연속으로 마법을 맞혀야 합니다.";
-            data.rewardAmount = 5;
-        }
-        else if (rand < 0.25f)
+        else if (rand < 0.30f) // 일반 몬스터 25% (기존 15%)
         {
             data.type = HexTileType.NormalMonster;
             data.requiredElements = new System.Collections.Generic.List<SpellElement>() { (SpellElement)Random.Range(1, 5) };
@@ -123,52 +135,52 @@ public class DungeonTileManager : MonoBehaviour
             data.eventDescription = "던전 생물이 공격해옵니다.";
             data.rewardAmount = 1;
         }
-        else if (rand < 0.35f)
-        {
-            data.type = HexTileType.Resource;
-            data.eventTitle = "채집 노드";
-            data.eventDescription = "유용한 소재를 채집할 수 있습니다.";
-            data.rewardAmount = 1; // 기본 1개, 마법 쓰면 보너스
-        }
-        else if (rand < 0.40f)
-        {
-            data.type = HexTileType.Obstacle;
-            data.requiredSpellType = SpellType.Utility;
-            data.eventTitle = "환경 장애물";
-            data.eventDescription = "가시 덤불이 앞을 가로막습니다. 유틸리티 마법이 필요합니다.";
-        }
-        else if (rand < 0.45f)
+        else if (rand < 0.40f) // 함정 10% (기존 5%)
         {
             data.type = HexTileType.Trap;
             data.requiredSpellType = SpellType.Defense;
             data.eventTitle = "기습 함정";
             data.eventDescription = "함정이 발동했습니다! 방어 마법이 필요합니다.";
         }
-        else if (rand < 0.5f)
+        else if (rand < 0.50f) // 채집 10%
+        {
+            data.type = HexTileType.Resource;
+            data.eventTitle = "채집 노드";
+            data.eventDescription = "유용한 소재를 채집할 수 있습니다.";
+            data.rewardAmount = 1; // 기본 1개, 마법 쓰면 보너스
+        }
+        else if (rand < 0.55f) // 장애물 5%
+        {
+            data.type = HexTileType.Obstacle;
+            data.requiredSpellType = SpellType.Utility;
+            data.eventTitle = "환경 장애물";
+            data.eventDescription = "가시 덤불이 앞을 가로막습니다. 유틸리티 마법이 필요합니다.";
+        }
+        else if (rand < 0.57f) // 제단 2% (기존 5%)
         {
             data.type = HexTileType.Altar;
             data.eventTitle = "고대의 제단";
             data.eventDescription = "마나를 바치면 이동 AP 소모가 감소할지도 모릅니다.";
         }
-        else if (rand < 0.55f)
+        else if (rand < 0.59f) // 시야 관측소 2% (기존 5%)
         {
             data.type = HexTileType.Sight;
             data.eventTitle = "시야 관측소";
             data.eventDescription = "주변의 안개가 걷힙니다.";
         }
-        else if (rand < 0.6f)
+        else if (rand < 0.61f) // 포탈 2% (기존 5%)
         {
             data.type = HexTileType.RandomPortal;
             data.eventTitle = "무작위 포탈";
             data.eventDescription = "어디로 갈지 모르는 포탈입니다.";
         }
-        else if (rand < 0.65f)
+        else if (rand < 0.63f) // 상인 2% (기존 5%)
         {
             data.type = HexTileType.Merchant;
             data.eventTitle = "방랑 상인";
             data.eventDescription = "소재를 물약으로 교환할 수 있습니다.";
         }
-        else if (rand < 0.70f)
+        else if (rand < 0.65f) // NPC 2% (기존 5%)
         {
             data.type = HexTileType.NPC;
             data.requiredSpellType = SpellType.Utility; // 회복
