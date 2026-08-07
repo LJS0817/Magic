@@ -11,19 +11,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 19_Reflect
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Reflect
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Ice Mirror
   Type: 1
-  icon: {fileID: -5416130020153189735, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: d5b5e25bc3089ea459030b1a9eeeb8f8, type: 3}
+  Element: 2
+  icon: {fileID: 21300000, guid: d5b5e25bc3089ea459030b1a9eeeb8f8, type: 3}
+  drawingSampleImage: {fileID: -5416130020153189735, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 60
-  Description: "\uC790\uC2E0\uC744 \uD5A5\uD55C \uB9C8\uBC95 \uACF5\uACA9\uC744 \uD295\uACA8\uB0B4\uB294
-    \uAC70\uC6B8\uC744 \uC18C\uD658\uD569\uB2C8\uB2E4."
+  Description: "\uC790\uC2E0\uC744 \uD5A5\uD55C \uB9C8\uBC95 \uACF5\uACA9\uC744 \uB9E4\uB044\uB7EC\uC6B4
+    \uC5BC\uC74C \uAC70\uC6B8\uB85C \uD295\uACA8\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uC138\uBAA8 1\uAC1C, \uC6D0 1\uAC1C, \uC138\uBAA8 1\uAC1C
     (\uC77C\uB82C \uBC30\uCE58)"
-  ActivationHint: "\uBC18\uC0AC\uACBD(\uC6D0) \uC591 \uC606\uC5D0 \uD295\uACA8\uB0BC
+  ActivationHint: "\uC5BC\uC74C \uBC18\uC0AC\uACBD(\uC6D0) \uC591 \uC606\uC5D0 \uD295\uACA8\uB0BC
     \uBC29\uD5A5(\uC138\uBAA8)\uC744 \uADF8\uB9AC\uC138\uC694."
   RequiredShapes:
   - Triangle

@@ -11,19 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 12_MagicSpear
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Magic Spear
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Ice Spear
   Type: 0
-  icon: {fileID: 464640638312915844, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: 4c706100fc676f340b7bd9b49eb9e1d5, type: 3}
+  Element: 2
+  icon: {fileID: 21300000, guid: 4c706100fc676f340b7bd9b49eb9e1d5, type: 3}
+  drawingSampleImage: {fileID: 464640638312915844, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 30
-  Description: "\uB300\uAE30 \uC911\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC
-    \uB0A0\uCE74\uB85C\uC6B4 \uCC3D\uC744 \uC3D8\uC544\uB0C5\uB2C8\uB2E4."
+  Description: "\uB300\uAE30 \uC911\uC758 \uC218\uBD84\uC744 \uC5BC\uB824\uB0B4\uC5B4
+    \uAFF0\uB6AB\uB294 \uC704\uB825\uC744 \uC9C0\uB2CC \uC5BC\uC74C \uCC3D\uC744
+    \uC3D8\uC544\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uB9C8\uB984\uBAA8 3\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
-  ActivationHint: "\uB0A0\uCE74\uB85C\uC6B4 \uB9C8\uB825(\uB9C8\uB984\uBAA8) 3\uAC1C\uB97C
-    \uB098\uB780\uD788 \uC5EE\uC5B4 \uCC3D\uC744 \uC644\uC131\uD558\uC138\uC694."
+  ActivationHint: "\uB0A0\uCE74\uB85C\uC6B4 \uC5BC\uC74C \uC870\uAC01(\uB9C8\uB984\uBAA8)
+    3\uAC1C\uB97C \uB098\uB780\uD788 \uC5EE\uC5B4 \uCC3D\uC744 \uC644\uC131\uD558\uC138\uC694."
   RequiredShapes:
   - Rhombus
   - Rhombus

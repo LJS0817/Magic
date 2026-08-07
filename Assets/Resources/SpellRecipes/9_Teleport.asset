@@ -11,19 +11,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 9_Teleport
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Teleport
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Thunder Blink
   Type: 2
-  icon: {fileID: -3160770046920691631, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: 7edd153225b986d4fa5b3a4f7f55de0a, type: 3}
+  Element: 3
+  icon: {fileID: 21300000, guid: 7edd153225b986d4fa5b3a4f7f55de0a, type: 3}
+  drawingSampleImage: {fileID: -3160770046920691631, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 70
-  Description: "\uACF5\uAC04\uC744 \uC65C\uACE1\uD558\uC5EC \uC9C0\uC815\uD55C \uC704\uCE58\uB85C
-    \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."
+  Description: "\uC790\uC2E0\uC744 \uC804\uC790\uB85C \uBCC0\uD658\uD574 \uBC88\uAC1C\uAC00
+    \uCE58\uB294 \uC18D\uB3C4\uB85C \uC9C0\uC815\uD55C \uC704\uCE58\uB85C \uC21C\uAC04\uC774\uB3D9\uD569\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 1\uAC1C, \uB124\uBAA8 1\uAC1C (\uC6D0 \uC548\uC5D0
     \uB124\uBAA8)"
-  ActivationHint: "\uACF5\uAC04\uC758 \uBB38(\uC6D0) \uC548\uC5D0 \uB3C4\uCC29\uC810(\uB124\uBAA8)\uC744
+  ActivationHint: "\uBC88\uAC1C\uC758 \uBB38(\uC6D0) \uC548\uC5D0 \uB3C4\uCC29\uC810(\uB124\uBAA8)\uC744
     \uC9C0\uC815\uD558\uC138\uC694."
   RequiredShapes:
   - Circle

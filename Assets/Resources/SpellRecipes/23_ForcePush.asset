@@ -11,20 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 23_ForcePush
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Force Push
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Thunder Wave
   Type: 0
-  icon: {fileID: -1458160581, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: 810c6983371d94348b1ffd613dc5ae1d, type: 3}
+  Element: 3
+  icon: {fileID: 21300000, guid: 810c6983371d94348b1ffd613dc5ae1d, type: 3}
+  drawingSampleImage: {fileID: -1458160581, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 40
-  Description: "\uAC15\uB825\uD55C \uCDA9\uACA9\uD30C\uB97C \uBC1C\uC0AC\uD558\uC5EC
-    \uC801\uB4E4\uC744 \uBA40\uB9AC \uBC00\uCCD0\uB0C5\uB2C8\uB2E4."
+  Description: "\uADC0\uB97C \uCC22\uB294 \uCC9C\uB465\uC758 \uD30C\uB3D9\uC744 \uBC1C\uC0AC\uD558\uC5EC
+    \uC801\uB4E4\uC744 \uBA40\uB9AC \uD295\uACA8\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uC6D0 1\uAC1C, \uB124\uBAA8 1\uAC1C
     (\uC77C\uB82C \uBC30\uCE58)"
-  ActivationHint: "\uC7A5\uBCBD(\uB124\uBAA8) \uC0AC\uC774\uC5D0 \uCDA9\uACA9\uD30C(\uC6D0)\uB97C
-    \uC555\uCD95\uC2DC\uD0A4\uC138\uC694."
+  ActivationHint: "\uC7A5\uBCBD(\uB124\uBAA8) \uC0AC\uC774\uC5D0 \uCC9C\uB465\uC758
+    \uD30C\uB3D9(\uC6D0)\uC744 \uC555\uCD95\uC2DC\uD0A4\uC138\uC694."
   RequiredShapes:
   - Square
   - Circle

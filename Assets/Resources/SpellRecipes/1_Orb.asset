@@ -11,19 +11,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 1_Orb
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Orb
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Fireball
   Type: 0
+  Element: 1
   icon: {fileID: 2671615675137220761, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
   drawingSampleImage: {fileID: 21300000, guid: a5c3a0f6f7b7f7942a676b502abad5df, type: 3}
   manaCost: 25
-  Description: "\uAC00\uC7A5 \uAE30\uCD08\uC801\uC778 \uB9C8\uBC95 \uAD6C\uCCB4.
-    \uB300\uAE30\uC758 \uB9C8\uB098\uB97C \uC751\uCD95\uD558\uC5EC \uC801\uC5D0\uAC8C
-    \uB0A0\uB824\uBCF4\uB0C5\uB2C8\uB2E4."
+  Description: "\uAC00\uC7A5 \uAE30\uCD08\uC801\uC778 \uD654\uC5FC \uAD6C\uCCB4.
+    \uB300\uAE30\uC758 \uB9C8\uB098\uB97C \uB728\uAC81\uAC8C \uC751\uCD95\uD558\uC5EC
+    \uC801\uC5D0\uAC8C \uB0A0\uB824\uBCF4\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 1\uAC1C"
-  ActivationHint: "\uB465\uADFC \uAD6C\uCCB4\uB97C \uD615\uC0C1\uD654\uD558\uC5EC
+  ActivationHint: "\uD0C0\uC624\uB974\uB294 \uD654\uC5FC \uAD6C\uCCB4\uB97C \uD615\uC0C1\uD654\uD558\uC5EC
     \uB2E8\uC21C\uD55C \uC6D0\uC744 \uADF8\uB9AC\uC138\uC694."
   RequiredShapes:
   - Circle

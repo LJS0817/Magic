@@ -11,20 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 16_ForceSpike
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Force Spike
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Earth Spike
   Type: 0
-  icon: {fileID: 2068928466, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: 19d92ad967053fe4cbacedcfa1c272a7, type: 3}
+  Element: 4
+  icon: {fileID: 21300000, guid: 19d92ad967053fe4cbacedcfa1c272a7, type: 3}
+  drawingSampleImage: {fileID: 2068928466, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 35
-  Description: "\uAC70\uB300\uD55C \uB9C8\uB825 \uAC00\uC2DC\uB97C \uBC14\uB2E5\uC5D0\uC11C
-    \uC19F\uAD6C\uCE58\uAC8C \uD569\uB2C8\uB2E4."
+  Description: "\uB300\uC9C0\uC758 \uBC11\uBC14\uB2E5\uC5D0\uC11C \uAC70\uB300\uD55C
+    \uC554\uC11D \uAC00\uC2DC\uB97C \uC19F\uAD6C\uCE58\uAC8C \uD569\uB2C8\uB2E4."
   ActivationCondition: "\uB124\uBAA8 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C (\uB124\uBAA8\uAC00
     \uB9C8\uB984\uBAA8\uB97C \uB458\uB7EC\uC308)"
-  ActivationHint: "\uB2E8\uB2E8\uD55C \uAE30\uBC18(\uB124\uBAA8) \uC18D\uC5D0 \uB0A0\uCE74\uB85C\uC6B4
-    \uAC00\uC2DC(\uB9C8\uB984\uBAA8)\uB97C \uD488\uC73C\uC138\uC694."
+  ActivationHint: "\uB2E8\uB2E8\uD55C \uB300\uC9C0(\uB124\uBAA8) \uC18D\uC5D0 \uB0A0\uCE74\uB85C\uC6B4
+    \uBC14\uC704 \uAC00\uC2DC(\uB9C8\uB984\uBAA8)\uB97C \uD488\uC73C\uC138\uC694."
   RequiredShapes:
   - Square
   - Rhombus

@@ -11,20 +11,20 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 24_MindControl
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Mind Control
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Shocking Mind
   Type: 2
-  icon: {fileID: 928931622, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: d13c83f15f4f2d0429d4bc38b9fc29a6, type: 3}
+  Element: 3
+  icon: {fileID: 21300000, guid: d13c83f15f4f2d0429d4bc38b9fc29a6, type: 3}
+  drawingSampleImage: {fileID: 928931622, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 90
-  Description: "\uB300\uC0C1\uC758 \uC815\uC2E0\uC744 \uBD95\uAD34\uC2DC\uD0A4\uACE0
-    \uC77C\uC2DC\uC801\uC73C\uB85C \uD63C\uB780\uC5D0 \uBE60\uB728\uB9BD\uB2C8\uB2E4."
+  Description: "\uC804\uB450\uC5FD\uC5D0 \uAC15\uD55C \uC804\uAE30 \uC790\uADF9\uC744
+    \uC8FC\uC5B4 \uC77C\uC2DC\uC801\uC73C\uB85C \uC815\uC2E0\uC744 \uBD95\uAD34\uC2DC\uD0A4\uACE0
+    \uD63C\uB780\uC5D0 \uBE60\uB728\uB9BD\uB2C8\uB2E4."
   ActivationCondition: "\uB9C8\uB984\uBAA8 1\uAC1C, \uC6D0 1\uAC1C (\uB9C8\uB984\uBAA8
     \uC548\uC5D0 \uC6D0)"
   ActivationHint: "\uB300\uC0C1\uC758 \uC815\uC2E0(\uB9C8\uB984\uBAA8) \uC18D\uC5D0
-    \uD658\uC0C1(\uC6D0)\uC744 \uC8FC\uC785\uD558\uC138\uC694."
+    \uD63C\uB780\uC758 \uBCBC\uB77D(\uC6D0)\uC744 \uC8FC\uC785\uD558\uC138\uC694."
   RequiredShapes:
   - Rhombus
   - Circle

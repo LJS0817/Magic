@@ -1508,17 +1508,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &441193940 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4136592289355022127, guid: 0c6d76d8ed15d764fbc410e978bc11b4, type: 3}
-  m_PrefabInstance: {fileID: 1484176570995284045}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26910018aa0016b49a12dd7fba64ec1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.UI.CustomSlider
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -8093,7 +8082,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.RecipeDeveloper
   manaSlider: {fileID: 8510815974570500650}
-  healthSlider: {fileID: 441193940}
   drawingArea: {fileID: 30292825}
   mainCamera: {fileID: 519420031}
   penController: {fileID: 1808845217}

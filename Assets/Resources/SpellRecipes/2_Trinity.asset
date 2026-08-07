@@ -11,19 +11,18 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 2_Trinity
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Trinity
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Ice Lance
   Type: 0
+  Element: 2
   icon: {fileID: -1605566116946375665, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
   drawingSampleImage: {fileID: 21300000, guid: 55d5d755161da9d41bf6ac9443b4742f, type: 3}
   manaCost: 50
-  Description: "\uC138 \uAC00\uC9C0\uC758 \uC808\uB300\uC801\uC778 \uC6D0\uB9AC\uAC00
-    \uC77C\uB82C\uB85C \uC815\uB82C\uD560 \uB54C \uBC1C\uB3D9\uB418\uB294 \uC2EC\uD310\uC758
+  Description: "\uC138 \uAC1C\uC758 \uB0A0\uCE74\uB85C\uC6B4 \uC5BC\uC74C \uCC3D\uC744
+    \uB098\uB780\uD788 \uC815\uB82C\uD558\uC5EC \uC801\uC744 \uAFF0\uB6AB\uB294 \uBE59\uACB0
     \uB9C8\uBC95\uC785\uB2C8\uB2E4."
   ActivationCondition: "\uC138\uBAA8 3\uAC1C (\uC77C\uB82C \uBC30\uCE58)"
-  ActivationHint: "\uC138 \uAC1C\uC758 \uC131\uC2A4\uB7EC\uC6B4 \uC0BC\uAC01\uD615\uC744
+  ActivationHint: "\uC138 \uAC1C\uC758 \uB0A0\uCE74\uB85C\uC6B4 \uC5BC\uC74C \uC870\uAC01(\uC0BC\uAC01\uD615)\uC744
     \uD55C \uC904\uB85C \uB098\uB780\uD788 \uC138\uC6B0\uC138\uC694."
   RequiredShapes:
   - Triangle

@@ -11,20 +11,20 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 22_Purify
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Purify
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Water Cleansing
   Type: 2
-  icon: {fileID: -1889205205, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: 8ce231bc340fe8d4c820c3c44a34f1eb, type: 3}
+  Element: 2
+  icon: {fileID: 21300000, guid: 8ce231bc340fe8d4c820c3c44a34f1eb, type: 3}
+  drawingSampleImage: {fileID: -1889205205, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 40
-  Description: "\uB300\uC0C1\uC5D0\uAC8C \uAC78\uB9B0 \uBAA8\uB4E0 \uD574\uB85C\uC6B4
-    \uB9C8\uBC95 \uD6A8\uACFC\uB97C \uC815\uD654\uD569\uB2C8\uB2E4."
+  Description: "\uAE68\uB057\uD55C \uBB3C\uC904\uAE30\uB85C \uB300\uC0C1\uC5D0\uAC8C
+    \uAC78\uB9B0 \uBAA8\uB4E0 \uD574\uB85C\uC6B4 \uB9C8\uBC95 \uD6A8\uACFC\uB97C
+    \uC53B\uC5B4\uB0C5\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 1\uAC1C, \uB9C8\uB984\uBAA8 1\uAC1C, \uC6D0 1\uAC1C
     (\uC77C\uB82C \uBC30\uCE58)"
   ActivationHint: "\uC815\uD654\uC758 \uACE0\uB9AC(\uC6D0) \uC0AC\uC774\uC5D0 \uB9D1\uC740
-    \uB9C8\uB098(\uB9C8\uB984\uBAA8)\uB97C \uB450\uC138\uC694."
+    \uBB3C\uBC29\uC6B8(\uB9C8\uB984\uBAA8)\uC744 \uB450\uC138\uC694."
   RequiredShapes:
   - Circle
   - Rhombus

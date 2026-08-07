@@ -11,19 +11,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a0bcb95730731142a61ed1d2ba27fd1, type: 3}
   m_Name: 25_Cataclysm
-  m_EditorClassIdentifier: Assembly-CSharp::Magic.Drawing.SpellRecipeAsset
-  SpellName: Cataclysm
+  m_EditorClassIdentifier: Assembly-CSharp::SpellRecipeAsset
+  SpellName: Volcano
   Type: 0
-  icon: {fileID: -1274930817551214607, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
-  statusEffect: 0
-  statusEffectDuration: 0
-  drawingSampleImage: {fileID: 21300000, guid: bb6f83c29e590bf4fa58e8d5b87b3b96, type: 3}
+  Element: 1
+  icon: {fileID: 21300000, guid: bb6f83c29e590bf4fa58e8d5b87b3b96, type: 3}
+  drawingSampleImage: {fileID: -1274930817551214607, guid: 87b39983f73c06c49b7b728b3947db8b, type: 3}
   manaCost: 120
-  Description: "\uC5C4\uCCAD\uB09C \uB9C8\uB098\uB97C \uD3ED\uC8FC\uC2DC\uCF1C \uD654\uBA74
-    \uC804\uCCB4\uC5D0 \uAD81\uADF9\uC758 \uD30C\uAD34\uB97C \uC120\uC0AC\uD569\uB2C8\uB2E4."
+  Description: "\uB300\uC9C0\uB97C \uAC00\uB974\uACE0 \uC6A9\uC554\uC744 \uBD84\uCD9C\uC2DC\uCF1C
+    \uD654\uBA74 \uC804\uCCB4\uC5D0 \uAD81\uADF9\uC758 \uD30C\uAD34\uB97C \uC120\uC0AC\uD558\uB294
+    \uD654\uC0B0 \uD3ED\uBC1C\uC785\uB2C8\uB2E4."
   ActivationCondition: "\uC6D0 4\uAC1C (\uD558\uB098\uC758 \uC6D0\uC774 \uC138 \uAC1C\uC758
     \uC6D0\uC744 \uB458\uB7EC\uC308)"
-  ActivationHint: "\uAC70\uB300\uD55C \uC138\uACC4(\uC6D0) \uC548\uC5D0 \uD30C\uBA78\uC758
+  ActivationHint: "\uAC70\uB300\uD55C \uBD84\uD654\uAD6C(\uC6D0) \uC548\uC5D0 \uB9C8\uADF8\uB9C8
     \uAD6C\uCCB4 3\uAC1C\uB97C \uAC00\uB450\uC5B4 \uC5F0\uC1C4 \uD3ED\uBC1C\uC744
     \uC77C\uC73C\uD0A4\uC138\uC694."
   RequiredShapes:

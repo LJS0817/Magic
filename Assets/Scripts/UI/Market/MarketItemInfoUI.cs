@@ -90,6 +90,11 @@ public class MarketItemInfoUI : MonoBehaviour
             int remainingSpace = InventoryManager.Instance.GetMaxCapacity() - InventoryManager.Instance.items.Count;
             maxCap = Mathf.Clamp(remainingSpace, 1, 99);
         }
+        if (_itemData is ItemRecipeBookSO recipeBook && recipeBook.isHintOnly)
+        {
+            maxCap = 1;
+        }
+
         if (current > maxCap) current = maxCap;
 
         if (_inputField != null) _inputField.text = current.ToString();
@@ -122,7 +127,17 @@ public class MarketItemInfoUI : MonoBehaviour
     {
         if (_inputField != null && int.TryParse(_inputField.text, out int amount))
         {
-            return Mathf.Max(1, amount);
+            int maxCap = 99;
+            if (InventoryManager.Instance != null)
+            {
+                int remainingSpace = InventoryManager.Instance.GetMaxCapacity() - InventoryManager.Instance.items.Count;
+                maxCap = Mathf.Clamp(remainingSpace, 1, 99);
+            }
+            if (_itemData is ItemRecipeBookSO recipeBook && recipeBook.isHintOnly)
+            {
+                maxCap = 1;
+            }
+            return Mathf.Clamp(amount, 1, maxCap);
         }
         return 1;
     }
