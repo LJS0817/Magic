@@ -85,14 +85,14 @@ public class MarketItemInfoUI : MonoBehaviour
         current++;
 
         int maxCap = 99;
-        if (InventoryManager.Instance != null)
+        if (_itemData != null && _itemData.type == ItemType.RecipeBook)
+        {
+            maxCap = 1; // 힌트나 레시피는 1개만 구매 가능, 인벤토리 용량 무시
+        }
+        else if (InventoryManager.Instance != null)
         {
             int remainingSpace = InventoryManager.Instance.GetMaxCapacity() - InventoryManager.Instance.items.Count;
             maxCap = Mathf.Clamp(remainingSpace, 1, 99);
-        }
-        if (_itemData is ItemRecipeBookSO recipeBook && recipeBook.isHintOnly)
-        {
-            maxCap = 1;
         }
 
         if (current > maxCap) current = maxCap;
@@ -128,14 +128,14 @@ public class MarketItemInfoUI : MonoBehaviour
         if (_inputField != null && int.TryParse(_inputField.text, out int amount))
         {
             int maxCap = 99;
-            if (InventoryManager.Instance != null)
+            if (_itemData != null && _itemData.type == ItemType.RecipeBook)
+            {
+                maxCap = 1; // 힌트나 레시피는 1개만 구매 가능, 인벤토리 용량 무시
+            }
+            else if (InventoryManager.Instance != null)
             {
                 int remainingSpace = InventoryManager.Instance.GetMaxCapacity() - InventoryManager.Instance.items.Count;
                 maxCap = Mathf.Clamp(remainingSpace, 1, 99);
-            }
-            if (_itemData is ItemRecipeBookSO recipeBook && recipeBook.isHintOnly)
-            {
-                maxCap = 1;
             }
             return Mathf.Clamp(amount, 1, maxCap);
         }

@@ -89,8 +89,10 @@ public class MarketManager : MonoBehaviour
         long unitPrice = GetItemPrice(itemData);
         long totalPrice = unitPrice * amount;
         
+        bool isRecipeBook = itemData.type == ItemType.RecipeBook;
+
         // Check Inventory Capacity first
-        if (InventoryManager.Instance != null && (InventoryManager.Instance.items.Count + amount) > InventoryManager.Instance.GetMaxCapacity())
+        if (!isRecipeBook && InventoryManager.Instance != null && (InventoryManager.Instance.items.Count + amount) > InventoryManager.Instance.GetMaxCapacity())
         {
             Debug.LogWarning("[MarketManager] 인벤토리 여유 공간이 부족하여 아이템을 구매할 수 없습니다.");
             return false;
@@ -102,11 +104,29 @@ public class MarketManager : MonoBehaviour
             int successCount = 0;
             for (int i = 0; i < amount; i++)
             {
-                ItemInstance newItem = CreateInstanceFromData(itemData);
-                if (newItem != null)
+                if (isRecipeBook)
                 {
-                    InventoryManager.Instance.AddItem(newItem);
-                    successCount++;
+                    if (itemData is ItemRecipeBookSO recipeBookSO)
+                    {
+                        if (recipeBookSO.isHintOnly)
+                        {
+                            PlayerDataManager.Instance.UnlockHint(recipeBookSO.targetSpellName);
+                        }
+                        else
+                        {
+                            PlayerDataManager.Instance.UnlockRecipe(recipeBookSO.targetSpellName);
+                        }
+                        successCount++;
+                    }
+                }
+                else
+                {
+                    ItemInstance newItem = CreateInstanceFromData(itemData);
+                    if (newItem != null)
+                    {
+                        InventoryManager.Instance.AddItem(newItem);
+                        successCount++;
+                    }
                 }
             }
 
