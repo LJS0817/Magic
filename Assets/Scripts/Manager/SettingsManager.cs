@@ -16,7 +16,7 @@ public class SettingsManager : MonoBehaviour
     
     // 상수 키값
     private const string KEY_RES_INDEX = "ResIndex";
-    private const string KEY_FULLSCREEN = "Fullscreen";
+    private const string KEY_FULLSCREEN_MODE = "FullscreenMode";
     private const string KEY_VSYNC = "VSync";
     private const string KEY_FPS_LIMIT = "FPSLimit";
 
@@ -52,8 +52,8 @@ public class SettingsManager : MonoBehaviour
 
         // 디스플레이
         int resIndex = PlayerPrefs.GetInt(KEY_RES_INDEX, _resolutions.Length - 1);
-        bool isFullscreen = PlayerPrefs.GetInt(KEY_FULLSCREEN, 1) == 1;
-        SetResolution(resIndex, isFullscreen);
+        int modeInt = PlayerPrefs.GetInt(KEY_FULLSCREEN_MODE, (int)FullScreenMode.FullScreenWindow);
+        SetResolution(resIndex, (FullScreenMode)modeInt);
 
         bool isVsync = PlayerPrefs.GetInt(KEY_VSYNC, 1) == 1;
         SetVSync(isVsync);
@@ -79,15 +79,15 @@ public class SettingsManager : MonoBehaviour
     }
 
     // ================== Display ==================
-    public void SetResolution(int resolutionIndex, bool isFullscreen)
+    public void SetResolution(int resolutionIndex, FullScreenMode mode)
     {
         if (_resolutions == null || resolutionIndex < 0 || resolutionIndex >= _resolutions.Length) return;
         
         Resolution res = _resolutions[resolutionIndex];
-        Screen.SetResolution(res.width, res.height, isFullscreen ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed);
+        Screen.SetResolution(res.width, res.height, mode);
         
         PlayerPrefs.SetInt(KEY_RES_INDEX, resolutionIndex);
-        PlayerPrefs.SetInt(KEY_FULLSCREEN, isFullscreen ? 1 : 0);
+        PlayerPrefs.SetInt(KEY_FULLSCREEN_MODE, (int)mode);
         PlayerPrefs.Save();
     }
 

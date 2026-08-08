@@ -509,6 +509,11 @@ public class DrawingManager : MonoBehaviour
                     currentScroll.spellIcon = matchedRecipe != null ? matchedRecipe.icon : null;
                     currentScroll.userDrawingData = currentDrawingData.Clone();
 
+                    ItemInstance currentTool = penController != null ? penController.CurrentTool : null;
+                    if (currentTool is Item_Wand) currentScroll.drawnInkColor = Color.cyan;
+                    else if (inkController != null) currentScroll.drawnInkColor = inkController.GetLineColor(currentTool as Item_Pen);
+                    else currentScroll.drawnInkColor = Color.black;
+
                     if (PlayerDataManager.Instance != null)
                     {
                         PlayerDataManager.Instance.UnlockRecipe(matchedSpell);

@@ -1,13 +1,21 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 public class CustomInteractableSlider : CustomSlider, IPointerDownHandler, IDragHandler
 {
-    public float maxValue = 1f;
+    public float maxValue = 100f;
     [SerializeField] private float m_Value;
+    RectTransform handleArea;
 
     public UnityEvent<float> onValueChanged = new UnityEvent<float>();
+
+    protected override void Awake()
+    {
+        base.Awake();
+        handleArea = mask.GetComponent<RectTransform>();
+    }
 
     public float value
     {
@@ -52,19 +60,32 @@ public class CustomInteractableSlider : CustomSlider, IPointerDownHandler, IDrag
 
     private void UpdateDrag(PointerEventData eventData)
     {
-        RectTransform rectTransform = GetComponent<RectTransform>();
-        if (rectTransform == null) return;
-
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out Vector2 localPoint))
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(handleArea, eventData.position, eventData.pressEventCamera, out Vector2 localPoint))
         {
-            float width = rectTransform.rect.width;
-            if (width <= 0) return;
+            float percentage = Mathf.InverseLerp(
+                handleArea.rect.xMin,
+                handleArea.rect.xMax,
+                localPoint.x
+            );
 
-            // rectTransform.rect.xMin is the left edge of the rect
-            float xPos = localPoint.x - rectTransform.rect.xMin;
-            float percent = Mathf.Clamp01(xPos / width);
+            float newValue = Mathf.Clamp01(percentage);
+            value = newValue;
+        }
+    }
 
-            value = percent * maxValue;
+    public override void SetValue(float value, float max)
+    {
+
+        float scaleX = canvas == null ? (Screen.width / 1920.0f) : canvas.lossyScale.x;
+        float fullWidth = handleArea.rect.width;
+        float currentScaleX = mask.rectTransform.lossyScale.x / scaleX;
+
+        float paddingRight = (fullWidth * currentScaleX) * (1f - value);
+        mask.padding = new Vector4(0, 0, paddingRight, 0);
+
+        if (valueText != null)
+        {
+            valueText.text = $"{Mathf.RoundToInt(value * 100f)}%";
         }
     }
 }

@@ -5,13 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class PreparationInventoryUI : PagedUIController<InventorySlot>
 {
-    [Header("Inventory Setup")]
-    [SerializeField] private List<Sprite> _slotBackgrounds;
-    [SerializeField] private Sprite _emptySlotIcon;
-    [SerializeField] private ItemInfoPanel _infoPanel;
-    [SerializeField] private RectTransform _inventoryPanel;
-
-    private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
     private InventorySlot _hoveredSlot;
     private List<ItemInstance> _filteredItems = new List<ItemInstance>();
 
@@ -153,7 +146,7 @@ public class PreparationInventoryUI : PagedUIController<InventorySlot>
             _infoPanel.Open();
             bool isSelected = InventoryManager.Instance != null && (InventoryManager.Instance.combatLoadout.Contains(slot.Item) || InventoryManager.Instance.EquippedWand == slot.Item);
             _infoPanel.Setup(slot.Item, isSelected, true);
-            if (_inventoryPanel != null) _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
+
         }
     }
 
@@ -169,15 +162,5 @@ public class PreparationInventoryUI : PagedUIController<InventorySlot>
         if (_infoPanel != null && _hoveredSlot == null) _infoPanel.Close();
     }
 
-    private Sprite GetSlotBackground(ItemInstance item)
-    {
-        if (_slotBackgrounds == null || _slotBackgrounds.Count == 0) return null;
-        if (item == null) return _slotBackgrounds[0];
-        if (_itemBackgroundMap.TryGetValue(item, out Sprite bg)) return bg;
-        
-        Sprite newBg = _slotBackgrounds[Random.Range(0, _slotBackgrounds.Count)];
-        _itemBackgroundMap[item] = newBg;
-        return newBg;
-    }
 }
 

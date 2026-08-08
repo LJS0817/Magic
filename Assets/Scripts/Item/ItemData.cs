@@ -82,6 +82,7 @@ public class Item_Scroll : ItemInstance
     public SpellElement scrollElement = SpellElement.None;
     public Sprite spellIcon = null;
     public DrawingData userDrawingData = null;
+    public Color drawnInkColor = Color.black;
 
     public ItemScrollSO ScrollData => data as ItemScrollSO;
 

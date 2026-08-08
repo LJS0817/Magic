@@ -3,14 +3,6 @@ using UnityEngine;
 
 public class LoadoutUIController : PagedUIController<InventorySlot>
 {
-    [SerializeField] private List<Sprite> _slotBackgrounds;
-    [SerializeField] private Sprite _emptySlotIcon;
-
-    [Header("Info Panel")]
-    [SerializeField] private ItemInfoPanel _infoPanel;
-    [SerializeField] private RectTransform _inventoryPanel;
-
-    private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
     private InventorySlot _hoveredSlot;
 
     protected override void Awake()
@@ -110,8 +102,48 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         var inv = InventoryManager.Instance;
         if (slot.Item is Item_Scroll scroll)
         {
-            if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
-            else inv.EquippedScroll = scroll;
+            if (scroll.isEmpty)
+            {
+                if (DungeonManager.Instance != null)
+                {
+                    Debug.LogWarning("[던전 인벤토리] 던전 탐험 중에는 스크롤에 새로운 마법을 새길 수 없습니다.");
+                    return;
+                }
+                if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
+                else inv.EquippedScroll = scroll;
+            }
+            else
+            {
+                if (DungeonManager.Instance != null && DungeonManager.Instance.IsEventActive)
+                {
+                    var popupUI = FindObjectOfType<EventPopupUI>();
+                    if (popupUI != null && popupUI.TrySolveEvent(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement))
+                    {
+                        scroll.currentDurability -= 1;
+                        if (scroll.currentDurability <= 0)
+                        {
+                            inv.RemoveItem(scroll, 1);
+                            Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
+                        }
+                        inv.NotifyLoadoutChanged();
+                        return;
+                    }
+                }
+                else if (DungeonManager.Instance != null)
+                {
+                    bool used = DungeonManager.Instance.CastFieldSpell(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement);
+                    if (used)
+                    {
+                        scroll.currentDurability -= 1;
+                        if (scroll.currentDurability <= 0)
+                        {
+                            inv.RemoveItem(scroll, 1);
+                            Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
+                        }
+                        inv.NotifyLoadoutChanged();
+                    }
+                }
+            }
         }
         else if (slot.Item is Item_Ink ink)
         {
@@ -196,8 +228,7 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         {
             _infoPanel.Open();
             _infoPanel.Setup(slot.Item, IsItemEquipped(slot.Item));
-            if (_inventoryPanel != null)
-                _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel, true);
+
         }
     }
 
@@ -229,23 +260,5 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
         return false;
     }
 
-    private Sprite GetSlotBackground(ItemInstance item)
-    {
-        if (_slotBackgrounds == null || _slotBackgrounds.Count == 0) return null;
-
-        if (item == null)
-        {
-            return _slotBackgrounds[0];
-        }
-
-        if (_itemBackgroundMap.TryGetValue(item, out Sprite bg))
-        {
-            return bg;
-        }
-
-        Sprite newBg = _slotBackgrounds[Random.Range(0, _slotBackgrounds.Count)];
-        _itemBackgroundMap[item] = newBg;
-        return newBg;
-    }
 }
 

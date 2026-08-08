@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using DG.Tweening;
+using TMPro;
 
 public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
@@ -17,9 +18,11 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Header("Animation Settings")]
     [SerializeField] protected float tweenDuration = 0.15f;
     [SerializeField] protected Ease tweenEase = Ease.OutQuad;
+    TMP_Text _text;
 
     [Header("Events")]
     public UnityEvent onClick;
+    public UnityEvent onRightClick;
 
     protected Tween colorTween;
     protected bool isHovering = false;
@@ -32,6 +35,7 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     protected virtual void Awake()
     {
+        if (transform.childCount > 0) _text = transform.GetChild(0).GetComponent<TMP_Text>();
         if (targetGraphic == null)
             targetGraphic = GetComponent<Graphic>();
             
@@ -88,7 +92,14 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public virtual void OnPointerClick(PointerEventData eventData)
     {
-        onClick?.Invoke();
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            onClick?.Invoke();
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            onRightClick?.Invoke();
+        }
     }
 
     protected void AnimateColor(Color targetColor)
@@ -96,6 +107,11 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         if (targetGraphic == null) return;
         
         colorTween?.Kill();
-        colorTween = targetGraphic.DOColor(targetColor, tweenDuration).SetEase(tweenEase);
+        colorTween = targetGraphic.DOColor(targetColor, tweenDuration).SetEase(tweenEase).SetUpdate(true);
+    }
+
+    public void SetText(string str)
+    {
+        if (_text != null) _text.SetText(str);
     }
 }

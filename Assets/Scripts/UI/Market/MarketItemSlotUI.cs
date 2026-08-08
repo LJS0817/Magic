@@ -22,7 +22,7 @@ public class MarketItemSlotUI : MonoBehaviour
         }
     }
 
-    public void Setup(ItemDataSO itemData, Action<ItemDataSO, long> callback)
+    public void Setup(ItemDataSO itemData, Action<ItemDataSO, long> onLeftClick, Action<ItemDataSO, long> onRightClick)
     {
         _itemData = itemData;
 
@@ -70,7 +70,10 @@ public class MarketItemSlotUI : MonoBehaviour
         {
             getDetail.Deselect(immediate: true);
             getDetail.onClick.RemoveAllListeners();
-            getDetail.onClick.AddListener(() => { callback(_itemData, price); });
+            getDetail.onRightClick.RemoveAllListeners();
+            
+            if (onLeftClick != null) getDetail.onClick.AddListener(() => onLeftClick(_itemData, price));
+            if (onRightClick != null) getDetail.onRightClick.AddListener(() => onRightClick(_itemData, price));
         }
     }
 

@@ -6,7 +6,6 @@ using DG.Tweening;
 
 public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
 {
-    [SerializeField] ItemInfoPanel itemInfoPanel;
     [SerializeField] CanvasGroup recipeListGroup;
     [SerializeField] Image _arrowImage;
     [SerializeField] CanvasGroup _recipeDefault;
@@ -92,20 +91,20 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
 
     private void OnSlotHoverEnter(RecipeEntryUI slot)
     {
-        if (itemInfoPanel != null && slot.UnlockState != RecipeUnlockState.Locked)
+        if (_infoPanel != null && slot.UnlockState != RecipeUnlockState.Locked)
         {
-            itemInfoPanel.Open();
+            _infoPanel.Open();
             string name = slot.UnlockState == RecipeUnlockState.Unlocked ? slot.RecipeData.SpellName : "???";
-            itemInfoPanel.SetupRecipeInfo(name);
-            itemInfoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _slotContainer.GetComponent<RectTransform>());
+            _infoPanel.SetupRecipeInfo(name);
+
         }
     }
 
     private void OnSlotHoverExit(RecipeEntryUI slot)
     {
-        if (itemInfoPanel != null)
+        if (_infoPanel != null)
         {
-            itemInfoPanel.Close();
+            _infoPanel.Close();
         }
     }
 

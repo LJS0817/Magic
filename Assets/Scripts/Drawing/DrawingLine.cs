@@ -21,6 +21,15 @@ public class DrawingLine : MonoBehaviour
         }
     }
 
+    public void Clear()
+    {
+        currentStroke.points.Clear();
+        if (lineRenderer != null)
+        {
+            lineRenderer.positionCount = 0;
+        }
+    }
+
     public void SetColor(Color color)
     {
         if (lineRenderer != null)

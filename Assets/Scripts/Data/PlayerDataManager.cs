@@ -66,6 +66,11 @@ public class PlayerDataManager : MonoBehaviour
     public void AdvanceDay()
     {
         currentDay++;
+        
+        // 하루가 지나면 마나를 가득 채웁니다.
+        currentMana = GetMaxMana();
+        NotifyManaChanged();
+        
         Debug.Log($"<color=yellow>[시간] 다음 날이 되었습니다. 현재 일차: {currentDay}일</color>");
         OnDayChanged?.Invoke(currentDay);
     }
@@ -249,6 +254,8 @@ public class PlayerDataManager : MonoBehaviour
         {
             UpgradeManager.Instance.OnUpgradeUnlocked += NotifyManaChanged;
         }
+
+        UnlockRecipe("Fireball");
     }
 
     private void OnDestroy()

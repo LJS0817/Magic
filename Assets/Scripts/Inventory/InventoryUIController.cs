@@ -4,17 +4,8 @@ using UnityEngine;
 public class InventoryUIController : PagedUIController<InventorySlot>
 {
     
-    [SerializeField] private List<Sprite> _slotBackgrounds;
-    [SerializeField] private Sprite _emptySlotIcon;
-
-    [Header("Info Panel")]
-    [SerializeField] private ItemInfoPanel _infoPanel;
-    [SerializeField] private RectTransform _inventoryPanel;
-
-    private Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
     private ItemInstance _selectedItem;
     private InventorySlot _hoveredSlot;
-    private int _currentSelectedAmount = 1;
 
     protected override void Awake()
     {
@@ -39,24 +30,13 @@ public class InventoryUIController : PagedUIController<InventorySlot>
     private void OnInkEquipped(Item_Ink item) => RefreshList();
     private void OnPenEquipped(Item_Pen item) => RefreshList();
 
-    private void Update()
+    protected override int GetHoveredItemMaxCount()
     {
         if (_hoveredSlot != null && _hoveredSlot.Item != null && _hoveredSlot.Item.IsStackable)
         {
-            float scroll = Input.mouseScrollDelta.y;
-            if (Mathf.Abs(scroll) > 0.01f)
-            {
-                if (scroll > 0) _currentSelectedAmount++;
-                else _currentSelectedAmount--;
-
-                _currentSelectedAmount = Mathf.Clamp(_currentSelectedAmount, 1, _hoveredSlot.Item.count);
-                
-                if (_infoPanel != null)
-                {
-                    _infoPanel.UpdateStackAmount(_currentSelectedAmount);
-                }
-            }
+            return _hoveredSlot.Item.count;
         }
+        return 1;
     }
 
     private void OnDestroy()
@@ -127,19 +107,6 @@ public class InventoryUIController : PagedUIController<InventorySlot>
     {
         if (slot == null || slot.Item == null || InventoryManager.Instance == null) return;
         
-        // 1. 주문 흥정이 타결되어 스크롤 선택 대기 중인 상태인지 확인
-        if (StoreManager.Instance != null && StoreManager.Instance.IsOrderContainerOpen)
-        {
-            if (slot.Item is Item_Scroll selectedScroll)
-            {
-                StoreManager.Instance.SelectItemForOrder(selectedScroll);
-            }
-            
-            // 상점 창이 열려있는 동안에는 일반 장착/장착 해제 로직을 원천 차단합니다.
-            return;
-        }
-
-        // 2. 일반 장착 및 사용 로직
         var inv = InventoryManager.Instance;
         if (slot.Item.IsStackable)
         {
@@ -148,20 +115,7 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                 var pData = PlayerDataManager.Instance;
                 if (pData != null && potion.PotionData != null)
                 {
-                    if (potion.PotionData.potionType == PotionType.AP)
-                    {
-                        if (DungeonManager.Instance != null)
-                        {
-                            DungeonManager.Instance.currentAP += (int)potion.PotionData.recoveryAmount;
-                            Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 행동력(AP)을 회복했습니다! 현재 AP: {DungeonManager.Instance.currentAP}</color>");
-                        }
-                        else
-                        {
-                            Debug.LogWarning("[아이템] 던전 밖에서는 AP 물약을 사용할 수 없습니다.");
-                            return; // 아이템 소모 방지
-                        }
-                    }
-                    else if (potion.PotionData.potionType == PotionType.Mana)
+                    if (potion.PotionData.potionType == PotionType.Mana)
                     {
                         pData.currentMana += potion.PotionData.recoveryAmount;
                         if (pData.currentMana > pData.GetMaxMana()) pData.currentMana = pData.GetMaxMana();
@@ -172,15 +126,10 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                             drawingMgr.manaSlider.SetValue(pData.currentMana, pData.GetMaxMana());
                         }
                         Debug.Log($"<color=cyan>[아이템] {potion.ItemName}을(를) 사용해 마력을 회복했습니다!</color>");
+                        
+                        inv.RemoveItem(potion, 1);
+                        RefreshList();
                     }
-                    else if (potion.PotionData.potionType == PotionType.ElementalResistance)
-                    {
-                        pData.ApplyElementalResistancePotion(potion.PotionData.resistanceElement, potion.PotionData.resistancePercentage, potion.PotionData.resistanceDuration);
-                        Debug.Log($"<color=yellow>[아이템] {potion.ItemName}을(를) 사용해 {potion.PotionData.resistanceElement} 속성 내성이 {potion.PotionData.resistancePercentage * 100}% 증가했습니다 ({potion.PotionData.resistanceDuration}초)!</color>");
-                    }
-                    
-                    inv.RemoveItem(potion, 1);
-                    RefreshList();
                 }
             }
             else
@@ -200,53 +149,10 @@ public class InventoryUIController : PagedUIController<InventorySlot>
         {
             if (scroll.isEmpty)
             {
-                if (DungeonManager.Instance != null)
-                {
-                    Debug.LogWarning("[인벤토리] 던전 탐험 중에는 스크롤에 새로운 마법을 새길 수 없습니다.");
-                    return;
-                }
-
                 if (inv.EquippedScroll == scroll) inv.EquippedScroll = null;
                 else inv.EquippedScroll = scroll;
                 RefreshList();
                 return;
-            }
-
-            // 이벤트가 활성화되어 있다면 이벤트 해결 시도
-            if (DungeonManager.Instance != null && DungeonManager.Instance.IsEventActive)
-            {
-                var popupUI = FindObjectOfType<EventPopupUI>();
-                if (popupUI != null && popupUI.TrySolveEvent(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement))
-                {
-                    scroll.currentDurability -= 1;
-                    if (scroll.currentDurability <= 0)
-                    {
-                        inv.RemoveItem(scroll, 1);
-                        Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
-                    }
-                    inv.NotifyInventoryChanged();
-                    RefreshList();
-                    return;
-                }
-            }
-            else
-            {
-                // 이벤트가 없을 때 필드 마법으로 사용
-                if (DungeonManager.Instance != null)
-                {
-                    bool used = DungeonManager.Instance.CastFieldSpell(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement);
-                    if (used)
-                    {
-                        scroll.currentDurability -= 1;
-                        if (scroll.currentDurability <= 0)
-                        {
-                            inv.RemoveItem(scroll, 1);
-                            Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
-                        }
-                        inv.NotifyInventoryChanged();
-                        RefreshList();
-                    }
-                }
             }
         }
         else if (slot.Item is Item_Ink ink)
@@ -324,7 +230,7 @@ public class InventoryUIController : PagedUIController<InventorySlot>
                 _infoPanel.UpdateStackAmount(_currentSelectedAmount);
             }
             
-            _infoPanel.ClippingPosition(slot.GetComponent<RectTransform>(), _inventoryPanel);
+
         }
     }
 
@@ -351,40 +257,10 @@ public class InventoryUIController : PagedUIController<InventorySlot>
     private bool IsItemEquipped(ItemInstance item)
     {
         if (item == null) return false;
-
-        if (StoreManager.Instance != null && StoreManager.Instance.IsOrderContainerOpen)
-        {
-            return StoreManager.Instance.SelectedOrderItem == item;
-        }
-
         if (item is Item_Scroll scroll) return InventoryManager.Instance.EquippedScroll == scroll;
         if (item is Item_Ink ink) return InventoryManager.Instance.EquippedInk == ink;
         if (item is Item_Pen pen) return InventoryManager.Instance.EquippedPen == pen;
-        
         return false;
-    }
-
-
-    Sprite GetSlotBackground(ItemInstance item)
-    {
-        if (_slotBackgrounds == null || _slotBackgrounds.Count == 0) return null;
-
-        // 빈 슬롯일 경우 기본 배경(예: 첫 번째 배경) 반환
-        if (item == null)
-        {
-            return _slotBackgrounds[0];
-        }
-
-        // 이미 배경이 지정된 아이템이면 기존 배경 반환
-        if (_itemBackgroundMap.TryGetValue(item, out Sprite bg))
-        {
-            return bg;
-        }
-
-        // 새로운 아이템이면 랜덤 배경을 지정하고 사전에 저장
-        Sprite newBg = _slotBackgrounds[Random.Range(0, _slotBackgrounds.Count)];
-        _itemBackgroundMap[item] = newBg;
-        return newBg;
     }
 }
 

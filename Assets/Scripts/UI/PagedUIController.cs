@@ -18,6 +18,52 @@ public abstract class PagedUIController<TSlot> : MonoBehaviour where TSlot : Mon
     protected List<TSlot> _slotPool = new List<TSlot>();
     protected int _currentPage = 0;
 
+    [Header("Slot Background & Info (Common)")]
+    [SerializeField] protected List<Sprite> _slotBackgrounds;
+    [SerializeField] protected Sprite _emptySlotIcon;
+    [SerializeField] protected ItemInfoPanel _infoPanel;
+    [SerializeField] protected RectTransform _inventoryPanel;
+    
+    protected Dictionary<ItemInstance, Sprite> _itemBackgroundMap = new Dictionary<ItemInstance, Sprite>();
+    protected int _currentSelectedAmount = 1;
+
+    protected Sprite GetSlotBackground(ItemInstance item)
+    {
+        if (_slotBackgrounds == null || _slotBackgrounds.Count == 0) return null;
+        if (item == null) return _slotBackgrounds[0];
+        if (_itemBackgroundMap.TryGetValue(item, out Sprite bg)) return bg;
+        
+        Sprite newBg = _slotBackgrounds[Random.Range(0, _slotBackgrounds.Count)];
+        _itemBackgroundMap[item] = newBg;
+        return newBg;
+    }
+
+    protected virtual int GetHoveredItemMaxCount() { return 1; }
+    protected virtual void OnQuantityChanged(int amount) 
+    { 
+        if (_infoPanel != null)
+        {
+            _infoPanel.UpdateStackAmount(amount);
+        }
+    }
+
+    protected virtual void Update()
+    {
+        int maxCount = GetHoveredItemMaxCount();
+        if (maxCount > 1)
+        {
+            float scroll = Input.mouseScrollDelta.y;
+            if (Mathf.Abs(scroll) > 0.01f)
+            {
+                if (scroll > 0) _currentSelectedAmount++;
+                else _currentSelectedAmount--;
+
+                _currentSelectedAmount = Mathf.Clamp(_currentSelectedAmount, 1, maxCount);
+                OnQuantityChanged(_currentSelectedAmount);
+            }
+        }
+    }
+
     protected virtual void Awake()
     {
         if (_prevPageButton != null) _prevPageButton.onClick.AddListener(OnPrevPage);

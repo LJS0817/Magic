@@ -54,7 +54,11 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
     {
         if (_filteredItems != null && dataIndex >= 0 && dataIndex < _filteredItems.Count)
         {
-            slot.Setup(_filteredItems[dataIndex], (item, price) => OnSlotClicked(slot, item, price));
+            slot.Setup(
+                _filteredItems[dataIndex], 
+                (item, price) => OnSlotClicked(slot, item, price),
+                (item, price) => OnSlotRightClicked(slot, item, price)
+            );
         }
         else
         {
@@ -79,6 +83,45 @@ public class MarketUI : PagedUIController<MarketItemSlotUI>
         {
             _infoUI.SetUp(itemData, price);
         }
+
+        if (MarketManager.Instance != null)
+        {
+            MarketManager.Instance.BuyItem(itemData, _currentSelectedAmount);
+        }
+    }
+
+    private void OnSlotRightClicked(MarketItemSlotUI clickedSlot, ItemDataSO itemData, long price)
+    {
+        if (StoreManager.Instance != null && StoreManager.Instance.IsOrderContainerOpen)
+        {
+            if (InventoryManager.Instance != null)
+            {
+                ItemInstance instance = InventoryManager.Instance.items.Find(i => i.ItemName == itemData.itemName);
+                if (instance != null && instance is Item_Scroll scroll)
+                {
+                    StoreManager.Instance.SelectItemForOrder(scroll);
+                }
+                else
+                {
+                    Debug.LogWarning("[MarketUI] 인벤토리에 해당 스크롤이 없거나 납품할 수 없는 아이템입니다.");
+                }
+            }
+        }
+        else if (MarketManager.Instance != null)
+        {
+            MarketManager.Instance.SellItem(itemData, _currentSelectedAmount);
+        }
+    }
+
+    protected override int GetHoveredItemMaxCount()
+    {
+        return _selectedSlot != null ? 99 : 1;
+    }
+
+    protected override void OnQuantityChanged(int amount)
+    {
+        //_currentSelectedAmount is used directly in OnSlotClicked / OnSlotRightClicked.
+        base.OnQuantityChanged(amount);
     }
 
     public override void RefreshList()

@@ -5,12 +5,12 @@ using TMPro;
 public class CustomSlider : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private RectMask2D mask;
-    [SerializeField] private TMP_Text valueText;
-    
-    private RectTransform canvas;
+    [SerializeField] protected RectMask2D mask;
+    [SerializeField] protected TMP_Text valueText;
 
-    private void Awake()
+    protected RectTransform canvas;
+
+    protected virtual void Awake()
     {
         if (canvas == null)
         {
@@ -19,14 +19,12 @@ public class CustomSlider : MonoBehaviour
         }
     }
 
-    public void SetValue(float value, float max)
+    public virtual void SetValue(float value, float max)
     {
         if (valueText != null)
         {
             valueText.text = $"{Mathf.RoundToInt(value)} / {max}";
         }
-
-        if (mask == null) return;
 
         // 값의 비율(0~1)로 변환
         float ratio = Mathf.Clamp01(value / max);
@@ -38,7 +36,7 @@ public class CustomSlider : MonoBehaviour
             if (parentCanvas != null) canvas = parentCanvas.GetComponent<RectTransform>();
         }
 
-        float scaleX = canvas == null ? (Screen.width / 1080.0f) : canvas.lossyScale.x;
+        float scaleX = canvas == null ? (Screen.width / 1920.0f) : canvas.lossyScale.x;
         float fullWidth = mask.rectTransform.rect.width;
         float currentScaleX = mask.rectTransform.lossyScale.x / scaleX;
 

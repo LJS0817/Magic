@@ -5,7 +5,7 @@ using TMPro;
 public class TimeUIController : MonoBehaviour
 {
     [Header("Day References")]
-    [SerializeField] private Button nextDayButton;
+    [SerializeField] private CustomButton nextDayButton;
     [SerializeField] private TMP_Text dayText;
 
     private void Start()

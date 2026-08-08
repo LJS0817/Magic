@@ -1,17 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PauseMenuController : MonoBehaviour
 {
-    public static PauseMenuController Instance { get; private set; }
-
     [Header("Panels")]
     [Tooltip("The main pause menu overlay (Continue, Save, Load, etc)")]
-    public GameObject pauseMenuPanel;
+    public CanvasGroup pauseMenuPanel;
+    public CanvasGroup pauseMenuButtons;
     
     [Tooltip("The settings/options overlay")]
-    public GameObject settingsPanel;
+    public CanvasGroup settingsPanel;
 
     [Header("Buttons")]
     public CustomButton continueButton;
@@ -25,14 +25,6 @@ public class PauseMenuController : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
         // UI 이벤트 바인딩
         if (continueButton != null) continueButton.onClick.AddListener(ResumeGame);
         if (saveButton != null) saveButton.onClick.AddListener(OnSaveClicked);
@@ -42,8 +34,28 @@ public class PauseMenuController : MonoBehaviour
         if (returnToDesktopButton != null) returnToDesktopButton.onClick.AddListener(ReturnToDesktop);
 
         // 초기 상태 숨김
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        SwitchPanel(false, false);
+    }
+
+    void SwitchPanel(bool onPause, bool onSetting)
+    {
+        if(pauseMenuPanel.interactable != onPause)
+        {
+            pauseMenuPanel.alpha = onPause ? 1f : 0f;
+            pauseMenuPanel.blocksRaycasts = onPause;
+            pauseMenuPanel.interactable = onPause;
+        }
+
+        if(settingsPanel.interactable != onSetting)
+        {
+            settingsPanel.alpha = onSetting ? 1f : 0f;
+            settingsPanel.blocksRaycasts = onSetting;
+            settingsPanel.interactable = onSetting;
+
+            pauseMenuButtons.alpha = onSetting ? 0f : 1f;
+            pauseMenuButtons.blocksRaycasts = !onSetting;
+            pauseMenuButtons.interactable = !onSetting;
+        }
     }
 
     private void Update()
@@ -73,8 +85,7 @@ public class PauseMenuController : MonoBehaviour
         IsPaused = true;
         Time.timeScale = 0f; // 게임 시간 정지
 
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
-        if (settingsPanel != null) settingsPanel.SetActive(false); // 무조건 메인 메뉴부터 표시
+        SwitchPanel(true, false);
     }
 
     public void ResumeGame()
@@ -82,26 +93,25 @@ public class PauseMenuController : MonoBehaviour
         IsPaused = false;
         Time.timeScale = 1f; // 게임 시간 재개
 
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        SwitchPanel(false, false);
     }
 
     private void OpenOptions()
     {
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(true);
+        SwitchPanel(true, true);
     }
 
     public void CloseOptions()
     {
-        if (settingsPanel != null) settingsPanel.SetActive(false);
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
+        SwitchPanel(true, false);
     }
 
     private void OnSaveClicked()
     {
         // TODO: 향후 SaveManager.Instance.Save() 등으로 연동
         Debug.Log("[PauseMenu] 저장이 완료되었습니다. (임시)");
+        loadButton.SetText($"불러오기 <size=60%>( {DateTime.Now.ToLocalTime()} )");
+        LayoutRebuilder.ForceRebuildLayoutImmediate(loadButton.GetComponent<RectTransform>());
     }
 
     private void OnLoadClicked()

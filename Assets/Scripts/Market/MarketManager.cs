@@ -156,6 +156,49 @@ public class MarketManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 상점(마켓)에서 아이템 데이터를 기반으로 플레이어 인벤토리의 아이템을 지정한 수량만큼 판매합니다.
+    /// </summary>
+    public bool SellItem(ItemDataSO itemData, int amount = 1)
+    {
+        if (itemData == null || amount <= 0 || InventoryManager.Instance == null) return false;
+
+        int playerHas = 0;
+        List<ItemInstance> itemsToSell = new List<ItemInstance>();
+        
+        foreach (var item in InventoryManager.Instance.items)
+        {
+            if (item.ItemName == itemData.itemName)
+            {
+                playerHas += item.count;
+                itemsToSell.Add(item);
+            }
+        }
+
+        if (playerHas < amount)
+        {
+            Debug.LogWarning($"<color=red>[Market] 인벤토리에 {itemData.itemName}이(가) 부족하여 판매할 수 없습니다. (보유: {playerHas}개)</color>");
+            return false;
+        }
+
+        long unitPrice = GetItemPrice(itemData) / 2; // 판매가는 기본적으로 절반이라고 가정 (또는 기획에 따라 변경)
+        if (unitPrice < 1) unitPrice = 1;
+        long totalPrice = unitPrice * amount;
+
+        int remainingToSell = amount;
+        for (int i = 0; i < itemsToSell.Count && remainingToSell > 0; i++)
+        {
+            var inst = itemsToSell[i];
+            int removeAmount = Mathf.Min(inst.count, remainingToSell);
+            InventoryManager.Instance.RemoveItem(inst, removeAmount);
+            remainingToSell -= removeAmount;
+        }
+
+        CurrencyManager.Instance.AddCurrency(CurrencyType.Copper, totalPrice);
+        Debug.Log($"<color=cyan>[Market] {itemData.itemName} {amount}개를 {totalPrice} 동화 가치에 판매했습니다.</color>");
+        return true;
+    }
+
+    /// <summary>
     /// ItemDataSO를 기반으로 올바른 ItemInstance 자식 클래스를 생성해주는 팩토리 헬퍼
     /// </summary>
     private ItemInstance CreateInstanceFromData(ItemDataSO itemData)
