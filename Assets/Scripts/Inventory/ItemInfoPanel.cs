@@ -12,6 +12,12 @@ public class ItemInfoPanel : MonoBehaviour
     [SerializeField] private TMP_Text _infoStateText;
     [SerializeField] private TMP_Text _clickInfoText;
 
+    [Header("Scroll Info Display")]
+    [SerializeField] private Image _spellIconImage;
+    [SerializeField] private Image _drawingSampleImage;
+    [SerializeField] private RectTransform _drawingContainer;
+    [SerializeField] private GameObject _drawingLinePrefab;
+
     RectTransform _rectTransform;
 
     private ItemInstance _currentItem;
@@ -40,6 +46,13 @@ public class ItemInfoPanel : MonoBehaviour
         _currentItem = item;
 
         if (_infoNameTextOnly.gameObject.activeInHierarchy) _infoNameTextOnly.gameObject.SetActive(false);
+        if (_spellIconImage != null) _spellIconImage.gameObject.SetActive(false);
+        if (_drawingSampleImage != null) _drawingSampleImage.gameObject.SetActive(false);
+        if (_drawingContainer != null)
+        {
+            _drawingContainer.gameObject.SetActive(false);
+            foreach (Transform child in _drawingContainer) Destroy(child.gameObject);
+        }
 
         if (_infoIconImage != null)
         {
@@ -70,8 +83,43 @@ public class ItemInfoPanel : MonoBehaviour
             }
             else
             {
-                string spell = (scroll.ScrollData != null && !string.IsNullOrEmpty(scroll.ScrollData.spellName)) ? scroll.ScrollData.spellName : "알 수 없는 마법";
+                string spell = !string.IsNullOrEmpty(scroll.spellName) ? scroll.spellName : "알 수 없는 마법";
                 _infoStateText.text = $"등급: {grade} | 마법진: {spell}";
+
+                if (_spellIconImage != null && scroll.spellIcon != null)
+                {
+                    _spellIconImage.gameObject.SetActive(true);
+                    _spellIconImage.sprite = scroll.spellIcon;
+                }
+
+                if (scroll.userDrawingData != null && scroll.userDrawingData.strokes.Count > 0)
+                {
+                    if (_drawingContainer != null && _drawingLinePrefab != null)
+                    {
+                        _drawingContainer.gameObject.SetActive(true);
+                        foreach (var stroke in scroll.userDrawingData.strokes)
+                        {
+                            GameObject lineObj = Instantiate(_drawingLinePrefab, _drawingContainer);
+                            DrawingLine drawingLine = lineObj.GetComponent<DrawingLine>();
+                            if (drawingLine != null)
+                            {
+                                // 미니맵 용도에 맞게 선 두께/색상을 조절할 수 있다면 추가 작업
+                                foreach (var p in stroke.points)
+                                {
+                                    drawingLine.AddPoint(p);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (_drawingSampleImage != null && scroll.ScrollData != null && scroll.ScrollData.sampleImage != null)
+                    {
+                        _drawingSampleImage.gameObject.SetActive(true);
+                        _drawingSampleImage.sprite = scroll.ScrollData.sampleImage;
+                    }
+                }
             }
         }
         else if (item is Item_Ink ink)

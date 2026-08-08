@@ -10,6 +10,13 @@ public class Stroke
     {
         points.Add(point);
     }
+
+    public Stroke Clone()
+    {
+        Stroke newStroke = new Stroke();
+        newStroke.points.AddRange(this.points);
+        return newStroke;
+    }
 }
 
 [System.Serializable]
@@ -25,6 +32,16 @@ public class DrawingData
     public void Clear()
     {
         strokes.Clear();
+    }
+
+    public DrawingData Clone()
+    {
+        DrawingData newData = new DrawingData();
+        foreach (var stroke in this.strokes)
+        {
+            newData.AddStroke(stroke.Clone());
+        }
+        return newData;
     }
 }
 

@@ -77,6 +77,11 @@ public class Item_Scroll : ItemInstance
 {
     public bool isEmpty = true;
     public int currentDurability;
+    public string spellName = "";
+    public float accuracyScore = 1.0f;
+    public SpellElement scrollElement = SpellElement.None;
+    public Sprite spellIcon = null;
+    public DrawingData userDrawingData = null;
 
     public ItemScrollSO ScrollData => data as ItemScrollSO;
 
@@ -85,6 +90,9 @@ public class Item_Scroll : ItemInstance
         if (scrollData != null && scrollData.isPreCompleted)
         {
             this.isEmpty = false;
+            this.spellName = scrollData.spellName;
+            this.accuracyScore = scrollData.accuracyScore;
+            this.scrollElement = scrollData.scrollElement;
         }
         else
         {

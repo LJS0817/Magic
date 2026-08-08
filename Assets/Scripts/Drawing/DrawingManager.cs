@@ -503,11 +503,11 @@ public class DrawingManager : MonoBehaviour
                     PlayerDataManager.Instance.NotifyManaChanged();
                     
                     currentScroll.isEmpty = false;
-                    if (currentScroll.ScrollData != null)
-                    {
-                        currentScroll.ScrollData.spellName = matchedSpell;
-                        currentScroll.ScrollData.accuracyScore = averageScore;
-                    }
+                    currentScroll.spellName = matchedSpell;
+                    currentScroll.accuracyScore = averageScore;
+                    currentScroll.scrollElement = matchedRecipe != null ? matchedRecipe.Element : SpellElement.None;
+                    currentScroll.spellIcon = matchedRecipe != null ? matchedRecipe.icon : null;
+                    currentScroll.userDrawingData = currentDrawingData.Clone();
 
                     if (PlayerDataManager.Instance != null)
                     {
@@ -521,6 +521,10 @@ public class DrawingManager : MonoBehaviour
                     {
                         InventoryManager.Instance.NotifyInventoryChanged();
                     }
+                    
+                    // 왁스 씰 연출 코루틴(비동기) 실행 - 1초 대기 후 장착 해제 및 초기화
+                    StartCoroutine(WaxSealSequence(currentScroll));
+                    return; // ClearDrawing()은 코루틴 안에서 수행
                 }
                 else
                 {
@@ -713,6 +717,26 @@ public class DrawingManager : MonoBehaviour
             
             displayIndex++;
         }
+    }
+
+    protected virtual System.Collections.IEnumerator WaxSealSequence(Item_Scroll currentScroll)
+    {
+        IsDrawingBlocked = true;
+        Debug.Log("<color=orange>쾅! [왁스 씰 연출 중...] (1초 대기)</color>");
+        
+        // TODO: UI에 왁스 씰 도장이 찍히는 연출(이펙트) 추가 가능 공간
+        
+        yield return new WaitForSeconds(1.0f);
+        
+        IsDrawingBlocked = false;
+        
+        if (InventoryManager.Instance != null && InventoryManager.Instance.EquippedScroll == currentScroll)
+        {
+            Debug.Log($"<color=white>[수거 완료] {currentScroll.spellName} 스크롤이 인벤토리로 수거되었습니다.</color>");
+            InventoryManager.Instance.EquippedScroll = null;
+        }
+        
+        ClearDrawing();
     }
 }
 
