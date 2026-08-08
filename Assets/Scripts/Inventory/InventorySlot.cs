@@ -6,6 +6,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 {
     [SerializeField] private Image _bg;
     [SerializeField] private Image _iconImage;
+    [SerializeField] private Image _spellIconImage;
     [SerializeField] private Button _slotButton;
     [SerializeField] private GameObject _equippedMark;
     [SerializeField] private TMPro.TMP_Text _countText;
@@ -46,6 +47,19 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         {
             _iconImage.sprite = _item.ItemIcon;
             _iconImage.gameObject.SetActive(true);
+
+            if (_spellIconImage != null)
+            {
+                if (_item is Item_Scroll scroll && scroll.spellIcon != null)
+                {
+                    _spellIconImage.sprite = scroll.spellIcon;
+                    _spellIconImage.gameObject.SetActive(true);
+                }
+                else
+                {
+                    _spellIconImage.gameObject.SetActive(false);
+                }
+            }
         }
         else
         {
@@ -58,6 +72,11 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
             {
                 _iconImage.sprite = null;
                 _iconImage.gameObject.SetActive(false);
+            }
+
+            if (_spellIconImage != null)
+            {
+                _spellIconImage.gameObject.SetActive(false);
             }
         }
 
