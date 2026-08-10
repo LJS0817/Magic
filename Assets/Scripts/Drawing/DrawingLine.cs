@@ -20,13 +20,21 @@ public class DrawingLine : MonoBehaviour
             lineRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
         }
     }
+    
+    public void SetActive(bool active)
+    {
+        lineRenderer.gameObject.SetActive(active);
+    }
 
     public void Clear()
     {
-        currentStroke.points.Clear();
-        if (lineRenderer != null)
+        if(currentStroke.points.Count > 0)
         {
-            lineRenderer.positionCount = 0;
+            currentStroke.points.Clear();
+            if (lineRenderer != null)
+            {
+                lineRenderer.positionCount = 0;
+            }
         }
     }
 

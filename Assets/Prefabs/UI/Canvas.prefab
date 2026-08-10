@@ -76,8 +76,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4285434272
-  m_fontColor: {r: 0.627451, g: 0.5372549, b: 0.43137258, a: 1}
+    rgba: 4281422188
+  m_fontColor: {r: 0.4245283, g: 0.3167542, b: 0.19023673, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2463,7 +2463,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 50
   m_TargetDisplay: 0
 --- !u!114 &3999439070287948093
 MonoBehaviour:
@@ -5349,7 +5349,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 100
+  m_SortingOrder: 200
   m_TargetDisplay: 0
 --- !u!114 &7095671332971981990
 MonoBehaviour:
@@ -12913,7 +12913,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7968338067464636714, guid: 11180b9b75e9d4f499bae6fc6ee4f56a, type: 3}
       propertyPath: m_Pivot.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7968338067464636714, guid: 11180b9b75e9d4f499bae6fc6ee4f56a, type: 3}
       propertyPath: m_AnchorMax.x
@@ -12969,11 +12969,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7968338067464636714, guid: 11180b9b75e9d4f499bae6fc6ee4f56a, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -64
+      value: -400.3
       objectReference: {fileID: 0}
     - target: {fileID: 7968338067464636714, guid: 11180b9b75e9d4f499bae6fc6ee4f56a, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -114
+      value: 154.4
       objectReference: {fileID: 0}
     - target: {fileID: 7968338067464636714, guid: 11180b9b75e9d4f499bae6fc6ee4f56a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
