@@ -35,7 +35,7 @@ public class CustomButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     protected virtual void Awake()
     {
-        if (transform.childCount > 0) _text = transform.GetChild(0).GetComponent<TMP_Text>();
+        if (transform.childCount > 0) _text = transform.GetChild(transform.childCount > 2 ? 2 : 0).GetComponent<TMP_Text>();
         if (targetGraphic == null)
             targetGraphic = GetComponent<Graphic>();
             
