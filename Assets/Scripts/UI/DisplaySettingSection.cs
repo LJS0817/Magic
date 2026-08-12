@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public class DisplaySettingWindow : SettingWindow
+public class DisplaySettingSection : SettingSection
 {
     [Header("Display Settings")]
     public TMP_Dropdown resolutionDropdown;
@@ -51,6 +51,18 @@ public class DisplaySettingWindow : SettingWindow
             fullscreenModeDropdown.AddOptions(modeOptions);
         }
 
+        if (fpsLimitDropdown != null)
+        {
+            fpsLimitDropdown.ClearOptions();
+            List<string> fpsOptions = new List<string>
+            {
+                "60 FPS",
+                "144 FPS",
+                "Unlimited"
+            };
+            fpsLimitDropdown.AddOptions(fpsOptions);
+        }
+
         // 이벤트 리스너 연결
         if (resolutionDropdown != null) resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
         if (fullscreenModeDropdown != null) fullscreenModeDropdown.onValueChanged.AddListener(OnFullscreenModeChanged);
@@ -78,6 +90,20 @@ public class DisplaySettingWindow : SettingWindow
             else if (fpsLimit == 144) fpsLimitDropdown.value = 1;
             else fpsLimitDropdown.value = 2; // 제한 없음
         }
+    }
+
+    public override void ResetToDefaults()
+    {
+        if (SM == null) return;
+
+        // 기본값: 최대 해상도, FullScreenWindow, VSync ON, FPS 60
+        Resolution[] resList = SM.GetResolutions();
+        int defaultResIndex = resList.Length - 1;
+        SM.SetResolution(defaultResIndex, FullScreenMode.FullScreenWindow);
+        SM.SetVSync(true);
+        SM.SetFPSLimit(60);
+
+        Refresh();
     }
 
     private void OnResolutionChanged(int index)

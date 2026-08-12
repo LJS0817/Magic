@@ -179,4 +179,30 @@ public class SettingsManager : MonoBehaviour
         if (_resolutions == null) _resolutions = Screen.resolutions;
         return _resolutions;
     }
+
+    /// <summary>
+    /// 모든 설정을 기본값으로 초기화합니다.
+    /// </summary>
+    public void ResetToDefaults()
+    {
+        // 디스플레이 기본값
+        if (_resolutions == null) _resolutions = Screen.resolutions;
+        SetResolution(_resolutions.Length - 1, FullScreenMode.FullScreenWindow);
+        SetVSync(true);
+        SetFPSLimit(60);
+
+        // 사운드 기본값
+        SetMasterVolume(1f);
+        SetBGMVolume(1f);
+        SetSFXVolume(1f);
+        SetUIVolume(1f);
+
+        // 게임플레이 기본값
+        SetDamageText(true);
+        SetScreenShake(true);
+
+        // 조작 기본값
+        SetConfineCursor(false);
+        SetDrawingSensitivity(1.0f);
+    }
 }

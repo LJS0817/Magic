@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-public class GameplaySettingWindow : SettingWindow
+public class GameplaySettingSection : SettingSection
 {
     [Header("Gameplay Settings")]
     public CustomToggle damageTextToggle;
@@ -25,6 +24,17 @@ public class GameplaySettingWindow : SettingWindow
 
         if (damageTextToggle != null) damageTextToggle.SetIsOnWithoutNotify(SM.isDamageTextEnabled);
         if (screenShakeToggle != null) screenShakeToggle.SetIsOnWithoutNotify(SM.isScreenShakeEnabled);
+    }
+
+    public override void ResetToDefaults()
+    {
+        if (SM == null) return;
+
+        // 기본값: DamageText ON, ScreenShake ON
+        SM.SetDamageText(true);
+        SM.SetScreenShake(true);
+
+        Refresh();
     }
 
     private void OnDamageTextChanged(bool isOn) => SM.SetDamageText(isOn);

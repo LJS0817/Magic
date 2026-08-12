@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-public class ControlSettingWindow : SettingWindow
+public class ControlSettingSection : SettingSection
 {
     [Header("Control Settings")]
     public CustomToggle confineCursorToggle;
@@ -25,6 +24,17 @@ public class ControlSettingWindow : SettingWindow
 
         if (confineCursorToggle != null) confineCursorToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt("ConfineCursor", 0) == 1);
         if (drawingSensitivitySlider != null) drawingSensitivitySlider.SetValueWithoutNotify(SM.drawingSensitivity);
+    }
+
+    public override void ResetToDefaults()
+    {
+        if (SM == null) return;
+
+        // 기본값: ConfineCursor OFF, DrawingSensitivity 1.0
+        SM.SetConfineCursor(false);
+        SM.SetDrawingSensitivity(1.0f);
+
+        Refresh();
     }
 
     private void OnConfineCursorChanged(bool isOn) => SM.SetConfineCursor(isOn);

@@ -7,6 +7,7 @@ public class CustomInteractableSlider : CustomSlider, IPointerDownHandler, IDrag
 {
     public float maxValue = 100f;
     [SerializeField] private float m_Value;
+    [SerializeField] private RectTransform handle;
     RectTransform handleArea;
 
     public UnityEvent<float> onValueChanged = new UnityEvent<float>();
@@ -14,7 +15,7 @@ public class CustomInteractableSlider : CustomSlider, IPointerDownHandler, IDrag
     protected override void Awake()
     {
         base.Awake();
-        handleArea = mask.GetComponent<RectTransform>();
+        handleArea = handle.parent.GetComponent<RectTransform>();
     }
 
     public float value
@@ -75,13 +76,21 @@ public class CustomInteractableSlider : CustomSlider, IPointerDownHandler, IDrag
 
     public override void SetValue(float value, float max)
     {
-
         float scaleX = canvas == null ? (Screen.width / 1920.0f) : canvas.lossyScale.x;
         float fullWidth = handleArea.rect.width;
         float currentScaleX = mask.rectTransform.lossyScale.x / scaleX;
+        float halfHandle = handle.rect.width * handle.lossyScale.x / scaleX * 0.5f;
 
-        float paddingRight = (fullWidth * currentScaleX) * (1f - value);
+        float paddingRight = halfHandle + (fullWidth * currentScaleX) * (1f - value);
         mask.padding = new Vector4(0, 0, paddingRight, 0);
+
+        // 2. Handle 위치 업데이트
+        if (handle != null && handleArea != null)
+        {
+            handle.anchorMin = new Vector2(value, handle.anchorMin.y);
+            handle.anchorMax = new Vector2(value, handle.anchorMax.y);
+            handle.anchoredPosition = new Vector2(0, handle.anchoredPosition.y);
+        }
 
         if (valueText != null)
         {

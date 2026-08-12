@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 6108609537667045365}
   - component: {fileID: 6011283225125306800}
   - component: {fileID: 3275176627404238196}
+  - component: {fileID: 6647754267985105087}
+  - component: {fileID: 1071178466949019464}
   m_Layer: 0
   m_Name: Link
   m_TagString: Untagged
@@ -50,6 +52,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.InventoryManager
   itemDatabase: {fileID: 11400000, guid: 17ee5cedda1f15d4cbf2f77c78bfab1c, type: 2}
   _player: {fileID: 6108609537667045365}
+  baseCombatLoadoutCapacity: 5
   baseInventoryCapacity: 20
 --- !u!114 &2680021099013104767
 MonoBehaviour:
@@ -102,23 +105,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 827c998dc5db3584fb2eb1adab0dee93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Magic.Data.PlayerDataManager
-  baseMaxHealth: 100
-  currentHealth: 100
+  hasGeneratedInitialOrders: 0
+  currentDay: 1
+  _storeSatisfaction: 0
+  unlockedRecipeObjects: []
+  visibleRecipeObjects: []
   baseMaxMana: 100
   currentMana: 100
   equippedScroll:
     data: {fileID: 0}
     acquisitionId: 0
+    count: 0
     isEmpty: 0
     currentDurability: 0
+    spellName: 
+    accuracyScore: 0
+    scrollElement: 0
+    spellIcon: {fileID: 0}
+    userDrawingData:
+      strokes: []
+    drawnInkColor: {r: 0, g: 0, b: 0, a: 0}
   equippedInk:
     data: {fileID: 0}
     acquisitionId: 0
+    count: 0
     currentAmount: 0
   equippedPen:
     data: {fileID: 0}
     acquisitionId: 0
+    count: 0
     currentInkCapacity: 0
+  equippedWand:
+    data: {fileID: 0}
+    acquisitionId: 0
+    count: 0
+  equippedPouch:
+    data: {fileID: 0}
+    acquisitionId: 0
+    count: 0
+  equippedRobe:
+    data: {fileID: 0}
+    acquisitionId: 0
+    count: 0
+  equippedCloak:
+    data: {fileID: 0}
+    acquisitionId: 0
+    count: 0
 --- !u!114 &6011283225125306800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,3 +241,32 @@ MonoBehaviour:
   _upgrade: {fileID: 6011283225125306800}
   _data: {fileID: 6108609537667045365}
   _inventory: {fileID: 1515349400720738957}
+--- !u!114 &6647754267985105087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e025560f464c4b14e90d761a4c6d5e2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Magic.Inventory.CurrencyManager
+  bankruptcyThresholdCopper: 0
+--- !u!114 &1071178466949019464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5353073888065776566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22b45ff5f7fbe476daca9029ff039597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SettingsManager
+  audioMixer: {fileID: 0}
+  isDamageTextEnabled: 1
+  isScreenShakeEnabled: 1
+  drawingSensitivity: 1
