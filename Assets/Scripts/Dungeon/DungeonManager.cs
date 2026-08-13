@@ -544,14 +544,7 @@ public class DungeonManager : MonoBehaviour
                         tileManager.FlipToTile(pos, tileManager.GetRevealedTile(tile));
                     }
                 }
-                
-                if (tile.Type == HexTileType.Sight)
-                {
-                    RevealSight(pos, 3);
-                    tile.ClearEvent();
-                    Debug.Log("<color=yellow>[이벤트] 시야 관측소: 주변의 안개가 넓게 걷힙니다!</color>");
-                }
-                else if (tile.Type == HexTileType.RandomPortal)
+                if (tile.Type == HexTileType.RandomPortal)
                 {
                     TeleportToRandomUnknown();
                     tile.ClearEvent();
@@ -732,11 +725,6 @@ public class DungeonManager : MonoBehaviour
         InventoryManager.Instance.NotifyLoadoutChanged();
     }
 
-    public void ApplyAltarBuff()
-    {
-        apCostReductionBuffTurns = 5;
-        Debug.Log("<color=yellow>[제단] 5턴 동안 이동 시 AP가 소모되지 않습니다!</color>");
-    }
 
     public void PeekTile(Vector3Int targetPos)
     {
@@ -822,10 +810,10 @@ public class DungeonManager : MonoBehaviour
             Vector3Int secretPos = unknownTiles[Random.Range(0, unknownTiles.Count)];
             
             HexTileEventData secretData = new HexTileEventData();
-            secretData.type = HexTileType.Resource;
-            secretData.eventTitle = "비밀 보물 방";
-            secretData.eventDescription = "NPC가 알려준 숨겨진 엄청난 보물입니다!";
-            secretData.rewardAmount = 10;
+            secretData.type = HexTileType.TreasureBox;
+            secretData.eventTitle = "보물상자";
+            secretData.eventDescription = "숨겨진 보물상자를 발견했습니다!";
+            secretData.rewardAmount = 3;
             
             HexTileData secretTile = new HexTileData(secretPos, secretData);
             tileMap[secretPos] = secretTile;

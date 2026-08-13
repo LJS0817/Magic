@@ -20,16 +20,15 @@ public class DungeonTileManager : MonoBehaviour
     public AnimatedTile bossTile;
     public AnimatedTile trapTile;
     public AnimatedTile obstacleTile;
-    public AnimatedTile altarTile;
-    public AnimatedTile sightTile;
     public AnimatedTile randomPortalTile;
-    public AnimatedTile resourceTile;
+    public AnimatedTile treasureBoxTile;
     public AnimatedTile merchantTile;
     public AnimatedTile npcTile;
     public AnimatedTile exitTile;
     
     [Header("Grid Settings")]
     public int radius = 3;
+    public int treasureBoxCount = 3;
 
     private Dictionary<Vector3Int, HexTileData> tileMapData = new Dictionary<Vector3Int, HexTileData>();
 
@@ -85,6 +84,30 @@ public class DungeonTileManager : MonoBehaviour
             tileMapData[bossPos] = new HexTileData(bossPos, bossData);
         }
 
+        List<Vector3Int> emptyCandidates = new List<Vector3Int>();
+        foreach (var kvp in tileMapData)
+        {
+            if (kvp.Value.Type == HexTileType.Empty)
+            {
+                emptyCandidates.Add(kvp.Key);
+            }
+        }
+
+        for (int i = 0; i < treasureBoxCount && emptyCandidates.Count > 0; i++)
+        {
+            int randomIndex = Random.Range(0, emptyCandidates.Count);
+            Vector3Int pos = emptyCandidates[randomIndex];
+            emptyCandidates.RemoveAt(randomIndex);
+
+            HexTileEventData boxData = new HexTileEventData();
+            boxData.type = HexTileType.TreasureBox;
+            boxData.eventTitle = "보물상자";
+            boxData.eventDescription = "유용한 보물이 들어있는 상자입니다.";
+            boxData.rewardAmount = 1;
+            
+            tileMapData[pos] = new HexTileData(pos, boxData);
+        }
+
         return tileMapData;
     }
 
@@ -96,10 +119,8 @@ public class DungeonTileManager : MonoBehaviour
             case HexTileType.Boss:          return bossTile != null ? bossTile : defaultFloorTile;
             case HexTileType.Trap:          return trapTile != null ? trapTile : defaultFloorTile;
             case HexTileType.Obstacle:      return obstacleTile != null ? obstacleTile : defaultFloorTile;
-            case HexTileType.Altar:         return altarTile != null ? altarTile : defaultFloorTile;
-            case HexTileType.Sight:         return sightTile != null ? sightTile : defaultFloorTile;
             case HexTileType.RandomPortal:  return randomPortalTile != null ? randomPortalTile : defaultFloorTile;
-            case HexTileType.Resource:      return resourceTile != null ? resourceTile : defaultFloorTile;
+            case HexTileType.TreasureBox:   return treasureBoxTile != null ? treasureBoxTile : defaultFloorTile;
             case HexTileType.Merchant:      return merchantTile != null ? merchantTile : defaultFloorTile;
             case HexTileType.NPC:           return npcTile != null ? npcTile : defaultFloorTile;
             case HexTileType.Exit:          return exitTile != null ? exitTile : defaultFloorTile;
@@ -142,45 +163,26 @@ public class DungeonTileManager : MonoBehaviour
             data.eventTitle = "기습 함정";
             data.eventDescription = "함정이 발동했습니다! 방어 마법이 필요합니다.";
         }
-        else if (rand < 0.50f) // 채집 10%
-        {
-            data.type = HexTileType.Resource;
-            data.eventTitle = "채집 노드";
-            data.eventDescription = "유용한 소재를 채집할 수 있습니다.";
-            data.rewardAmount = 1; // 기본 1개, 마법 쓰면 보너스
-        }
-        else if (rand < 0.55f) // 장애물 5%
+        else if (rand < 0.45f) // 장애물 5%
         {
             data.type = HexTileType.Obstacle;
             data.requiredSpellType = SpellType.Utility;
             data.eventTitle = "환경 장애물";
             data.eventDescription = "가시 덤불이 앞을 가로막습니다. 유틸리티 마법이 필요합니다.";
         }
-        else if (rand < 0.57f) // 제단 2% (기존 5%)
-        {
-            data.type = HexTileType.Altar;
-            data.eventTitle = "고대의 제단";
-            data.eventDescription = "마나를 바치면 이동 AP 소모가 감소할지도 모릅니다.";
-        }
-        else if (rand < 0.59f) // 시야 관측소 2% (기존 5%)
-        {
-            data.type = HexTileType.Sight;
-            data.eventTitle = "시야 관측소";
-            data.eventDescription = "주변의 안개가 걷힙니다.";
-        }
-        else if (rand < 0.61f) // 포탈 2% (기존 5%)
+        else if (rand < 0.47f) // 포탈 2%
         {
             data.type = HexTileType.RandomPortal;
             data.eventTitle = "무작위 포탈";
             data.eventDescription = "어디로 갈지 모르는 포탈입니다.";
         }
-        else if (rand < 0.63f) // 상인 2% (기존 5%)
+        else if (rand < 0.49f) // 상인 2%
         {
             data.type = HexTileType.Merchant;
             data.eventTitle = "방랑 상인";
             data.eventDescription = "소재를 물약으로 교환할 수 있습니다.";
         }
-        else if (rand < 0.65f) // NPC 2% (기존 5%)
+        else if (rand < 0.51f) // NPC 2%
         {
             data.type = HexTileType.NPC;
             data.requiredSpellType = SpellType.Utility; // 회복

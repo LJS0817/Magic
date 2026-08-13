@@ -61,10 +61,9 @@ public class DungeonUIController : MonoBehaviour
             case HexTileType.Boss: return "보스";
             case HexTileType.Trap: return "함정";
             case HexTileType.Obstacle: return "장애물";
-            case HexTileType.Altar: return "제단";
-            case HexTileType.Sight: return "시야";
+
             case HexTileType.RandomPortal: return "무작위 포탈";
-            case HexTileType.Resource: return "자원";
+            case HexTileType.TreasureBox: return "보물상자";
             case HexTileType.Merchant: return "상인";
             case HexTileType.NPC: return "NPC";
             case HexTileType.Exit: return "출구";
