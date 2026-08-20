@@ -29,6 +29,7 @@ public class DungeonTileManager : MonoBehaviour
     [Header("Grid Settings")]
     public int radius = 3;
     public int treasureBoxCount = 3;
+    public int exitCount = 1;
 
     private Dictionary<Vector3Int, HexTileData> tileMapData = new Dictionary<Vector3Int, HexTileData>();
 
@@ -54,7 +55,7 @@ public class DungeonTileManager : MonoBehaviour
                 
                 tileMapData.Add(cellPos, tileData);
 
-                if (randomData.type != HexTileType.Start && randomData.type != HexTileType.Exit)
+                if (randomData.type != HexTileType.Start)
                 {
                     bossCandidates.Add(cellPos);
                 }
@@ -91,6 +92,21 @@ public class DungeonTileManager : MonoBehaviour
             {
                 emptyCandidates.Add(kvp.Key);
             }
+        }
+
+        // 출구(Exit) 배치 - 1개(exitCount)만 생성
+        for (int i = 0; i < exitCount && emptyCandidates.Count > 0; i++)
+        {
+            int randomIndex = Random.Range(0, emptyCandidates.Count);
+            Vector3Int pos = emptyCandidates[randomIndex];
+            emptyCandidates.RemoveAt(randomIndex);
+
+            HexTileEventData exitData = new HexTileEventData();
+            exitData.type = HexTileType.Exit;
+            exitData.eventTitle = "탈출구";
+            exitData.eventDescription = "무사히 상점으로 귀환할 수 있습니다.";
+
+            tileMapData[pos] = new HexTileData(pos, exitData);
         }
 
         for (int i = 0; i < treasureBoxCount && emptyCandidates.Count > 0; i++)
@@ -142,13 +158,7 @@ public class DungeonTileManager : MonoBehaviour
         }
         
         float rand = Random.value;
-        if (rand < 0.05f) 
-        {
-            data.type = HexTileType.Exit;
-            data.eventTitle = "탈출구";
-            data.eventDescription = "무사히 상점으로 귀환할 수 있습니다.";
-        }
-        else if (rand < 0.30f) // 일반 몬스터 25% (기존 15%)
+        if (rand < 0.25f) // 일반 몬스터 25%
         {
             data.type = HexTileType.NormalMonster;
             data.requiredElements = new System.Collections.Generic.List<SpellElement>() { (SpellElement)Random.Range(1, 5) };
@@ -156,33 +166,33 @@ public class DungeonTileManager : MonoBehaviour
             data.eventDescription = "던전 생물이 공격해옵니다.";
             data.rewardAmount = 1;
         }
-        else if (rand < 0.40f) // 함정 10% (기존 5%)
+        else if (rand < 0.35f) // 함정 10%
         {
             data.type = HexTileType.Trap;
             data.requiredSpellType = SpellType.Defense;
             data.eventTitle = "기습 함정";
             data.eventDescription = "함정이 발동했습니다! 방어 마법이 필요합니다.";
         }
-        else if (rand < 0.45f) // 장애물 5%
+        else if (rand < 0.40f) // 장애물 5%
         {
             data.type = HexTileType.Obstacle;
             data.requiredSpellType = SpellType.Utility;
             data.eventTitle = "환경 장애물";
             data.eventDescription = "가시 덤불이 앞을 가로막습니다. 유틸리티 마법이 필요합니다.";
         }
-        else if (rand < 0.47f) // 포탈 2%
+        else if (rand < 0.42f) // 포탈 2%
         {
             data.type = HexTileType.RandomPortal;
             data.eventTitle = "무작위 포탈";
             data.eventDescription = "어디로 갈지 모르는 포탈입니다.";
         }
-        else if (rand < 0.49f) // 상인 2%
+        else if (rand < 0.44f) // 상인 2%
         {
             data.type = HexTileType.Merchant;
             data.eventTitle = "방랑 상인";
             data.eventDescription = "소재를 물약으로 교환할 수 있습니다.";
         }
-        else if (rand < 0.51f) // NPC 2%
+        else if (rand < 0.46f) // NPC 2%
         {
             data.type = HexTileType.NPC;
             data.requiredSpellType = SpellType.Utility; // 회복

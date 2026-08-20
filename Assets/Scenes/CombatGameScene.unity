@@ -1872,22 +1872,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonMapGenerator
   dungeonTilemap: {fileID: 920165126}
-  fogTile: {fileID: 11400000, guid: 9381a46aec628cb48b7e2b0697336ac8, type: 2}
-  defaultFloorTile: {fileID: 11400000, guid: fa9e5076ef7e123489236b9458b4acf1, type: 2}
-  playerTile: {fileID: 11400000, guid: 34bbe97e702341a40971b6582e45d9e0, type: 2}
+  fogTile: {fileID: 11400000, guid: 2701dbb8a5be855408339816c3b41e9e, type: 2}
+  defaultFloorTile: {fileID: 11400000, guid: 0dbc61d451e3b264f94011381063e7a7, type: 2}
+  playerTile: {fileID: 11400000, guid: 21b15f653c43fc84b840a78c9a00d202, type: 2}
   pathTile: {fileID: 11400000, guid: 90062d88e8e709f4aa021de89cf34071, type: 2}
-  normalMonsterTile: {fileID: 11400000, guid: 30885c80e2319444d9a148e55b01f578, type: 2}
-  bossTile: {fileID: 11400000, guid: 1309e9b2357ca5f4f8bcdbb78e306d69, type: 2}
-  trapTile: {fileID: 11400000, guid: eb5751019a6c4a54fb18a0b1f4c6a444, type: 2}
-  obstacleTile: {fileID: 11400000, guid: d71cbfa065123e94188dd8e2caf756fd, type: 2}
-  altarTile: {fileID: 11400000, guid: c42cfe2d3edf5ec4bafaf65b337cc862, type: 2}
-  sightTile: {fileID: 11400000, guid: a62af87270bffe1428a4fb19629dad24, type: 2}
-  randomPortalTile: {fileID: 11400000, guid: faa22a8c553b259448fea92e65459341, type: 2}
-  resourceTile: {fileID: 11400000, guid: 7592c63e4c2b20b40849ea60a7256425, type: 2}
-  merchantTile: {fileID: 11400000, guid: 51ab811358fd50446b7af898e135d7bd, type: 2}
-  npcTile: {fileID: 11400000, guid: 9e8f92b3d760ce0418df6f992c95698f, type: 2}
-  exitTile: {fileID: 11400000, guid: aa45af7c6cf11e8438db923c11325cef, type: 2}
+  normalMonsterTile: {fileID: 11400000, guid: 0e64fee5f48eac74686223fb170a2844, type: 2}
+  bossTile: {fileID: 11400000, guid: 1e46c01d5563e444eb97852899f117e9, type: 2}
+  trapTile: {fileID: 11400000, guid: d43a21a6fb7f6a34790a0007624bfcfc, type: 2}
+  obstacleTile: {fileID: 11400000, guid: 8e2dc492281c9874ab8fea479f9903ee, type: 2}
+  randomPortalTile: {fileID: 11400000, guid: a68d9cd1343ef594f8426896ff53df99, type: 2}
+  treasureBoxTile: {fileID: 11400000, guid: 047dade714648e7468dab2c135c73d89, type: 2}
+  merchantTile: {fileID: 11400000, guid: 25f9f8adb18ed114baf2b5093fea48eb, type: 2}
+  npcTile: {fileID: 11400000, guid: 1ad053e6006a5ac4c8e849f7315242e0, type: 2}
+  exitTile: {fileID: 11400000, guid: 27551f0c32ebe2540b7d9eec2758d242, type: 2}
   radius: 3
+  treasureBoxCount: 3
 --- !u!114 &1512672478
 MonoBehaviour:
   m_ObjectHideFlags: 0
