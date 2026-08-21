@@ -675,54 +675,6 @@ public class DrawingManager : MonoBehaviour
         }
     }
 
-    protected virtual void OnGUI()
-    {
-        if (drawnShapes == null || drawnShapes.Count == 0) return;
-
-        GUIStyle style = new GUIStyle(GUI.skin.label);
-        style.fontSize = 20;
-        style.alignment = TextAnchor.MiddleLeft;
-        style.richText = true; // 리치 텍스트 활성화
-
-        float startX = 20f;
-        float startY = Screen.height * 0.4f;
-
-        // 가독성을 위해 배경 박스 하나 깔아주기
-        GUI.Box(new Rect(startX - 10, startY - 10, 300, 40 + (drawnShapes.Count * 30)), "");
-
-        GUI.Label(new Rect(startX, startY, 200, 30), "<color=white>--- Drawn Shapes ---</color>", style);
-        
-        int displayIndex = 0;
-        foreach (var shape in drawnShapes)
-        {
-            string displayName = shape.Name;
-            string scoreText = $" : {shape.Accuracy:F2}";
-            string colorTag = "<color=red>";
-
-            // 이름이 Unknown이거나 정확도가 0.5 미만이면 실패로 간주
-            bool isFailed = shape.Name == "Unknown" || shape.Name == "None" || shape.Accuracy < 0.5f;
-
-            if (isFailed)
-            {
-                displayName = "판정 실패";
-                scoreText = ""; // 실패 시 점수는 숨기거나 표시 안함 (어떤 도형으로 판정 실패했는지 숨김)
-                colorTag = "<color=gray>";
-            }
-            else if (shape.Accuracy >= 0.85f)
-            {
-                colorTag = "<color=yellow>"; // 대성공
-            }
-            else if (shape.Accuracy >= 0.5f)
-            {
-                colorTag = "<color=green>"; // 성공
-            }
-
-            GUI.Label(new Rect(startX, startY + 30 + (displayIndex * 30), 300, 30), 
-                $"{colorTag}[{displayIndex + 1}] {displayName}{scoreText}</color>", style);
-            
-            displayIndex++;
-        }
-    }
 
     protected virtual System.Collections.IEnumerator WaxSealSequence(Item_Scroll currentScroll)
     {
