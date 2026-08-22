@@ -131,17 +131,7 @@ public class LoadoutUIController : PagedUIController<InventorySlot>
                 }
                 else if (DungeonManager.Instance != null)
                 {
-                    bool used = DungeonManager.Instance.CastFieldSpell(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement);
-                    if (used)
-                    {
-                        scroll.currentDurability -= 1;
-                        if (scroll.currentDurability <= 0)
-                        {
-                            inv.RemoveItem(scroll, 1);
-                            Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
-                        }
-                        inv.NotifyLoadoutChanged();
-                    }
+                    DungeonManager.Instance.StartSpellTargeting(scroll);
                 }
             }
         }

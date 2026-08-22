@@ -272,8 +272,12 @@ MonoBehaviour:
   _prevPageButton: {fileID: 115049659}
   _nextPageButton: {fileID: 115049658}
   _pageText: {fileID: 115049657}
-  _slotBackgrounds: []
-  _emptySlotIcon: {fileID: 0}
+  _slotBackgrounds:
+  - {fileID: -4120399330518263098, guid: 9815abba7b8d85b469408a22ec7bc491, type: 3}
+  - {fileID: 1443532989, guid: 9815abba7b8d85b469408a22ec7bc491, type: 3}
+  - {fileID: -1470490341, guid: 9815abba7b8d85b469408a22ec7bc491, type: 3}
+  - {fileID: 237995492, guid: 9815abba7b8d85b469408a22ec7bc491, type: 3}
+  _emptySlotIcon: {fileID: 21300000, guid: 9d00330b185ce8b4dad76ddc2aa4bcfc, type: 3}
   _infoPanel: {fileID: 0}
   _inventoryPanel: {fileID: 0}
   recipeListGroup: {fileID: 115049656}

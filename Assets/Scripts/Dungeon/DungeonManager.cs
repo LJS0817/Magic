@@ -178,9 +178,29 @@ public class DungeonManager : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (IsTargetingSpell)
+            {
+                CancelSpellTargeting();
+            }
+        }
+
         // 호버 처리
         if (!isDraggingMap && !IsEventActive)
         {
+            if (IsTargetingSpell)
+            {
+                if ((mapRenderRect == null || isPointerInRenderRect) && GetTargetCell(Input.mousePosition, out Vector3Int hoverCellPos) && ValidTargetCells.Contains(hoverCellPos))
+                {
+                    if (tileManager != null) tileManager.UpdateFocusObject(hoverCellPos);
+                }
+                else
+                {
+                    if (tileManager != null) tileManager.UpdateFocusObject(null);
+                }
+            }
+
             if (peekedTilePos.HasValue)
             {
                 // Peek 중일 때는 마우스 위치와 무관하게 Peek 중인 타일의 정보를 고정 표시
@@ -278,15 +298,130 @@ public class DungeonManager : MonoBehaviour
         return false;
     }
 
-    [HideInInspector] public bool isTeleportTargeting = false;
+    [Header("Spell Targeting")]
+    public bool isTeleportTargeting = false;
+    public bool IsTargetingSpell { get; private set; }
+    public Item_Scroll PendingScroll { get; private set; }
+    public string PendingSpellName { get; private set; }
+    public SpellElement PendingSpellElement { get; private set; }
+    public int PendingSpellRange { get; private set; } = 3;
+    public HashSet<Vector3Int> ValidTargetCells { get; private set; } = new HashSet<Vector3Int>();
+
+    public void StartSpellTargeting(Item_Scroll scroll, int range = 3)
+    {
+        if (scroll == null || scroll.ScrollData == null) return;
+        StartSpellTargeting(scroll.ScrollData.spellName, scroll.ScrollData.scrollElement, range, scroll);
+    }
+
+    public void StartSpellTargeting(string spellName, SpellElement element, int range = 3, Item_Scroll scroll = null)
+    {
+        if (peekedTilePos.HasValue)
+        {
+            RevertPeek();
+        }
+
+        IsTargetingSpell = true;
+        PendingScroll = scroll;
+        PendingSpellName = spellName;
+        PendingSpellElement = element;
+        PendingSpellRange = range;
+
+        CalculateValidTargetCells(range);
+        if (tileManager != null)
+        {
+            tileManager.ShowRange(ValidTargetCells);
+        }
+        Debug.Log($"<color=cyan>[마법 시전 대기] '{spellName}' 타깃 선택 모드! (사거리: {range}) 사용할 타일을 클릭하세요. (우클릭/ESC: 취소)</color>");
+    }
+
+    public void CancelSpellTargeting()
+    {
+        if (!IsTargetingSpell && !isTeleportTargeting) return;
+        IsTargetingSpell = false;
+        isTeleportTargeting = false;
+        PendingScroll = null;
+        PendingSpellName = null;
+        PendingSpellElement = SpellElement.None;
+        ValidTargetCells.Clear();
+        if (tileManager != null)
+        {
+            tileManager.ClearHighlights();
+        }
+        Debug.Log("<color=yellow>[마법 시전 취소] 타깃 선택이 취소되었습니다.</color>");
+    }
+
+    private void CalculateValidTargetCells(int range)
+    {
+        ValidTargetCells.Clear();
+        foreach (var kvp in tileMap)
+        {
+            int dist = HexPathfinding.GetHeuristic(currentPos, kvp.Key);
+            if (dist <= range)
+            {
+                ValidTargetCells.Add(kvp.Key);
+            }
+        }
+    }
 
     public bool CastFieldSpell(string spellName, SpellElement element)
     {
+        StartSpellTargeting(spellName, element, 3);
+        return true;
+    }
+
+    private void ExecuteSpellOnTile(Vector3Int targetCellPos)
+    {
+        string spellName = PendingSpellName;
+        SpellElement element = PendingSpellElement;
+        Item_Scroll scroll = PendingScroll;
+
+        bool success = CastFieldSpellOnTile(spellName, element, targetCellPos);
+        if (success)
+        {
+            if (scroll != null)
+            {
+                scroll.currentDurability -= 1;
+                if (scroll.currentDurability <= 0 && InventoryManager.Instance != null)
+                {
+                    InventoryManager.Instance.RemoveItem(scroll, 1);
+                    Debug.Log($"<color=cyan>[인벤토리] 스크롤 내구도를 모두 소진하여 스크롤이 파괴되었습니다.</color>");
+                }
+                if (InventoryManager.Instance != null)
+                {
+                    InventoryManager.Instance.NotifyLoadoutChanged();
+                }
+            }
+        }
+
+        CancelSpellTargeting();
+    }
+
+    public bool CastFieldSpellOnTile(string spellName, SpellElement element, Vector3Int targetCellPos)
+    {
+        if (!tileMap.TryGetValue(targetCellPos, out HexTileData targetTile))
+        {
+            Debug.LogWarning("[마법 시전 실패] 존재하지 않는 타일입니다.");
+            return false;
+        }
+
         if (spellName.Contains("Teleport") || spellName.Contains("Thunder Blink") || spellName.Contains("Blink"))
         {
-            isTeleportTargeting = true;
-            Debug.Log("<color=cyan>[마법 시전] Teleport 발동! 이동할 탐험된 타일을 클릭하세요.</color>");
-            return true;
+            if (targetTile.IsDiscovered)
+            {
+                if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+                ClearPathTiles();
+                RestoreTile(currentPos);
+                currentPos = targetCellPos;
+                UpdateFogOfWar();
+                SetPlayerTile(currentPos);
+                Debug.Log($"<color=cyan>[순간이동] {targetCellPos} 타일로 순간이동했습니다!</color>");
+                return true;
+            }
+            else
+            {
+                Debug.LogWarning("[순간이동 실패] 이미 탐험한 타일로만 순간이동할 수 있습니다.");
+                return false;
+            }
         }
         else if (spellName.Contains("Haste") || spellName.Contains("Lightning Speed"))
         {
@@ -297,20 +432,34 @@ public class DungeonManager : MonoBehaviour
         }
         else if (spellName.Contains("Mana Trap") || spellName.Contains("Trap"))
         {
-            PlayerDataManager.Instance.currentMana += 50f;
-            if(PlayerDataManager.Instance.currentMana > PlayerDataManager.Instance.GetMaxMana()) PlayerDataManager.Instance.currentMana = PlayerDataManager.Instance.GetMaxMana();
-            PlayerDataManager.Instance.NotifyManaChanged();
-            Debug.Log($"<color=cyan>[마법 시전] Mana Trap 발동! 마나 50 회복.</color>");
+            if (PlayerDataManager.Instance != null)
+            {
+                PlayerDataManager.Instance.currentMana += 50f;
+                if (PlayerDataManager.Instance.currentMana > PlayerDataManager.Instance.GetMaxMana())
+                    PlayerDataManager.Instance.currentMana = PlayerDataManager.Instance.GetMaxMana();
+                PlayerDataManager.Instance.NotifyManaChanged();
+            }
+            Debug.Log($"<color=cyan>[마법 시전] Mana Trap 발동! {targetCellPos} 타일에 시전되어 마나 50 회복.</color>");
             return true;
         }
         else if (spellName.Contains("Heal") || spellName.Contains("Purify"))
         {
-            Debug.Log($"<color=cyan>[마법 시전] {spellName} 발동! (임시 처리: 상태이상 회복 등급 적용)</color>");
+            Debug.Log($"<color=cyan>[마법 시전] {spellName} 발동! {targetCellPos} 타일에 적용되었습니다.</color>");
             return true;
         }
-        
-        Debug.LogWarning($"<color=yellow>[마법 시전] {spellName}은(는) 비전투 상황(이벤트 없음)에서 사용할 수 있는 필드 효과가 없습니다.</color>");
-        return false;
+
+        // 일반 필드 마법: 안개 해제 및 타일 상태 갱신
+        if (!targetTile.IsDiscovered)
+        {
+            targetTile.Discover();
+            if (tileManager != null)
+            {
+                tileManager.dungeonTilemap.SetTile(targetCellPos, tileManager.defaultFloorTile);
+            }
+            UpdateFogOfWar();
+        }
+        Debug.Log($"<color=cyan>[마법 시전] {spellName}이(가) {targetCellPos} 타일에 시전되었습니다!</color>");
+        return true;
     }
 
     private void ProcessLeftClick(Vector2 screenPos)
@@ -322,6 +471,19 @@ public class DungeonManager : MonoBehaviour
 
         if (GetTargetCell(screenPos, out Vector3Int cellPos))
         {
+            if (IsTargetingSpell)
+            {
+                if (ValidTargetCells.Contains(cellPos))
+                {
+                    ExecuteSpellOnTile(cellPos);
+                }
+                else
+                {
+                    Debug.LogWarning("[마법 시전 실패] 유효한 사거리 범위 내의 타일을 선택해야 합니다.");
+                }
+                return;
+            }
+
             if (tileMap.TryGetValue(cellPos, out HexTileData tile))
             {
                 if (isTeleportTargeting)
@@ -331,7 +493,7 @@ public class DungeonManager : MonoBehaviour
                         isTeleportTargeting = false;
                         if (moveCoroutine != null) StopCoroutine(moveCoroutine);
                         ClearPathTiles();
-                        
+
                         RestoreTile(currentPos);
                         currentPos = cellPos;
                         UpdateFogOfWar();
@@ -364,6 +526,12 @@ public class DungeonManager : MonoBehaviour
         // 트랙패드나 민감한 마우스에서 우클릭을 뗄 때 미세한 바운스로 인해 다시 클릭이 인식되는 현상 방지
         if (Time.unscaledTime - lastRevertTime < 0.15f) return;
 
+        if (IsTargetingSpell || isTeleportTargeting)
+        {
+            CancelSpellTargeting();
+            return;
+        }
+
         if (GetTargetCell(screenPos, out Vector3Int cellPos))
         {
             if (peekedTilePos.HasValue)
@@ -375,11 +543,17 @@ public class DungeonManager : MonoBehaviour
             {
                 PeekTile(cellPos);
             }
-        } 
+        }
     }
+
+    public float DungeonStartTime { get; private set; }
+    public event System.Action<float, List<ItemInstance>> OnDungeonEscaped;
+    public float GetExplorationTime() => Mathf.Max(0f, Time.time - DungeonStartTime);
+    public List<ItemInstance> GetDungeonLootList() => new List<ItemInstance>(dungeonLoot);
 
     public void EnterDungeon()
     {
+        DungeonStartTime = Time.time;
         currentAP = initialAP;
         OnAPChanged?.Invoke(currentAP);
         
@@ -407,10 +581,10 @@ public class DungeonManager : MonoBehaviour
     
     public void AddLoot(ItemInstance loot)
     {
-        if (InventoryManager.Instance.AddDungeonLootToLoadout(loot))
+        if (InventoryManager.Instance != null && InventoryManager.Instance.AddDungeonLootToLoadout(loot))
         {
             dungeonLoot.Add(loot);
-            Debug.Log($"<color=cyan>[던전] 아이템 획득: {loot.ItemName}</color>");
+            Debug.Log($"<color=cyan>[던전] 아이템 획득: {loot.ItemName} (현재 로드아웃에 추가됨)</color>");
         }
     }
 
@@ -599,8 +773,19 @@ public class DungeonManager : MonoBehaviour
             if (tile.EventData.rewardAmount > 0)
             {
                 int totalReward = tile.EventData.rewardAmount * rewardMultiplier;
-                Debug.Log($"<color=cyan>[보상] 던전 소재 {totalReward}개를 획득했습니다! (임시 가방에 추가됨)</color>");
-                // 실제 연동 시: AddLoot(new ItemInstance(someMaterialData, totalReward));
+                Debug.Log($"<color=cyan>[보상] 던전 소재 {totalReward}개를 획득했습니다! (현재 로드아웃에 추가됨)</color>");
+                
+                var db = InventoryManager.Instance != null ? InventoryManager.Instance.itemDatabase : null;
+                if (db != null && db.materials != null && db.materials.Count > 0)
+                {
+                    var matSO = db.materials[Random.Range(0, db.materials.Count)];
+                    if (matSO != null)
+                    {
+                        Item_Material mat = new Item_Material(matSO);
+                        mat.count = totalReward;
+                        AddLoot(mat);
+                    }
+                }
             }
 
             if (tile.Type == HexTileType.Exit)
@@ -696,22 +881,29 @@ public class DungeonManager : MonoBehaviour
 
     private void EscapeDungeon()
     {
-        Debug.Log("<color=yellow>[던전] 무사히 탈출했습니다! 전리품을 정산합니다.</color>");
-        
-        foreach (var item in dungeonLoot)
+        float elapsedTime = GetExplorationTime();
+        List<ItemInstance> lootList = GetDungeonLootList();
+
+        Debug.Log($"<color=yellow>[던전] 무사히 탈출했습니다! (소요시간: {(int)(elapsedTime / 60):D2}:{(int)(elapsedTime % 60):D2}) 전리품을 정산합니다.</color>");
+
+        if (InventoryManager.Instance != null)
         {
-            if (!InventoryManager.Instance.items.Contains(item))
+            foreach (var item in dungeonLoot)
             {
-                InventoryManager.Instance.AddItem(item);
+                if (!InventoryManager.Instance.items.Contains(item))
+                {
+                    InventoryManager.Instance.AddItem(item);
+                }
             }
+            InventoryManager.Instance.NotifyInventoryChanged();
         }
-        
-        InventoryManager.Instance.NotifyInventoryChanged();
+
+        OnDungeonEscaped?.Invoke(elapsedTime, lootList);
     }
 
     private void DieInDungeon()
     {
-        Debug.Log("<color=red>[던전] AP가 모두 소진되어 쓰러졌습니다... 전리품과 임시 가방의 일부를 잃어버립니다.</color>");
+        Debug.Log("<color=red>[던전] AP가 모두 소진되어 쓰러졌습니다... 현재 로드아웃의 일부를 잃어버립니다.</color>");
         
         foreach (var item in InventoryManager.Instance.combatLoadout)
         {

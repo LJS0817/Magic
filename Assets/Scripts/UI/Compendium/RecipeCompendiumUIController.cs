@@ -127,7 +127,7 @@ public class RecipeCompendiumUIController : PagedUIController<RecipeEntryUI>
         if (state == RecipeUnlockState.Unlocked)
         {
             if (detailNameText != null) detailNameText.text = recipe.SpellName;
-            if (detailSampleImage != null) detailSampleImage.sprite = recipe.icon; // Icon으로 변경
+            if (detailSampleImage != null) detailSampleImage.sprite = recipe.drawingSampleImage != null ? recipe.drawingSampleImage : recipe.icon;
             if (detailTypeText != null) detailTypeText.text = $"타입: {recipe.Type}";
             if (detailManaText != null) detailManaText.text = $"마나 소모: {recipe.manaCost}";
             if (detailDescText != null) detailDescText.text = recipe.Description;

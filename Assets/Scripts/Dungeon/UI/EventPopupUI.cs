@@ -11,6 +11,13 @@ public class EventPopupUI : MonoBehaviour
     
     [SerializeField] private Button btnOptionC; // 맨몸 돌파
 
+    [Header("Exit Result UI")]
+    [SerializeField] private Transform lootContainer;
+    [SerializeField] private GameObject lootItemSlotPrefab;
+    [SerializeField] private Sprite emptySlotIcon;
+
+    private System.Collections.Generic.List<GameObject> spawnedLootSlots = new System.Collections.Generic.List<GameObject>();
+
     private HexTileData currentTile;
     private int currentPhaseIndex = 0;
 
@@ -81,6 +88,38 @@ public class EventPopupUI : MonoBehaviour
 
     private void UpdatePopupUI()
     {
+        ClearLootSlots();
+
+        if (currentTile.Type == HexTileType.Exit)
+        {
+            if (titleText != null) titleText.text = "<color=yellow><b>던전 출구 도달!</b></color>";
+
+            float elapsedTime = DungeonManager.Instance != null ? DungeonManager.Instance.GetExplorationTime() : 0f;
+            int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+            int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+            string timeStr = $"{minutes:D2}분 {seconds:D2}초";
+
+            if (descText != null)
+            {
+                descText.text = $"<b><color=#FFD700>무사히 탐험을 마쳤습니다!</color></b>\n" +
+                                $"<size=18><b>탐험 시간:</b> <color=#00FFFF>{timeStr}</color></size>\n\n" +
+                                $"<b><color=#A020F0>이번 모험에서 획득한 아이템:</color></b>";
+            }
+
+            if (lootContainer != null)
+            {
+                lootContainer.gameObject.SetActive(true);
+                PopulateLootSlots();
+            }
+
+            var txtExit = btnOptionC != null ? btnOptionC.GetComponentInChildren<TextMeshProUGUI>() : null;
+            if (btnOptionC != null) btnOptionC.gameObject.SetActive(true);
+            if (txtExit != null) txtExit.text = "탈출 정산 및 복귀";
+            return;
+        }
+
+        if (lootContainer != null) lootContainer.gameObject.SetActive(false);
+
         if (titleText != null) titleText.text = $"이벤트 발생! ({currentTile.EventData.eventTitle})";
         
         string reqText = "";
@@ -107,12 +146,6 @@ public class EventPopupUI : MonoBehaviour
         {
             if (txtC != null) txtC.text = "지나가기 / 거래는 버튼 클릭(미구현)"; 
         }
-
-        else if (currentTile.Type == HexTileType.Exit)
-        {
-            // Exit는 버튼이 C 하나 남았으므로 "탈출하기"로 표시할 수 있습니다.
-            if (txtC != null) txtC.text = "탈출하기";
-        }
         else if (currentTile.Type == HexTileType.TreasureBox)
         {
             if (txtC != null) txtC.text = "강제로 열기 (돌파)";
@@ -121,6 +154,37 @@ public class EventPopupUI : MonoBehaviour
         {
             if (txtC != null) txtC.text = "맨몸 돌파 (피해 감수)";
         }
+    }
+
+    private void PopulateLootSlots()
+    {
+        if (lootContainer == null || DungeonManager.Instance == null) return;
+        var lootList = DungeonManager.Instance.GetDungeonLootList();
+        if (lootList == null) return;
+
+        foreach (var item in lootList)
+        {
+            if (lootItemSlotPrefab != null)
+            {
+                GameObject slotObj = Instantiate(lootItemSlotPrefab, lootContainer);
+                InventorySlot slot = slotObj.GetComponent<InventorySlot>();
+                if (slot != null)
+                {
+                    slot.Initialize(null, null, null, null, null);
+                    slot.SetInfo(item, null, emptySlotIcon, false);
+                }
+                spawnedLootSlots.Add(slotObj);
+            }
+        }
+    }
+
+    private void ClearLootSlots()
+    {
+        foreach (var slot in spawnedLootSlots)
+        {
+            if (slot != null) Destroy(slot);
+        }
+        spawnedLootSlots.Clear();
     }
 
     public bool TrySolveEvent(string spellName, SpellElement element)
@@ -184,6 +248,15 @@ public class EventPopupUI : MonoBehaviour
 
     private void OnOptionCClicked()
     {
+        if (currentTile.Type == HexTileType.Exit)
+        {
+            DungeonManager.Instance.ResolveEvent(currentTile, true);
+            HidePopupUI();
+            Time.timeScale = 1f;
+            UnityEngine.SceneManagement.SceneManager.LoadScene("StoreGameScene");
+            return;
+        }
+
         if (currentTile.Type == HexTileType.Merchant)
         {
             DungeonManager.Instance.ResolveEvent(currentTile, true);

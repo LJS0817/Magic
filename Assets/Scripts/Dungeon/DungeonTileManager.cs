@@ -26,6 +26,11 @@ public class DungeonTileManager : MonoBehaviour
     public AnimatedTile npcTile;
     public AnimatedTile exitTile;
     
+    [Header("Highlight & Range")]
+    public Tilemap highlightTilemap;
+    public TileBase rangeTile; // Rule Tile, AnimatedTile, 또는 일반 Tile 자산 수용
+    public GameObject highlightObject;
+
     [Header("Grid Settings")]
     public int radius = 3;
     public int treasureBoxCount = 3;
@@ -259,5 +264,43 @@ public class DungeonTileManager : MonoBehaviour
         dungeonTilemap.SetAnimationFrame(pos, 0);
 
         onComplete?.Invoke();
+    }
+
+    public void ShowRange(IEnumerable<Vector3Int> validCells)
+    {
+        ClearHighlights();
+        if (highlightTilemap == null || validCells == null) return;
+        TileBase t = rangeTile != null ? (TileBase)rangeTile : (TileBase)pathTile;
+        foreach (var cell in validCells)
+        {
+            highlightTilemap.SetTile(cell, t);
+        }
+    }
+
+    public void UpdateFocusObject(Vector3Int? cellPos)
+    {
+        if (highlightObject == null) return;
+        if (cellPos.HasValue)
+        {
+            highlightObject.SetActive(true);
+            Vector3 worldPos = dungeonTilemap != null ? dungeonTilemap.GetCellCenterWorld(cellPos.Value) : transform.position;
+            highlightObject.transform.position = worldPos;
+        }
+        else
+        {
+            highlightObject.SetActive(false);
+        }
+    }
+
+    public void ClearHighlights()
+    {
+        if (highlightTilemap != null)
+        {
+            highlightTilemap.ClearAllTiles();
+        }
+        if (highlightObject != null)
+        {
+            highlightObject.SetActive(false);
+        }
     }
 }

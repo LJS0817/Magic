@@ -39,7 +39,8 @@ public class ItemInfoPanel : MonoBehaviour
 
         GameObject lineObj = Instantiate(_drawingLinePrefab, _drawingContainer);
         drawingLine = lineObj.GetComponent<DrawingLine>();
-        drawingLine.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        drawingLine.transform.localScale = new Vector3(0.25f, 0.25f, 1f);
+        drawingLine.lineRenderer.widthCurve = AnimationCurve.Constant(0f, 1f, 0.05f);
         drawingLine.lineRenderer.sortingOrder = 11;
         Close();
     }
